@@ -16,6 +16,10 @@ class _SplashViewState extends State<SplashView> {
   int animationDuration = 500;
 
   Future<void> worker() async {
+    Future.delayed(Duration(milliseconds: 3000)).then((value) {
+      Navigator.pushNamed(context, "/home");
+    });
+
     while (isActive) {
       await Future.delayed(Duration(milliseconds: animationDuration));
       logoSize = logoSize == 1.0 ? 1.2 : 1.0;
@@ -81,16 +85,6 @@ class _SplashViewState extends State<SplashView> {
                       ),
                     ),
                   ],
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 350,
-                child: CupertinoButton(
-                  child: Text("다음"),
-                  color: Colors.red.shade400,
-                  padding: EdgeInsets.all(0),
-                  onPressed: () => Navigator.pushNamed(context, "/home"),
                 ),
               ),
               SizedBox(

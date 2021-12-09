@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -23,11 +25,16 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 115,
+      height: Platform.isIOS ? 115 : 95,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: Platform.isIOS
+            ? BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              )
+            : null,
         // ignore: prefer_const_literals_to_create_immutables
         boxShadow: [
           const BoxShadow(
@@ -40,7 +47,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 22),
+          const SizedBox(height: 23),
           Row(
             children: [
               horizontalMargin,
