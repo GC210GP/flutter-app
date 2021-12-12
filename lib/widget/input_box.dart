@@ -4,18 +4,22 @@ class InputBox extends StatefulWidget {
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
   final void Function(String)? onFieldSubmitted;
-  final String initValue;
+  final void Function()? onTap;
+  final String? initValue;
   final bool obscureText;
   final double height;
+  final TextEditingController? controller;
 
   const InputBox({
     Key? key,
     this.onChanged,
     this.onEditingComplete,
     this.onFieldSubmitted,
-    this.initValue = "",
+    this.onTap,
+    this.initValue,
     this.obscureText = false,
     this.height = 35,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -51,11 +55,13 @@ class _InputBoxState extends State<InputBox> {
             fontSize: 15,
             color: Colors.grey.shade800,
           ),
+          controller: widget.controller,
           onChanged: widget.onChanged,
           onEditingComplete: widget.onEditingComplete,
           onFieldSubmitted: widget.onFieldSubmitted,
           initialValue: widget.initValue,
           obscureText: widget.obscureText,
+          onTap: widget.onTap,
           decoration: InputDecoration(
             border: InputBorder.none,
           ),

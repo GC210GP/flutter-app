@@ -1,7 +1,10 @@
+import 'package:blood_donation/util/global_variables.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
+
+import '../message_view.dart';
 
 class SuggestionPageView extends StatefulWidget {
   const SuggestionPageView({Key? key}) : super(key: key);
@@ -10,8 +13,21 @@ class SuggestionPageView extends StatefulWidget {
   _SuggestionPageViewState createState() => _SuggestionPageViewState();
 }
 
+enum BLOOD_TYPE {
+  plusA,
+  plusB,
+  plusAB,
+  plusO,
+  minusA,
+  minusB,
+  minusAB,
+  minusO,
+}
+
 class _SuggestionPageViewState extends State<SuggestionPageView> {
   CarouselController controller = CarouselController();
+
+  double pageOpacity = 0;
 
   List<Map<String, dynamic>> suggestionList = [
     {
@@ -28,7 +44,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
     {
       "nickname": "강철수",
       "uid": "45401542354",
-      "bloodType": "PLUS_O", // 체계화 필요
+      "bloodType": "A(+)",
       "location": "경기도 성남시",
       "sns": "@ycyc1999",
       "corr": 0.84,
@@ -39,7 +55,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
     {
       "nickname": "박영희",
       "uid": "5479867423",
-      "bloodType": "PLUS_A", // 체계화 필요
+      "bloodType": "O(+)",
       "location": "서울특별시 성동구",
       "sns": "@awesome_hlifej",
       "corr": 0.54,
@@ -50,7 +66,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
     {
       "nickname": "이성민",
       "uid": "5479867423",
-      "bloodType": "PLUS_A", // 체계화 필요
+      "bloodType": "A(-)",
       "location": "경기도 광주시",
       "sns": "@doky.sp",
       "corr": 0.32,
@@ -61,133 +77,125 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        upperBar(),
-        Expanded(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Builder(
-              builder: (context) {
-                List<Widget> caroselList = [];
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(Duration(milliseconds: 0)).then((value) {
+      pageOpacity = 1;
+      setState(() {});
+    });
+  }
 
-                for (Map<String, dynamic> i in suggestionList) {
-                  i["nickname"];
-                  i["bloodType"];
-                  i["location"];
-                  i["corr"];
-                  i["img"];
-                  i["rels"];
-                  caroselList.add(
-                    caroselItemLayout(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            flex: 20,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 185,
-                                  height: 185,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(175),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color.fromRGBO(0, 0, 0, 0.2),
-                                        offset: Offset(0, 4),
-                                        spreadRadius: 0.0,
-                                        blurRadius: 7.0,
-                                      ),
-                                    ],
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: pageOpacity,
+      duration: Duration(milliseconds: 100),
+      child: Column(
+        children: [
+          upperBar(),
+          Expanded(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Builder(
+                builder: (context) {
+                  List<Widget> caroselList = [];
+
+                  for (Map<String, dynamic> i in suggestionList) {
+                    i["nickname"];
+                    i["bloodType"];
+                    i["location"];
+                    i["corr"];
+                    i["img"];
+                    i["rels"];
+                    caroselList.add(
+                      caroselItemLayout(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              flex: 20,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 140,
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(140),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color.fromRGBO(0, 0, 0, 0.2),
+                                          offset: Offset(0, 4),
+                                          spreadRadius: 0.0,
+                                          blurRadius: 7.0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(130),
+                                          child: Image.network(
+                                            i["img"],
+                                            width: 130,
+                                            height: 130,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  child: Row(
+                                  SizedBox(height: 20),
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(175),
-                                        child: Image.network(
-                                          i["img"],
-                                          width: 175,
-                                          height: 175,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      i["nickname"],
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontFamily: "NanumSR",
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 23,
-                                        color: Colors.red.shade300,
-                                      ),
-                                    ),
-                                    Text(
-                                      " 님은",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontFamily: "NanumSR",
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 23,
-                                        color: Colors.grey.shade800,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  "당신의 도움이 필요해요",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: "NanumSR",
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 20,
-                                    color: Colors.grey.shade800,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    shadowBox(
-                                      height: 35,
-                                      color: Colors.red.shade300,
-                                      width: i["bloodType"].length * 13.0,
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        i["bloodType"],
+                                      Text(
+                                        i["nickname"],
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: "NanumSR",
                                           fontWeight: FontWeight.w900,
-                                          fontSize: 15,
-                                          color: Colors.grey.shade100,
+                                          fontSize: 23,
+                                          color: Colors.red.shade300,
                                         ),
                                       ),
+                                      Text(
+                                        " 님은",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontFamily: "NanumSR",
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 23,
+                                          color: Colors.grey.shade800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    "당신의 도움이 필요해요",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 20,
+                                      color: Colors.grey.shade800,
                                     ),
-                                    SizedBox(width: 10),
-                                    CupertinoButton(
-                                      padding: EdgeInsets.all(0),
-                                      onPressed: () => url.launch(
-                                          "https://instagram.com/${i["sns"].substring(1, i["sns"].length)}"),
-                                      child: shadowBox(
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      shadowBox(
                                         height: 35,
-                                        color: Colors.purple.shade300,
-                                        width: i["sns"].length * 10.5,
+                                        color: Colors.red.shade300,
+                                        width: i["bloodType"].length * 13.0,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          i["sns"],
-                                          textAlign: TextAlign.center,
+                                          "   " + i["bloodType"] + "   ",
                                           style: TextStyle(
                                             fontFamily: "NanumSR",
                                             fontWeight: FontWeight.w900,
@@ -196,222 +204,271 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 10,
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Expanded(
-                                      child: shadowBox(
-                                        height: 75,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.thermostat_sharp,
-                                              color: Colors.red.shade300,
-                                              size: 30,
+                                      SizedBox(width: 5),
+                                      CupertinoButton(
+                                        padding: EdgeInsets.all(0),
+                                        onPressed: () => url.launch(
+                                            "https://instagram.com/${i["sns"].substring(1, i["sns"].length)}"),
+                                        child: shadowBox(
+                                          height: 35,
+                                          color: Colors.purple.shade300,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "   " + i["sns"] + "   ",
+                                            style: TextStyle(
+                                              fontFamily: "NanumSR",
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 15,
+                                              color: Colors.grey.shade100,
                                             ),
-                                            SizedBox(width: 7),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "나와의 온도",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: "NanumSR",
-                                                    fontWeight: FontWeight.w900,
-                                                    fontSize: 11,
-                                                    color: Colors.grey.shade500,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  (i["corr"] * 100).toString() +
-                                                      "℃",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: "NanumSR",
-                                                    fontWeight: FontWeight.w900,
-                                                    fontSize: 20,
-                                                    color: Colors.red.shade300,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Expanded(
-                                      child: shadowBox(
+                                      SizedBox(width: 5),
+                                      shadowBox(
+                                        height: 35,
+                                        color: Colors.pink.shade300,
                                         alignment: Alignment.center,
-                                        height: 75,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.person_2_fill,
-                                              color: Colors.red.shade300,
-                                              size: 30,
-                                            ),
-                                            SizedBox(width: 7),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "연결고리",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: "NanumSR",
-                                                    fontWeight: FontWeight.w900,
-                                                    fontSize: 11,
-                                                    color: Colors.grey.shade500,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  i["rels"][0] +
-                                                      ", " +
-                                                      i["rels"][1] +
-                                                      "..",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontFamily: "NanumSR",
-                                                    fontWeight: FontWeight.w900,
-                                                    fontSize: 13,
-                                                    color: Colors.red.shade300,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: SizedBox(
-                                      width: 2000,
-                                      child: CupertinoButton(
-                                        borderRadius: BorderRadius.circular(15),
                                         child: Text(
-                                          "도와주기",
+                                          "   " + i["location"] + "   ",
                                           style: TextStyle(
                                             fontFamily: "NanumSR",
                                             fontWeight: FontWeight.w900,
-                                            fontSize: 20,
+                                            fontSize: 15,
                                             color: Colors.grey.shade100,
                                           ),
                                         ),
-                                        color: Colors.red.shade300,
-                                        padding: EdgeInsets.all(0),
-                                        onPressed: () => Navigator.pushNamed(
-                                            context, "/home"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              flex: 10,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Expanded(
+                                        child: shadowBox(
+                                          height: 75,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.thermostat_sharp,
+                                                color: Colors.red.shade300,
+                                                size: 40,
+                                              ),
+                                              SizedBox(width: 7),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "나와의 온도",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily: "NanumSR",
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      fontSize: 12,
+                                                      color:
+                                                          Colors.grey.shade500,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    (i["corr"] * 100)
+                                                            .toString() +
+                                                        "℃",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily: "NanumSR",
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      fontSize: 22,
+                                                      color:
+                                                          Colors.red.shade300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      // SizedBox(
+                                      //   width: 15,
+                                      // ),
+                                      // Expanded(
+                                      //   child: shadowBox(
+                                      //     alignment: Alignment.center,
+                                      //     height: 75,
+                                      //     child: Row(
+                                      //       mainAxisAlignment:
+                                      //           MainAxisAlignment.center,
+                                      //       children: [
+                                      //         Icon(
+                                      //           CupertinoIcons.person_2_fill,
+                                      //           color: Colors.red.shade300,
+                                      //           size: 30,
+                                      //         ),
+                                      //         SizedBox(width: 7),
+                                      //         Column(
+                                      //           mainAxisAlignment:
+                                      //               MainAxisAlignment.center,
+                                      //           crossAxisAlignment:
+                                      //               CrossAxisAlignment.start,
+                                      //           children: [
+                                      //             Text(
+                                      //               "연결고리",
+                                      //               textAlign: TextAlign.center,
+                                      //               style: TextStyle(
+                                      //                 fontFamily: "NanumSR",
+                                      //                 fontWeight: FontWeight.w900,
+                                      //                 fontSize: 11,
+                                      //                 color: Colors.grey.shade500,
+                                      //               ),
+                                      //             ),
+                                      //             Text(
+                                      //               i["rels"][0] +
+                                      //                   ", " +
+                                      //                   i["rels"][1] +
+                                      //                   "..",
+                                      //               textAlign: TextAlign.center,
+                                      //               style: TextStyle(
+                                      //                 fontFamily: "NanumSR",
+                                      //                 fontWeight: FontWeight.w900,
+                                      //                 fontSize: 13,
+                                      //                 color: Colors.red.shade300,
+                                      //               ),
+                                      //             ),
+                                      //           ],
+                                      //         ),
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(15.0),
+                                      child: SizedBox(
+                                        width: 2000,
+                                        child: CupertinoButton(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: Text(
+                                            "도와주기",
+                                            style: TextStyle(
+                                              fontFamily: "NanumSR",
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 20,
+                                              color: Colors.grey.shade100,
+                                            ),
+                                          ),
+                                          color: Colors.red.shade300,
+                                          padding: EdgeInsets.all(0),
+                                          onPressed: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => MessageView(
+                                                fromId: GlobalVariables.userIdx,
+                                                toId: 2,
+                                                fromName: "nickname(2)",
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                if (suggestionList.length == 0) {
-                  caroselList.add(
-                    caroselItemLayout(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "로그인하시면\n도움이 필요한\n친구들을 찾아드립니다",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "NanumSR",
-                              fontWeight: FontWeight.w900,
-                              fontSize: 20,
-                              color: Colors.grey.shade900,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            height: 50,
-                            width: 150,
-                            child: CupertinoButton(
-                              borderRadius: BorderRadius.circular(15.0),
-                              child: Text(
-                                "로그인",
-                                style: TextStyle(
-                                  fontFamily: "NanumSR",
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 20,
-                                  color: Colors.grey.shade100,
-                                ),
+                                ],
                               ),
-                              color: Colors.red.shade300,
-                              padding: EdgeInsets.all(0),
-                              onPressed: () =>
-                                  Navigator.pushNamed(context, "/signin"),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                return CarouselSlider(
-                  carouselController: controller,
-                  options: CarouselOptions(
-                    enlargeCenterPage: true,
-                    viewportFraction: 1.0,
-                    aspectRatio: 1 / 2,
-                    enableInfiniteScroll: false,
-                    onPageChanged: (index, reason) {
-                      print("index: $index / reason: $reason");
-                    },
-                    onScrolled: (value) {
-                      print("value: $value");
-                    },
-                  ),
-                  items: caroselList,
-                );
-              },
+                  if (suggestionList.length == 0) {
+                    caroselList.add(
+                      caroselItemLayout(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "로그인하시면\n도움이 필요한\n친구들을 찾아드립니다",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "NanumSR",
+                                fontWeight: FontWeight.w900,
+                                fontSize: 20,
+                                color: Colors.grey.shade900,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              height: 50,
+                              width: 150,
+                              child: CupertinoButton(
+                                borderRadius: BorderRadius.circular(15.0),
+                                child: Text(
+                                  "로그인",
+                                  style: TextStyle(
+                                    fontFamily: "NanumSR",
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                    color: Colors.grey.shade100,
+                                  ),
+                                ),
+                                color: Colors.red.shade300,
+                                padding: EdgeInsets.all(0),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, "/signin"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return CarouselSlider(
+                    carouselController: controller,
+                    options: CarouselOptions(
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      aspectRatio: 1 / 2,
+                      enableInfiniteScroll: false,
+                      onPageChanged: (index, reason) {
+                        print("index: $index / reason: $reason");
+                      },
+                      onScrolled: (value) {
+                        print("value: $value");
+                      },
+                    ),
+                    items: caroselList,
+                  );
+                },
+              ),
             ),
           ),
-        ),
-        SizedBox(height: 20),
-      ],
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1006851579394-oam153m231c8019a28rpevbij0iphtdf.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1006851579394-oam153m231c8019a28rpevbij0iphtdf</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDtuRs9pCDW2ctl5uaHZ0G0YeJBnRwFods</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1006851579394</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>kr.co.kave.bloodDonation</string>
+	<key>PROJECT_ID</key>
+	<string>double-d-e0613</string>
+	<key>STORAGE_BUCKET</key>
+	<string>double-d-e0613.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1006851579394:ios:a144887fdc6893f103111b</string>
+</dict>
+</plist>
