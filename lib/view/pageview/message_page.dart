@@ -52,10 +52,22 @@ class _MessagePageViewState extends State<MessagePageView> {
               ),
               SizedBox(height: 20),
               Expanded(
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [...chatroomList],
-                ),
+                child: chatroomList.length != 0
+                    ? ListView(
+                        physics: const BouncingScrollPhysics(),
+                        children: [...chatroomList],
+                      )
+                    : Center(
+                        child: Text(
+                          "대화가 없습니다\n\n",
+                          style: TextStyle(
+                            fontFamily: "NanumSR",
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ),
               )
             ],
           ),
@@ -89,10 +101,11 @@ class _MessagePageViewState extends State<MessagePageView> {
 
         chatroomList.add(
           chatroomItem(
-            imgSrc:
-                "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/5c65d9c885649cf21365e270bc1a8bc7.jpg",
-            name: toId.toString(),
-            // lastMsg: "안녕하세요.",
+            imgSrc: toId == 2
+                ? "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                : "https://image.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg",
+            name: toId == 2 ? "홍길동" : "김영희",
+            lastMsg: toId == 2 ? "😊😊" : "안녕하세요!",
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -100,7 +113,7 @@ class _MessagePageViewState extends State<MessagePageView> {
                   chatroomId: i,
                   fromId: GlobalVariables.userIdx,
                   toId: toId,
-                  fromName: "nickname($toId)",
+                  fromName: toId == 2 ? "홍길동" : "김영희",
                 ),
               ),
             ),

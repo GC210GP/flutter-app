@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
-
 import '../message_view.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 class SuggestionPageView extends StatefulWidget {
   const SuggestionPageView({Key? key}) : super(key: key);
@@ -28,53 +31,6 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   CarouselController controller = CarouselController();
 
   double pageOpacity = 0;
-
-  List<Map<String, dynamic>> suggestionList = [
-    {
-      "nickname": "홍길동",
-      "uid": "121545352",
-      "bloodType": "A(+)", // 체계화 필요
-      "location": "서울특별시 은평구",
-      "sns": "@doky.sp",
-      "corr": 0.95,
-      "img":
-          "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/5c65d9c885649cf21365e270bc1a8bc7.jpg",
-      "rels": ["강철수", "박영희", "이성민"] // [2,3,4] uid 기준 전송
-    },
-    {
-      "nickname": "강철수",
-      "uid": "45401542354",
-      "bloodType": "A(+)",
-      "location": "경기도 성남시",
-      "sns": "@ycyc1999",
-      "corr": 0.84,
-      "img":
-          "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/7f1775b75a70aa502d3965c881cefc1a.jpg",
-      "rels": ["박영희", "이성민"]
-    },
-    {
-      "nickname": "박영희",
-      "uid": "5479867423",
-      "bloodType": "O(+)",
-      "location": "서울특별시 성동구",
-      "sns": "@awesome_hlifej",
-      "corr": 0.54,
-      "img":
-          "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/5c65d9c885649cf21365e270bc1a8bc7.jpg",
-      "rels": ["박영희", "이성민"]
-    },
-    {
-      "nickname": "이성민",
-      "uid": "5479867423",
-      "bloodType": "A(-)",
-      "location": "경기도 광주시",
-      "sns": "@doky.sp",
-      "corr": 0.32,
-      "img":
-          "http://image.chosun.com/sitedata/image/201907/24/2019072400001_0.jpg",
-      "rels": ["이성민", "강철수"]
-    },
-  ];
 
   @override
   void initState() {
@@ -101,13 +57,14 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                 builder: (context) {
                   List<Widget> caroselList = [];
 
-                  for (Map<String, dynamic> i in suggestionList) {
-                    i["nickname"];
-                    i["bloodType"];
-                    i["location"];
-                    i["corr"];
-                    i["img"];
-                    i["rels"];
+                  for (Map<String, dynamic> i
+                      in GlobalVariables.suggestionList) {
+                    // i["nickname"];
+                    // i["bloodType"];
+                    // i["location"];
+                    // i["corr"];
+                    // i["img"];
+                    // i["rels"];
                     caroselList.add(
                       caroselItemLayout(
                         child: Column(
@@ -364,33 +321,52 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.all(15.0),
-                                      child: SizedBox(
-                                        width: 2000,
-                                        child: CupertinoButton(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          child: Text(
-                                            "도와주기",
-                                            style: TextStyle(
-                                              fontFamily: "NanumSR",
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 20,
-                                              color: Colors.grey.shade100,
-                                            ),
-                                          ),
-                                          color: Colors.red.shade300,
-                                          padding: EdgeInsets.all(0),
-                                          onPressed: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => MessageView(
-                                                fromId: GlobalVariables.userIdx,
-                                                toId: 2,
-                                                fromName: "nickname(2)",
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Expanded(
+                                            child: CupertinoButton(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Text(
+                                                "도와주기",
+                                                style: TextStyle(
+                                                  fontFamily: "NanumSR",
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 20,
+                                                  color: Colors.grey.shade100,
+                                                ),
+                                              ),
+                                              color: Colors.red.shade300,
+                                              padding: EdgeInsets.all(0),
+                                              onPressed: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => MessageView(
+                                                    fromId:
+                                                        GlobalVariables.userIdx,
+                                                    toId: i["uid"],
+                                                    fromName: i["nickname"],
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                          SizedBox(width: 5),
+                                          SizedBox(
+                                            width: 75,
+                                            child: CupertinoButton(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Icon(
+                                                  CupertinoIcons.star_fill),
+                                              color: Colors.pinkAccent.shade400,
+                                              padding: EdgeInsets.all(0),
+                                              onPressed: () => {},
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -403,7 +379,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                     );
                   }
 
-                  if (suggestionList.length == 0) {
+                  if (GlobalVariables.suggestionList.length == 0) {
                     caroselList.add(
                       caroselItemLayout(
                         child: Column(
@@ -436,8 +412,8 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                 ),
                                 color: Colors.red.shade300,
                                 padding: EdgeInsets.all(0),
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, "/signin"),
+                                onPressed: () => getSuggestion(),
+                                // Navigator.pushNamed(context, "/signin"),
                               ),
                             ),
                           ],
@@ -564,4 +540,46 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
           SizedBox(height: 20),
         ],
       );
+
+  Future<void> getSuggestion() async {
+    Map<String, String> headers = {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.acceptHeader: 'application/json',
+    };
+    GlobalVariables.suggestionList.clear();
+
+    if (GlobalVariables.baseurl == -1) return;
+
+    http.Response response = await http.get(
+      Uri.parse(GlobalVariables.baseurl +
+          "/recommend/?userId=${GlobalVariables.userIdx}"),
+      headers: headers,
+    );
+
+    Map<String, dynamic> result = convert.jsonDecode(response.body);
+
+    if (response.statusCode < 400) {
+      result = convert.jsonDecode(response.body);
+
+      List<dynamic> recommandlist = result["data"];
+
+      for (dynamic a in recommandlist) {
+        GlobalVariables.suggestionList.add(
+          {
+            "nickname": a["nickname"],
+            "uid": a["id"],
+            "bloodType": a["bloodType"],
+            "location": a["location"],
+            "sns": "@doky.sp",
+            "corr": 0.65,
+            "img":
+                "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/5c65d9c885649cf21365e270bc1a8bc7.jpg",
+            // a["profileImageLocation"],
+          },
+        );
+      }
+
+      setState(() {});
+    }
+  }
 }

@@ -17,7 +17,7 @@ class _SplashViewState extends State<SplashView> {
 
   Future<void> worker() async {
     Future.delayed(Duration(milliseconds: 3000)).then((value) {
-      Navigator.pushNamed(context, "/home");
+      Navigator.pushReplacementNamed(context, "/home");
     });
 
     while (isActive) {

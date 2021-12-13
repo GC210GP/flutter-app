@@ -1,5 +1,6 @@
 import 'package:blood_donation/view/home_view.dart';
 import 'package:blood_donation/view/signin_view.dart';
+import 'package:blood_donation/view/signup.view.dart';
 import 'package:blood_donation/view/spash_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: SplashView(),
       routes: {
+        "/splash": (_) => SplashView(),
         "/home": (_) => HomeView(),
         "/signin": (_) => SigninView(),
+        "/signup": (_) => SignupView(),
       },
     );
   }

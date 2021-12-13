@@ -64,10 +64,6 @@ class _MessageViewState extends State<MessageView> {
             genChatroomId = str2;
           }
 
-          print("====================");
-          print(isChatroomCreated);
-          print(genChatroomId);
-
           if (!isChatroomCreated) {
             collection.doc(genChatroomId).set(
               {
