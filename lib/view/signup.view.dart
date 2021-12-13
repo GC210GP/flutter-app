@@ -523,7 +523,7 @@ class _SignupViewState extends State<SignupView> {
       Map<String, dynamic> result = convert.jsonDecode(response.body);
       id = result["data"]["id"];
       GlobalVariables.userIdx = id;
-      // TODO: Save this to fs
+
       Navigator.pushReplacementNamed(context, "/splash");
     } else {
       isSignFailed = true;

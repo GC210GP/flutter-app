@@ -34,7 +34,6 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(Duration(milliseconds: 0)).then((value) {
       pageOpacity = 1;

@@ -99,9 +99,6 @@ class _MessagePageViewState extends State<MessagePageView> {
           toId = int.parse(list[0]);
         }
 
-        // TODO: toID 값 가져와서 채팅룸 생성하기
-        // TODO: toID로 사용자 이름, 마지막 채팅 기록 가져오기
-
         chatroomList.add(
           chatroomItem(
             imgSrc:
