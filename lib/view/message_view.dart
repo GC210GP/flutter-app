@@ -13,12 +13,12 @@ class MessageView extends StatefulWidget {
   const MessageView({
     Key? key,
     this.chatroomId,
-    required this.fromName,
+    required this.toName,
     required this.fromId,
     required this.toId,
   }) : super(key: key);
 
-  final String fromName;
+  final String toName;
   final String? chatroomId;
 
   final int fromId;
@@ -52,8 +52,8 @@ class _MessageViewState extends State<MessageView> {
 
       fireControl.getDocList().then((value) {
         if (widget.chatroomId == null) {
-          String str1 = widget.fromId.toString() + "-" + widget.toId.toString();
-          String str2 = widget.toId.toString() + "-" + widget.fromId.toString();
+          String str1 = widget.fromId.toString() + "=" + widget.toId.toString();
+          String str2 = widget.toId.toString() + "=" + widget.fromId.toString();
           bool isChatroomCreated = false;
           genChatroomId = str1;
 
@@ -159,7 +159,7 @@ class _MessageViewState extends State<MessageView> {
                           onPressed: () => Navigator.pop(context),
                         ),
                         Text(
-                          widget.fromName,
+                          widget.toName,
                           style: TextStyle(
                             fontFamily: "NanumSR",
                             fontWeight: FontWeight.w900,

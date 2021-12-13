@@ -85,9 +85,11 @@ class _MessagePageViewState extends State<MessagePageView> {
     //     .then((value) {
     //   print(convert.utf8.decode(value.bodyBytes));
     // });
+    print(value);
+    print(GlobalVariables.userIdx);
 
     for (String i in value) {
-      List<String> list = i.split("-");
+      List<String> list = i.split("=");
       if (list.contains(GlobalVariables.userIdx.toString())) {
         int toId = -1;
 
@@ -98,14 +100,15 @@ class _MessagePageViewState extends State<MessagePageView> {
         }
 
         // TODO: toID 값 가져와서 채팅룸 생성하기
+        // TODO: toID로 사용자 이름, 마지막 채팅 기록 가져오기
 
         chatroomList.add(
           chatroomItem(
-            imgSrc: toId == 2
-                ? "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
-                : "https://image.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg",
-            name: toId == 2 ? "홍길동" : "김영희",
-            lastMsg: toId == 2 ? "😊😊" : "안녕하세요!",
+            imgSrc:
+                "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+            name: toId.toString(),
+            lastMsg:
+                GlobalVariables.userIdx.toString() + "->" + toId.toString(),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -113,7 +116,7 @@ class _MessagePageViewState extends State<MessagePageView> {
                   chatroomId: i,
                   fromId: GlobalVariables.userIdx,
                   toId: toId,
-                  fromName: toId == 2 ? "홍길동" : "김영희",
+                  toName: toId.toString(),
                 ),
               ),
             ),

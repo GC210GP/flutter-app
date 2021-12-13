@@ -91,7 +91,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                     builder: (_) => MessageView(
                       fromId: GlobalVariables.userIdx,
                       toId: 4,
-                      fromName: "태평주민",
+                      toName: "태평주민",
                     ),
                   ),
                 ),

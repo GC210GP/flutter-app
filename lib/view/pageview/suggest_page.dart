@@ -347,7 +347,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                                     fromId:
                                                         GlobalVariables.userIdx,
                                                     toId: i["uid"],
-                                                    fromName: i["nickname"],
+                                                    toName: i["nickname"],
                                                   ),
                                                 ),
                                               ),
