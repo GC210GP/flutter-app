@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_storage/firebase_storage.dart' as fbs;
 // import 'package:firebase_auth/firebase_auth.dart' as fa;
 
@@ -28,6 +29,9 @@ class FireControl {
   ///
   /// ### 초기화
   Future<bool> init() async {
+    // Firebase 초기화
+    await Firebase.initializeApp();
+
     try {
       _collection = fs.FirebaseFirestore.instance.collection(collectionName);
     } catch (e) {
@@ -35,11 +39,6 @@ class FireControl {
       isInit = false;
       return false;
     }
-
-    // bool result = await _signIn(
-    //   id: Secret.firebaseAuthEmail,
-    //   pw: Secret.firebaseAuthPassword,
-    // );
 
     isInit = true;
     return true;
@@ -55,36 +54,6 @@ class FireControl {
     try {
       _doc =
           fs.FirebaseFirestore.instance.collection(collectionName).doc(docName);
-
-      // if (data is User) {
-      //   await _doc.set(
-      //     {
-      //       '"$idx"': {
-      //         '"name"': '"${data.name}"',
-      //         '"age"': data.age,
-      //         '"job"': '"${data.job}"',
-      //         '"gender"': data.gender == Gender.male ? '"M"' : '"F"',
-      //         '"insurance"': data.insurance,
-      //         '"cancer"': data.cancer,
-      //         '"brain"': data.brain,
-      //         '"heart"': data.heart,
-      //         '"bankDeposit"': data.bankDeposit,
-      //         '"bankSaving"': data.bankSaving,
-      //         '"parkingAccount"': data.parkingAccount,
-      //         '"lifeAccount"': data.lifeAccount,
-      //         '"admission"': data.admission,
-      //         '"surgery"': data.surgery,
-      //         '"indemnity"': data.indemnity,
-      //       }
-      //     },
-      //     fs.SetOptions(merge: true),
-      //   );
-      // } else {
-      //   await _doc.set(
-      //     data,
-      //     fs.SetOptions(merge: true),
-      //   );
-      // }
 
       return true;
     } catch (e) {
@@ -138,15 +107,6 @@ class FireControl {
       print("Failed to get doc: $e");
       return null;
     }
-
-    // result.data["dddd"]
-
-    // print(snapshot.docs.length);
-
-    // for (var i in snapshot.docs) {
-    //   print(i.data());
-    // }
-    // return snapshot.toString();
   }
 
   ///
