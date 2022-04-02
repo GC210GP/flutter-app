@@ -1,6 +1,9 @@
+import 'package:blood_donation/model/person.dto.dart';
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/util/fire_control.dart';
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:blood_donation/view/message_view.dart';
+import 'package:blood_donation/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -17,64 +20,97 @@ class _MessagePageViewState extends State<MessagePageView> {
   List<Widget> chatroomList = [];
   FireControl fireControl = FireControl(collectionName: "chat");
   double pageOpacity = 0;
+  bool isFireControlLoaded = false;
 
   @override
   void initState() {
     super.initState();
-
-    fireControl.init().then((value) {
+    fireControl.init().then((isSuccess) async {
       pageOpacity = 1;
-      listLoader();
+      setState(() {});
+
+      if (isSuccess) {
+        await Future.delayed(const Duration(milliseconds: 250));
+        await listLoader();
+        isFireControlLoaded = true;
+        setState(() {});
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "메시지",
-                    style: TextStyle(
-                      fontFamily: "NanumSR",
-                      fontWeight: FontWeight.w900,
-                      fontSize: 30,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
+      opacity: pageOpacity,
+      duration: const Duration(milliseconds: 100),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isFireControlLoaded)
               Expanded(
-                child: chatroomList.length != 0
-                    ? ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: [...chatroomList],
-                      )
-                    : Center(
-                        child: Text(
-                          "대화가 없습니다\n\n",
-                          style: TextStyle(
-                            fontFamily: "NanumSR",
-                            fontWeight: FontWeight.w900,
-                            fontSize: 15,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const PageTitleWidget(title: "메시지"),
+                    Expanded(
+                      child: chatroomList.isNotEmpty
+                          ? ListView(
+                              physics: const BouncingScrollPhysics(),
+                              children: [...chatroomList],
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    "💬",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontSize: 50,
+                                    ),
+                                  ),
+                                  Text(
+                                    "\n대화가 없습니다\n'홈'이나 '추천' 탭에서 대화를 시작해보세요\n\n\n\n",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 15,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    )
+                  ],
+                ),
               )
-            ],
-          ),
+
+            ///
+            ///
+            ///
+            // FireControl 비정상 로드
+            else
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 100,
+                  padding: const EdgeInsets.only(bottom: 50.0),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 7.5,
+                    color: DDColor.primary.shade600,
+                    backgroundColor: DDColor.disabled,
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
-      opacity: pageOpacity,
-      duration: Duration(milliseconds: 100),
     );
   }
 
@@ -121,8 +157,6 @@ class _MessagePageViewState extends State<MessagePageView> {
         );
       }
     }
-
-    setState(() {});
   }
 
   Widget chatroomItem({
@@ -132,7 +166,7 @@ class _MessagePageViewState extends State<MessagePageView> {
     VoidCallback? onPressed,
   }) =>
       CupertinoButton(
-        padding: EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
         onPressed: onPressed,
         child: Container(
           height: 90,

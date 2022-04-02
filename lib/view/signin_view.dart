@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:blood_donation/widget/input_box.dart';
 
@@ -26,6 +27,7 @@ class _SigninViewState extends State<SigninView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DDColor.background,
       appBar: AppBar(
         toolbarHeight: 0,
         shadowColor: Colors.transparent,
@@ -58,7 +60,7 @@ class _SigninViewState extends State<SigninView> {
                         fontFamily: "NanumSR",
                         fontWeight: FontWeight.w900,
                         fontSize: 45,
-                        color: Colors.red.shade400,
+                        color: DDColor.primary,
                       ),
                     ),
                   ],
@@ -138,7 +140,7 @@ class _SigninViewState extends State<SigninView> {
                       fontFamily: "NanumSR",
                       fontWeight: FontWeight.w900,
                       fontSize: 13.5,
-                      color: Colors.red.shade400,
+                      color: DDColor.primary,
                     ),
                   )
                 else
@@ -185,41 +187,41 @@ class _SigninViewState extends State<SigninView> {
     required String userid,
     required String userpw,
   }) async {
-    var body = convert.json.encode(
-      {"email": userid, "password": userpw},
-    );
+    // var body = convert.json.encode(
+    //   {"email": userid, "password": userpw},
+    // );
 
-    Map<String, String> headers = {
-      HttpHeaders.contentTypeHeader: 'application/json',
-      HttpHeaders.acceptHeader: 'application/json',
-    };
+    // Map<String, String> headers = {
+    //   HttpHeaders.contentTypeHeader: 'application/json',
+    //   HttpHeaders.acceptHeader: 'application/json',
+    // };
 
-    http.Response response = await http.post(
-      Uri.parse(GlobalVariables.baseurl + "/auth"),
-      body: body,
-      headers: headers,
-    );
+    // http.Response response = await http.post(
+    //   Uri.parse(GlobalVariables.baseurl + "/auth"),
+    //   body: body,
+    //   headers: headers,
+    // );
 
-    Map<String, dynamic> result = convert.jsonDecode(response.body);
+    // Map<String, dynamic> result = convert.jsonDecode(response.body);
 
-    if (result.keys.contains("token")) {
-      Map<String, dynamic> payload = Jwt.parseJwt(result['token']);
-      GlobalVariables.userIdx = int.parse(payload['sub']);
+    // if (result.keys.contains("token")) {
+    //   Map<String, dynamic> payload = Jwt.parseJwt(result['token']);
+    //   GlobalVariables.userIdx = int.parse(payload['sub']);
 
-      response = await http.get(Uri.parse(GlobalVariables.baseurl +
-          "/users?userId=" +
-          GlobalVariables.userIdx.toString()));
+    //   response = await http.get(Uri.parse(GlobalVariables.baseurl +
+    //       "/users?userId=" +
+    //       GlobalVariables.userIdx.toString()));
 
-      result = convert.jsonDecode(response.body);
+    //   result = convert.jsonDecode(response.body);
 
-      if (result.keys.contains("data")) {
-        // print(response.body);
-        Navigator.pushReplacementNamed(context, "/splash");
-        return;
-      }
-    }
+    //   if (result.keys.contains("data")) {
+    //     // print(response.body);
+    //     Navigator.pushReplacementNamed(context, "/splash");
+    //     return;
+    //   }
+    // }
 
-    isLoginFailed = true;
+    // isLoginFailed = true;
     setState(() {});
   }
 }

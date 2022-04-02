@@ -1,3 +1,4 @@
+import 'package:blood_donation/util/colors.dart';
 import 'package:flutter/material.dart';
 
 class CommunityEditorView extends StatefulWidget {
@@ -10,6 +11,8 @@ class CommunityEditorView extends StatefulWidget {
 class _CommunityEditorViewState extends State<CommunityEditorView> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: DDColor.background,
+    );
   }
 }

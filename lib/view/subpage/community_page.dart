@@ -1,4 +1,6 @@
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/view/community_view.dart';
+import 'package:blood_donation/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -32,34 +34,15 @@ class _CommunityPageViewState extends State<CommunityPageView> {
           padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
           child: Column(
             children: [
-              // Row(
-              //   children: [
-              //     Text(
-              //       "커뮤니티",
-              //       style: TextStyle(
-              //         fontFamily: "NanumSR",
-              //         fontWeight: FontWeight.w900,
-              //         fontSize: 30,
-              //         color: Colors.grey.shade800,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              SizedBox(height: 20),
               Expanded(
                 child: ListView(
+                  padding: const EdgeInsets.all(0.0),
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    Text(
-                      "#가천대학교",
-                      style: TextStyle(
-                        fontFamily: "NanumSR",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 30,
-                        color: Colors.grey.shade900,
-                      ),
+                    const PageTitleWidget(
+                      title: "#가천대",
+                      margin: EdgeInsets.only(bottom: 10.0),
                     ),
-                    SizedBox(height: 10),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: Column(
@@ -77,18 +60,10 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                     ///
                     ///
 
-                    SizedBox(height: 30),
-
-                    Text(
-                      "#성남시",
-                      style: TextStyle(
-                        fontFamily: "NanumSR",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 30,
-                        color: Colors.grey.shade900,
-                      ),
+                    const PageTitleWidget(
+                      title: "#성남",
+                      margin: EdgeInsets.only(top: 40.0, bottom: 10.0),
                     ),
-                    SizedBox(height: 10),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: Column(
@@ -127,10 +102,10 @@ class _CommunityPageViewState extends State<CommunityPageView> {
   Widget item({required String author, required String title}) => Container(
         height: 60,
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: DDColor.widgetBackgroud,
           border: Border(
             bottom: BorderSide(
-              color: Colors.grey.shade100,
+              color: DDColor.background,
             ),
           ),
         ),

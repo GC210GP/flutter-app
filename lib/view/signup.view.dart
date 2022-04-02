@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:blood_donation/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,6 +54,7 @@ class _SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DDColor.background,
       appBar: AppBar(
         toolbarHeight: 0,
         shadowColor: Colors.transparent,
@@ -437,7 +439,7 @@ class _SignupViewState extends State<SignupView> {
                           fontFamily: "NanumSR",
                           fontWeight: FontWeight.w900,
                           fontSize: 13.5,
-                          color: Colors.red.shade400,
+                          color: DDColor.primary,
                         ),
                       )
                     else

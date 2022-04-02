@@ -1,3 +1,4 @@
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/view/community_board_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class _CommunityViewState extends State<CommunityView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DDColor.background,
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
         child: Column(

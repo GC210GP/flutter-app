@@ -1,30 +1,17 @@
-import 'dart:io';
-
+import 'package:blood_donation/model/person.dto.dart';
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
 import '../message_view.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 class SuggestionPageView extends StatefulWidget {
   const SuggestionPageView({Key? key}) : super(key: key);
 
   @override
   _SuggestionPageViewState createState() => _SuggestionPageViewState();
-}
-
-enum BLOOD_TYPE {
-  plusA,
-  plusB,
-  plusAB,
-  plusO,
-  minusA,
-  minusB,
-  minusAB,
-  minusO,
 }
 
 class _SuggestionPageViewState extends State<SuggestionPageView> {
@@ -35,7 +22,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 0)).then((value) {
+    Future.delayed(const Duration(milliseconds: 0)).then((value) {
       pageOpacity = 1;
       setState(() {});
     });
@@ -45,10 +32,10 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: pageOpacity,
-      duration: Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 100),
       child: Column(
         children: [
-          upperBar(),
+          const SuggestionUpperBar(),
           Expanded(
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -56,16 +43,9 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                 builder: (context) {
                   List<Widget> caroselList = [];
 
-                  for (Map<String, dynamic> i
-                      in GlobalVariables.suggestionList) {
-                    // i["nickname"];
-                    // i["bloodType"];
-                    // i["location"];
-                    // i["corr"];
-                    // i["img"];
-                    // i["rels"];
+                  for (UserDto user in GlobalVariables.suggestionList) {
                     caroselList.add(
-                      caroselItemLayout(
+                      CaroselItemLayout(
                         child: Column(
                           children: [
                             Expanded(
@@ -73,13 +53,19 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+
                                   Container(
                                     width: 140,
                                     height: 140,
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: DDColor.background,
                                       borderRadius: BorderRadius.circular(140),
-                                      boxShadow: [
+                                      boxShadow: const [
                                         BoxShadow(
                                           color: Color.fromRGBO(0, 0, 0, 0.2),
                                           offset: Offset(0, 4),
@@ -96,7 +82,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                           borderRadius:
                                               BorderRadius.circular(130),
                                           child: Image.network(
-                                            i["img"],
+                                            user.profileImageLocation,
                                             width: 130,
                                             height: 130,
                                             fit: BoxFit.cover,
@@ -105,12 +91,19 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                       ],
                                     ),
                                   ),
+
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+
                                   SizedBox(height: 20),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        i["nickname"],
+                                        user.nickname,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: "NanumSR",
@@ -142,16 +135,33 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                     ),
                                   ),
                                   SizedBox(height: 10),
+
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      shadowBox(
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+
+                                      ShadowBox(
                                         height: 35,
                                         color: Colors.red.shade300,
-                                        width: i["bloodType"].length * 13.0,
+                                        width:
+                                            user.bloodType.toString().length *
+                                                13.0,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          "   " + i["bloodType"] + "   ",
+                                          "   " +
+                                              user.bloodType.toString() +
+                                              "   ",
                                           style: TextStyle(
                                             fontFamily: "NanumSR",
                                             fontWeight: FontWeight.w900,
@@ -160,17 +170,26 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                           ),
                                         ),
                                       ),
+
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+
                                       SizedBox(width: 5),
                                       CupertinoButton(
                                         padding: EdgeInsets.all(0),
                                         onPressed: () => url.launch(
-                                            "https://instagram.com/${i["sns"].substring(1, i["sns"].length)}"),
-                                        child: shadowBox(
+                                            "https://instagram.com/${user.sns[0].snsProfile.substring(1, user.sns[0].snsProfile.length)}"),
+                                        child: ShadowBox(
                                           height: 35,
                                           color: Colors.purple.shade300,
                                           alignment: Alignment.center,
                                           child: Text(
-                                            "   " + i["sns"] + "   ",
+                                            "   " +
+                                                user.sns[0].snsProfile +
+                                                "   ",
                                             style: TextStyle(
                                               fontFamily: "NanumSR",
                                               fontWeight: FontWeight.w900,
@@ -181,12 +200,19 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                         ),
                                       ),
                                       SizedBox(width: 5),
-                                      shadowBox(
+
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+
+                                      ShadowBox(
                                         height: 35,
                                         color: Colors.pink.shade300,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          "   " + i["location"] + "   ",
+                                          "   " + user.location + "   ",
                                           style: TextStyle(
                                             fontFamily: "NanumSR",
                                             fontWeight: FontWeight.w900,
@@ -200,6 +226,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                 ],
                               ),
                             ),
+
+                            ///
+                            ///
+                            ///
+                            ///
+                            ///
+
                             Expanded(
                               flex: 10,
                               child: Column(
@@ -210,7 +243,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                         width: 15,
                                       ),
                                       Expanded(
-                                        child: shadowBox(
+                                        child: ShadowBox(
                                           height: 75,
                                           child: Row(
                                             mainAxisAlignment:
@@ -241,8 +274,8 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    (i["corr"] * 100)
-                                                            .toString() +
+                                                    // TODO: Correlation 값
+                                                    (0.23 * 100).toString() +
                                                         "℃",
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
@@ -260,6 +293,14 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                           ),
                                         ),
                                       ),
+
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+                                      ///
+
                                       // SizedBox(
                                       //   width: 15,
                                       // ),
@@ -288,9 +329,11 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                       //               textAlign: TextAlign.center,
                                       //               style: TextStyle(
                                       //                 fontFamily: "NanumSR",
-                                      //                 fontWeight: FontWeight.w900,
+                                      //                 fontWeight:
+                                      //                     FontWeight.w900,
                                       //                 fontSize: 11,
-                                      //                 color: Colors.grey.shade500,
+                                      //                 color:
+                                      //                     Colors.grey.shade500,
                                       //               ),
                                       //             ),
                                       //             Text(
@@ -301,9 +344,11 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                       //               textAlign: TextAlign.center,
                                       //               style: TextStyle(
                                       //                 fontFamily: "NanumSR",
-                                      //                 fontWeight: FontWeight.w900,
+                                      //                 fontWeight:
+                                      //                     FontWeight.w900,
                                       //                 fontSize: 13,
-                                      //                 color: Colors.red.shade300,
+                                      //                 color:
+                                      //                     Colors.red.shade300,
                                       //               ),
                                       //             ),
                                       //           ],
@@ -317,6 +362,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                       ),
                                     ],
                                   ),
+
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.all(15.0),
@@ -345,8 +397,9 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                                   builder: (_) => MessageView(
                                                     fromId:
                                                         GlobalVariables.userIdx,
-                                                    toId: i["uid"],
-                                                    toName: i["nickname"],
+                                                    // TODO: 연락할 상대방 정보 입력
+                                                    toId: user.uid,
+                                                    toName: user.nickname,
                                                   ),
                                                 ),
                                               ),
@@ -369,6 +422,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                       ),
                                     ),
                                   ),
+
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
+                                  ///
                                 ],
                               ),
                             ),
@@ -378,9 +438,16 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                     );
                   }
 
+                  ///
+                  ///
+                  ///
+                  ///
+                  ///
+                  // 리스트에 아무도 없을 경우
+
                   if (GlobalVariables.suggestionList.length == 0) {
                     caroselList.add(
-                      caroselItemLayout(
+                      CaroselItemLayout(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -447,138 +514,175 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
     );
   }
 
-  Widget shadowBox({
-    required Widget child,
-    double? width,
-    double? height,
-    Alignment? alignment,
-    Color? color,
-  }) =>
-      Container(
-        alignment: alignment,
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: color ?? Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.1),
-              offset: Offset(0, 4),
-              spreadRadius: 0.0,
-              blurRadius: 7.0,
-            ),
-          ],
-        ),
-        child: child,
-      );
-
-  Widget caroselItemLayout({required Widget child}) => Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: shadowBox(child: child),
-            ),
-          ),
-        ],
-      );
-
-  Widget upperBar() => Column(
-        children: [
-          SizedBox(height: 30),
-          Container(
-            width: 40,
-            height: 40,
-            child: Stack(
-              children: [
-                Image(
-                  width: 35,
-                  image: AssetImage("./assets/icon/applogo.png"),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade800,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 2.5,
-                  right: 2.5,
-                  child: Container(
-                    width: 15,
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 2,
-                  right: 5.5,
-                  child: Text(
-                    "2",
-                    style: TextStyle(
-                      fontFamily: "NanumSR",
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12.5,
-                      color: Colors.red.shade800,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-        ],
-      );
-
   Future<void> getSuggestion() async {
-    Map<String, String> headers = {
-      HttpHeaders.contentTypeHeader: 'application/json',
-      HttpHeaders.acceptHeader: 'application/json',
-    };
-    GlobalVariables.suggestionList.clear();
-
-    if (GlobalVariables.baseurl == -1) return;
-
-    http.Response response = await http.get(
-      Uri.parse(GlobalVariables.baseurl +
-          "/recommend/?userId=${GlobalVariables.userIdx}"),
-      headers: headers,
-    );
-
-    Map<String, dynamic> result = convert.jsonDecode(response.body);
-
-    if (response.statusCode < 400) {
-      result = convert.jsonDecode(response.body);
-
-      List<dynamic> recommandlist = result["data"];
-
-      for (dynamic a in recommandlist) {
-        GlobalVariables.suggestionList.add(
-          {
-            "nickname": a["nickname"],
-            "uid": a["id"],
-            "bloodType": a["bloodType"],
-            "location": a["location"],
-            "sns": "@doky.sp",
-            "corr": 0.65,
-            "img":
-                "https://sw.gachon.ac.kr/files/GA1/cms/attach/2/5c65d9c885649cf21365e270bc1a8bc7.jpg",
-            // a["profileImageLocation"],
-          },
-        );
-      }
-
-      setState(() {});
+    for (int i = 0; i < 10; i++) {
+      GlobalVariables.suggestionList.add(
+        UserDto(
+          uid: 1,
+          name: "홍길동",
+          nickname: "홍홍",
+          email: "tttt@test.com",
+          sns: [SnsDto(snsType: SnsType.INSTAGRAM, snsProfile: "doky.sp")],
+          phoneNumber: "010-4444-7777",
+          profileImageLocation:
+              "https://www.pcmag.com/images/PCMag_NavLogo.png",
+          birthdate: DateTime.now(),
+          location: "경기도 성남시 수정구",
+          sex: Gender.MALE,
+          job: "학생",
+          bloodType: BloodType.PLUS_A,
+          isDormant: false,
+          isDonated: false,
+          createdDate: DateTime.now(),
+          updatedDate: DateTime.now(),
+        ),
+      );
     }
+
+    setState(() {});
+  }
+}
+
+///
+///
+///
+///
+///
+
+class CaroselItemLayout extends StatelessWidget {
+  final Widget child;
+  const CaroselItemLayout({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ShadowBox(child: child),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class ShadowBox extends StatelessWidget {
+  final Alignment? alignment;
+  final double? width;
+  final double? height;
+  final Color? color;
+  final Widget child;
+
+  const ShadowBox({
+    Key? key,
+    required this.child,
+    this.width,
+    this.height,
+    this.alignment,
+    this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: alignment,
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: color ?? DDColor.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            offset: Offset(0, 4),
+            spreadRadius: 0.0,
+            blurRadius: 7.0,
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+///
+///
+///
+///
+///
+
+class SuggestionUpperBar extends StatefulWidget {
+  const SuggestionUpperBar({Key? key}) : super(key: key);
+
+  @override
+  State<SuggestionUpperBar> createState() => _SuggestionUpperBarState();
+}
+
+class _SuggestionUpperBarState extends State<SuggestionUpperBar> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 30),
+        Container(
+          width: 40,
+          height: 40,
+          child: Stack(
+            children: [
+              Image(
+                width: 35,
+                image: AssetImage("./assets/icon/applogo.png"),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: DDColor.primary.shade400,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 2.5,
+                right: 2.5,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: DDColor.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 2,
+                right: 5.5,
+                child: Text(
+                  "2",
+                  style: TextStyle(
+                    fontFamily: "NanumSR",
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12.5,
+                    color: DDColor.primary.shade400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 20),
+      ],
+    );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:blood_donation/util/chat/chat_data.dart';
+import 'package:blood_donation/util/colors.dart';
 import 'package:blood_donation/util/fire_control.dart';
 import 'package:blood_donation/util/global_variables.dart';
 import 'package:blood_donation/widget/input_box.dart';
@@ -45,7 +45,6 @@ class _MessageViewState extends State<MessageView> {
   @override
   void initState() {
     super.initState();
-    // fireControl.init();
 
     fireControl.init().then((value) {
       CollectionReference<Object?> collection = fireControl.collection;
@@ -137,6 +136,7 @@ class _MessageViewState extends State<MessageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DDColor.background,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -226,7 +226,7 @@ class _MessageViewState extends State<MessageView> {
                           child: CupertinoButton(
                             color: controller.text.length > 0
                                 ? Colors.red.shade300
-                                : Colors.grey.shade300,
+                                : DDColor.disabled,
                             padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
                             borderRadius: BorderRadius.circular(15),
                             child:

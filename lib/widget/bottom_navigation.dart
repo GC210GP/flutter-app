@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blood_donation/util/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
       height: Platform.isIOS ? 115 : 95,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DDColor.widgetBackgroud,
         borderRadius: Platform.isIOS
             ? BorderRadius.only(
                 topLeft: Radius.circular(25),
@@ -52,7 +53,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
             children: [
               horizontalMargin,
               Expanded(
-                child: buttonItem(
+                child: buttomItem(
                   index: 1,
                   currIndex: widget.index,
                   icons: CupertinoIcons.house_alt_fill,
@@ -61,7 +62,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                 ),
               ),
               Expanded(
-                child: buttonItem(
+                child: buttomItem(
                   index: 2,
                   currIndex: widget.index,
                   icons: CupertinoIcons.chat_bubble_fill,
@@ -70,7 +71,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                 ),
               ),
               Expanded(
-                child: buttonItem(
+                child: buttomItem(
                   index: 3,
                   currIndex: widget.index,
                   icons: Icons.my_library_books_rounded,
@@ -79,7 +80,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                 ),
               ),
               Expanded(
-                child: buttonItem(
+                child: buttomItem(
                   index: 4,
                   currIndex: widget.index,
                   icons: Icons.equalizer_rounded,
@@ -95,7 +96,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
     );
   }
 
-  Widget buttonItem({
+  Widget buttomItem({
     required String label,
     required IconData icons,
     required int index,
@@ -115,9 +116,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
           children: [
             Icon(
               icons,
-              color: index == currIndex
-                  ? Colors.red.shade400
-                  : Colors.grey.shade300,
+              color: index == currIndex ? DDColor.primary : DDColor.disabled,
               size: 30,
             ),
             SizedBox(height: 6),
@@ -127,9 +126,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                 fontFamily: "NanumSR",
                 fontWeight: FontWeight.w900,
                 fontSize: 13,
-                color: index == currIndex
-                    ? Colors.red.shade400
-                    : Colors.grey.shade300,
+                color: index == currIndex ? DDColor.primary : DDColor.disabled,
               ),
             ),
           ],

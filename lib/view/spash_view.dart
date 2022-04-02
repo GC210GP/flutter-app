@@ -1,5 +1,4 @@
-import 'package:blood_donation/widget/bottom_navigation.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:blood_donation/util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,36 +11,35 @@ class SplashView extends StatefulWidget {
 
 class _SplashViewState extends State<SplashView> {
   double logoSize = 1.0;
-  bool isActive = false;
-  int animationDuration = 500;
+  final int animationDuration = 500;
+  final int tmpPassTime = 3000;
 
   Future<void> worker() async {
-    Future.delayed(Duration(milliseconds: 3000)).then((value) {
+    bool isAnimationRunning = true;
+
+    Future.delayed(const Duration(milliseconds: 3000)).then((value) {
+      isAnimationRunning = false;
       Navigator.pushReplacementNamed(context, "/home");
     });
 
-    while (isActive) {
+    while (isAnimationRunning) {
       await Future.delayed(Duration(milliseconds: animationDuration));
-      logoSize = logoSize == 1.0 ? 1.2 : 1.0;
-
-      setState(() {});
+      setState(() {
+        logoSize = logoSize == 0.8 ? 1.0 : 0.8;
+      });
     }
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    isActive = false;
+  void initState() {
+    worker();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!isActive) {
-      isActive = true;
-      worker();
-    }
-
     return Scaffold(
+      backgroundColor: DDColor.background,
       appBar: AppBar(
         toolbarHeight: 0,
         shadowColor: Colors.transparent,
@@ -51,47 +49,39 @@ class _SplashViewState extends State<SplashView> {
         foregroundColor: Colors.transparent,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 75,
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedScale(
-                      duration: Duration(milliseconds: animationDuration),
-                      scale: logoSize,
-                      curve: Curves.easeOutSine,
-                      child: Image(
-                        width: 60,
-                        image: AssetImage("./assets/icon/applogo.png"),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      "나의 도움이 필요한 친구를\n찾고 있어요",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: "NanumSR",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ],
+      body: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 50,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              margin: const EdgeInsets.only(bottom: 20),
+              child: AnimatedScale(
+                duration: Duration(milliseconds: animationDuration),
+                scale: logoSize,
+                curve: Curves.easeOutSine,
+                child: const Image(
+                  width: 60,
+                  image: AssetImage("./assets/icon/applogo.png"),
                 ),
               ),
-              SizedBox(
-                height: 75,
+            ),
+            const Text(
+              "나의 도움이 필요한 친구를\n찾고 있어요",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "NanumSR",
+                fontWeight: FontWeight.w900,
+                fontSize: 24,
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
