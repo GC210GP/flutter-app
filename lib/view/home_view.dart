@@ -1,9 +1,9 @@
-import 'package:blood_donation/util/colors.dart';
-import 'package:blood_donation/view/subpage/community_page.dart';
-import 'package:blood_donation/view/subpage/message_page.dart';
-import 'package:blood_donation/view/subpage/setting_page.dart';
-import 'package:blood_donation/view/subpage/suggest_page.dart';
-import 'package:blood_donation/widget/bottom_navigation.dart';
+import 'package:app/util/colors.dart';
+import 'package:app/view/subpage/community_page.dart';
+import 'package:app/view/subpage/message_page.dart';
+import 'package:app/view/subpage/setting_page.dart';
+import 'package:app/view/subpage/suggest_page.dart';
+import 'package:app/widget/bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

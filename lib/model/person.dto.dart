@@ -2,8 +2,8 @@
 // auth, user 대응
 
 // 유저 정보
-import 'package:blood_donation/model/association.dto.dart';
-import 'package:blood_donation/model/post.dto.dart';
+import 'package:app/model/association.dto.dart';
+import 'package:app/model/post.dto.dart';
 
 class UserDto {
   int uid;

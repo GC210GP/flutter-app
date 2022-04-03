@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:blood_donation/util/colors.dart';
+import 'package:app/util/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

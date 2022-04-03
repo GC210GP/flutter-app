@@ -1,7 +1,7 @@
-import 'package:blood_donation/view/home_view.dart';
-import 'package:blood_donation/view/signin_view.dart';
-import 'package:blood_donation/view/signup.view.dart';
-import 'package:blood_donation/view/spash_view.dart';
+import 'package:app/view/home_view.dart';
+import 'package:app/view/signin_view.dart';
+import 'package:app/view/signup.view.dart';
+import 'package:app/view/spash_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {

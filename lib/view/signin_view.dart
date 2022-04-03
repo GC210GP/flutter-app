@@ -1,14 +1,8 @@
-import 'dart:io';
-
-import 'package:blood_donation/util/colors.dart';
-import 'package:blood_donation/util/global_variables.dart';
-import 'package:blood_donation/widget/input_box.dart';
-
+import 'package:app/util/colors.dart';
+import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 import 'package:jwt_decode/jwt_decode.dart';
 

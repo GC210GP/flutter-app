@@ -1,6 +1,6 @@
-import 'package:blood_donation/model/person.dto.dart';
-import 'package:blood_donation/util/colors.dart';
-import 'package:blood_donation/util/global_variables.dart';
+import 'package:app/model/person.dto.dart';
+import 'package:app/util/colors.dart';
+import 'package:app/util/global_variables.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

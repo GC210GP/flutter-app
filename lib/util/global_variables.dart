@@ -1,4 +1,4 @@
-import 'package:blood_donation/model/person.dto.dart';
+import 'package:app/model/person.dto.dart';
 
 class GlobalVariables {
   static const String baseurl =

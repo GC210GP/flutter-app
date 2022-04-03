@@ -1,9 +1,9 @@
-import 'package:blood_donation/model/person.dto.dart';
-import 'package:blood_donation/util/colors.dart';
-import 'package:blood_donation/util/fire_control.dart';
-import 'package:blood_donation/util/global_variables.dart';
-import 'package:blood_donation/view/message_view.dart';
-import 'package:blood_donation/widget/page_title_widget.dart';
+import 'package:app/model/person.dto.dart';
+import 'package:app/util/colors.dart';
+import 'package:app/util/fire_control.dart';
+import 'package:app/util/global_variables.dart';
+import 'package:app/view/message_view.dart';
+import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

@@ -1,5 +1,5 @@
-import 'package:blood_donation/util/colors.dart';
-import 'package:blood_donation/widget/page_title_widget.dart';
+import 'package:app/util/colors.dart';
+import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

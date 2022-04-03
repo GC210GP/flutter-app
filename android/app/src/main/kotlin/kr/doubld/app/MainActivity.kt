@@ -1,4 +1,4 @@
-package kr.co.kave.blood_donation
+package kr.doubld.app
 
 import io.flutter.embedding.android.FlutterActivity
 
