@@ -145,3 +145,10 @@ enum SnsType {
   KAKAO,
   TWITTER,
 }
+
+enum Auth {
+  ROLE_USER,
+  ROLE_NEED_EMAIL,
+  ROLE_ADMIN,
+  UNKNOWN,
+}
