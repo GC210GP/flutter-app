@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:app/model/fcm.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/secret.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:jwt_decode/jwt_decode.dart';
@@ -50,6 +52,22 @@ class HttpConn {
     http.Response response = await http.post(
       Uri.parse(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString)),
       headers: _headers,
+      body: _body,
+    );
+    return resultBuilder(response);
+  }
+
+  ///
+  ///
+  ///
+  /// POST
+  Future<Map<String, dynamic>> fbPost({
+    required FcmDto sendData,
+  }) async {
+    var _body = convert.json.encode(Secret.buildFbBody(sendData));
+    http.Response response = await http.post(
+      Uri.parse(Secret.fbBaseUrl),
+      headers: Secret.fbHeader,
       body: _body,
     );
     return resultBuilder(response);
