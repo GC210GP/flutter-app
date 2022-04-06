@@ -5,5 +5,16 @@ class GlobalVariables {
       "http://blooddonationnew-env.eba-zyvef2nw.ap-northeast-2.elasticbeanstalk.com";
   static int userIdx = 1;
 
+  static double radius = 12.5;
+
   static List<UserDto> suggestionList = [];
+
+  // TODO: 바꾸기
+  static String defaultImgUrl =
+      "https://www.mein-maler.de/wp-content/uploads/2021/04/anonym.png";
+
+  /// - *00000000 모든 특별시도
+  /// - 41*000000 경기도 시군구
+  static String addressApiUrl =
+      "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=";
 }
