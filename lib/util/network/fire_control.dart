@@ -8,8 +8,16 @@ import 'package:firebase_core/firebase_core.dart';
 class FireControl {
   // Make singleton instance
   // FireControl._();
-  // static final FireControl _instance = FireControl._();
-  // static FireControl get instance => _instance;
+  static FireControl? _instance;
+  static FireControl? get instance => _instance;
+
+  static bool setInstanceOnce(FireControl instance) {
+    if (_instance == null) {
+      _instance = instance;
+      return true;
+    }
+    return false;
+  }
 
   bool isInit = false;
   final String collectionName;

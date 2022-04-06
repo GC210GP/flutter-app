@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class ChatData {
   late ChatMetadata metadata;
   late List<ChatMessage> content;
@@ -11,15 +9,23 @@ class ChatData {
 
     dynamic rawMetadata = result['metadata'];
     dynamic rawContent = result['content'];
+    dynamic rawChatFrom = result['chatFrom'];
 
     List<int> memberList = [];
     for (var i in rawMetadata['member']) {
       memberList.add(i);
     }
 
+    ChatFrom chatFrom = ChatFrom.none;
+    for (ChatFrom i in ChatFrom.values) {
+      if (i.toString() == rawChatFrom) chatFrom = i;
+    }
+
     metadata = ChatMetadata(
       isDone: rawMetadata['isDone'],
       member: memberList,
+      chatFrom: chatFrom,
+      suggestionIdx: rawMetadata['suggestionIdx'],
     );
 
     List<dynamic> rawContents = rawContent;
@@ -51,6 +57,8 @@ class ChatData {
 
     return {
       '"metadata"': {
+        '"chatFrom"': '"${metadata.chatFrom}"',
+        '"suggestionIdx"': metadata.suggestionIdx,
         '"member"': metadata.member,
         '"isDone"': metadata.isDone,
       },
@@ -63,10 +71,14 @@ class ChatMetadata {
   ChatMetadata({
     required this.member,
     required this.isDone,
+    required this.chatFrom,
+    required this.suggestionIdx,
   });
 
   final List<int> member;
   final bool isDone;
+  final ChatFrom chatFrom;
+  final int suggestionIdx;
 
   @override
   String toString() {
@@ -74,6 +86,8 @@ class ChatMetadata {
     {
       member: $member,
       isDone: $isDone,
+      chatFrom: $chatFrom,
+      suggestionIdx: $suggestionIdx,
     }
     """);
     return super.toString();
@@ -102,4 +116,10 @@ class ChatMessage {
     """);
     return super.toString();
   }
+}
+
+enum ChatFrom {
+  suggestion,
+  community,
+  none,
 }
