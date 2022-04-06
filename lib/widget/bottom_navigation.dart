@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app/util/colors.dart';
+import 'package:app/util/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +13,7 @@ class CustomBottomNavigation extends StatefulWidget {
   }) : super(key: key);
 
   final int index;
+
   final VoidCallback onPressed;
   final CustomButtomNavigationController? controller;
 
@@ -26,19 +27,18 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Platform.isIOS ? 115 : 95,
-      width: MediaQuery.of(context).size.width,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.only(top: 20.0),
       decoration: BoxDecoration(
         color: DDColor.widgetBackgroud,
         borderRadius: Platform.isIOS
-            ? BorderRadius.only(
+            ? const BorderRadius.only(
                 topLeft: Radius.circular(25),
                 topRight: Radius.circular(25),
               )
             : null,
-        // ignore: prefer_const_literals_to_create_immutables
-        boxShadow: [
-          const BoxShadow(
+        boxShadow: const [
+          BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
             offset: Offset(0, -3),
             spreadRadius: 0.0,
@@ -46,93 +46,113 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
           )
         ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          const SizedBox(height: 23),
-          Row(
-            children: [
-              horizontalMargin,
-              Expanded(
-                child: buttomItem(
-                  index: 1,
-                  currIndex: widget.index,
-                  icons: CupertinoIcons.house_alt_fill,
-                  label: "홈",
-                  onPressed: widget.onPressed,
-                ),
-              ),
-              Expanded(
-                child: buttomItem(
-                  index: 2,
-                  currIndex: widget.index,
-                  icons: CupertinoIcons.chat_bubble_fill,
-                  label: "메시지",
-                  onPressed: widget.onPressed,
-                ),
-              ),
-              Expanded(
-                child: buttomItem(
-                  index: 3,
-                  currIndex: widget.index,
-                  icons: Icons.my_library_books_rounded,
-                  label: "커뮤니티",
-                  onPressed: widget.onPressed,
-                ),
-              ),
-              Expanded(
-                child: buttomItem(
-                  index: 4,
-                  currIndex: widget.index,
-                  icons: Icons.equalizer_rounded,
-                  label: "설정",
-                  onPressed: widget.onPressed,
-                ),
-              ),
-              horizontalMargin,
-            ],
+          horizontalMargin,
+          Expanded(
+            child: BottomIcon(
+              index: 1,
+              currIndex: widget.index,
+              icons: CupertinoIcons.house_alt_fill,
+              label: "홈",
+              onPressed: widget.onPressed,
+              controller: widget.controller,
+            ),
+          ),
+          Expanded(
+            child: BottomIcon(
+              index: 2,
+              currIndex: widget.index,
+              icons: CupertinoIcons.chat_bubble_fill,
+              label: "메시지",
+              onPressed: widget.onPressed,
+              controller: widget.controller,
+            ),
+          ),
+          Expanded(
+            child: BottomIcon(
+              index: 3,
+              currIndex: widget.index,
+              icons: Icons.my_library_books_rounded,
+              label: "커뮤니티",
+              onPressed: widget.onPressed,
+              controller: widget.controller,
+            ),
+          ),
+          Expanded(
+            child: BottomIcon(
+              index: 4,
+              currIndex: widget.index,
+              icons: Icons.equalizer_rounded,
+              label: "설정",
+              onPressed: widget.onPressed,
+              controller: widget.controller,
+            ),
+          ),
+          horizontalMargin,
+        ],
+      ),
+    );
+  }
+}
+
+///
+///
+///
+
+class BottomIcon extends StatelessWidget {
+  final String label;
+  final IconData icons;
+  final int index;
+  final int currIndex;
+  final VoidCallback? onPressed;
+  final CustomButtomNavigationController? controller;
+
+  const BottomIcon({
+    Key? key,
+    required this.label,
+    required this.icons,
+    required this.index,
+    required this.currIndex,
+    this.onPressed,
+    this.controller,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoButton(
+      padding: const EdgeInsets.all(0),
+      onPressed: () {
+        if (controller != null) controller!.currentIdx = index;
+        if (onPressed != null) onPressed!();
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Icon(
+            icons,
+            color: index == currIndex ? DDColor.primary : DDColor.disabled,
+            size: 25,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: "NanumSR",
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+              color: index == currIndex ? DDColor.primary : DDColor.disabled,
+            ),
           ),
         ],
       ),
     );
   }
-
-  Widget buttomItem({
-    required String label,
-    required IconData icons,
-    required int index,
-    required int currIndex,
-    required VoidCallback onPressed,
-  }) =>
-      CupertinoButton(
-        padding: EdgeInsets.all(0),
-        onPressed: () {
-          if (widget.controller != null) {
-            widget.controller!.currentIdx = index;
-          }
-          onPressed();
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Icon(
-              icons,
-              color: index == currIndex ? DDColor.primary : DDColor.disabled,
-              size: 30,
-            ),
-            SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: "NanumSR",
-                fontWeight: FontWeight.w900,
-                fontSize: 13,
-                color: index == currIndex ? DDColor.primary : DDColor.disabled,
-              ),
-            ),
-          ],
-        ),
-      );
 }
+
+///
+///
+///
 
 class CustomButtomNavigationController {
   int currentIdx = 0;

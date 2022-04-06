@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:app/model/person.dto.dart';
-import 'package:app/util/colors.dart';
+import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
+import 'package:app/view/community/community_editor_view.dart';
+import 'package:app/widget/button.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:url_launcher/url_launcher.dart' as url;
 import '../message_view.dart';
 
@@ -18,6 +24,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   CarouselController controller = CarouselController();
 
   double pageOpacity = 0;
+  HttpConn httpConn = HttpConn();
 
   @override
   void initState() {
@@ -379,7 +386,8 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                           Expanded(
                                             child: CupertinoButton(
                                               borderRadius:
-                                                  BorderRadius.circular(15),
+                                                  BorderRadius.circular(
+                                                      GlobalVariables.radius),
                                               child: Text(
                                                 "도와주기",
                                                 style: TextStyle(
@@ -410,7 +418,8 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                             width: 75,
                                             child: CupertinoButton(
                                               borderRadius:
-                                                  BorderRadius.circular(15),
+                                                  BorderRadius.circular(
+                                                      GlobalVariables.radius),
                                               child: Icon(
                                                   CupertinoIcons.star_fill),
                                               color: Colors.pinkAccent.shade400,
@@ -462,25 +471,63 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                               ),
                             ),
                             SizedBox(height: 20),
-                            Container(
-                              height: 50,
-                              width: 150,
-                              child: CupertinoButton(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: Text(
-                                  "로그인",
-                                  style: TextStyle(
-                                    fontFamily: "NanumSR",
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 20,
-                                    color: Colors.grey.shade100,
+                            DDButton(
+                              label: "로그인",
+                              width: 100,
+                              onPressed: () {
+                                Navigator.pushNamed(context, "/signin");
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            DDButton(
+                              label: "Auth",
+                              width: 100,
+                              onPressed: () async {
+                                dynamic result = await httpConn.auth(
+                                    email: 'a016232@daum.com',
+                                    password: '1234');
+                                print(result);
+                              },
+                            ),
+                            DDButton(
+                              label: "Get",
+                              width: 100,
+                              onPressed: () async {
+                                dynamic result = await httpConn.get(
+                                  apiUrl: "/users",
+                                  queryString: {
+                                    "userId": 10,
+                                  },
+                                );
+                                print(result);
+                              },
+                            ),
+                            DDButton(
+                              label: "POST",
+                              width: 100,
+                              onPressed: () {},
+                            ),
+                            DDButton(
+                              label: "PATCH",
+                              width: 100,
+                              onPressed: () {},
+                            ),
+                            DDButton(
+                              label: "DELETE",
+                              width: 100,
+                              onPressed: () {},
+                            ),
+                            DDButton(
+                              label: "COMM",
+                              width: 100,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CommunityEditorView(),
                                   ),
-                                ),
-                                color: Colors.red.shade300,
-                                padding: EdgeInsets.all(0),
-                                onPressed: () => getSuggestion(),
-                                // Navigator.pushNamed(context, "/signin"),
-                              ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -598,7 +645,7 @@ class ShadowBox extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: color ?? DDColor.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(GlobalVariables.radius),
         boxShadow: const [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),

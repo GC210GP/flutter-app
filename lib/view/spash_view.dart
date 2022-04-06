@@ -1,4 +1,5 @@
-import 'package:app/util/colors.dart';
+import 'package:app/util/network/fire_control.dart';
+import 'package:app/util/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,22 +14,6 @@ class _SplashViewState extends State<SplashView> {
   double logoSize = 1.0;
   final int animationDuration = 500;
   final int tmpPassTime = 3000;
-
-  Future<void> worker() async {
-    bool isAnimationRunning = true;
-
-    Future.delayed(const Duration(milliseconds: 3000)).then((value) {
-      isAnimationRunning = false;
-      Navigator.pushReplacementNamed(context, "/home");
-    });
-
-    while (isAnimationRunning) {
-      await Future.delayed(Duration(milliseconds: animationDuration));
-      setState(() {
-        logoSize = logoSize == 0.8 ? 1.0 : 0.8;
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -84,5 +69,33 @@ class _SplashViewState extends State<SplashView> {
         ),
       ),
     );
+  }
+
+  ///
+  ///
+  ///
+
+  Future<void> worker() async {
+    bool isAnimationRunning = true;
+
+    FireControl.setInstanceOnce(FireControl(collectionName: "chat"));
+    assert(FireControl.instance != null);
+    FireControl.instance!.init().then((isOk) {
+      if (isOk) {
+        Future.delayed(const Duration(milliseconds: 2000)).then((value) {
+          isAnimationRunning = false;
+          Navigator.pushReplacementNamed(context, "/home");
+        });
+      } else {
+        // TODO: Firebase 연결실패
+      }
+    });
+
+    while (isAnimationRunning) {
+      setState(() {
+        logoSize = logoSize == 0.8 ? 1.0 : 0.8;
+      });
+      await Future.delayed(Duration(milliseconds: animationDuration));
+    }
   }
 }

@@ -1,7 +1,14 @@
-import 'package:app/util/colors.dart';
+import 'dart:convert';
+
+import 'package:app/util/global_variables.dart';
+import 'package:app/util/theme/colors.dart';
+import 'package:app/view/settting_text_view.dart';
+import 'package:app/view/signup/signup.view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url;
+import 'dart:convert' as convert;
 
 class SettingPageView extends StatefulWidget {
   const SettingPageView({Key? key}) : super(key: key);
@@ -93,19 +100,66 @@ class _SettingPageViewState extends State<SettingPageView> {
                     ///
 
                     SettingListItem(
-                      title: "이용약관",
+                      title: "📄  이용약관", //📃
                       margin: const EdgeInsets.only(bottom: 10.0),
-                      onPressed: () {},
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SettingTextView(
+                            title: "이용약관",
+                            content: exampleText,
+                          ),
+                        ),
+                      ),
                     ),
                     SettingListItem(
-                      title: "개인정보보호방침",
+                      title: "🔒  개인정보보호방침",
                       margin: const EdgeInsets.only(bottom: 10.0),
-                      onPressed: () {},
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SettingTextView(
+                            title: "개인정보보호방침",
+                            content: exampleText,
+                          ),
+                        ),
+                      ),
                     ),
                     SettingListItem(
-                      title: "오픈소스 라이센스",
+                      title: "🎁  오픈소스 라이센스",
+                      // margin: const EdgeInsets.only(bottom: 10.0),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SettingTextView(
+                            title: "오픈소스 라이센스",
+                            content: exampleText,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      height: 50,
+                    ),
+                    SettingListItem(
+                      title: "🏠  더블디 홈페이지",
                       margin: const EdgeInsets.only(bottom: 10.0),
-                      onPressed: () {},
+                      onPressed: () => url.launch(
+                        "https://doky.space",
+                        forceSafariVC: false,
+                      ),
+                    ),
+                    SettingListItem(
+                      title: "🛠  계정 및 기타문의",
+                      margin: const EdgeInsets.only(bottom: 10.0),
+                      onPressed: () => url.launch(
+                        Uri(
+                          scheme: 'mailto',
+                          path: 'doubld@gmail.com',
+                          query:
+                              'subject=[더블디] ${'OOO'}님 계정 및 기타문의&body=카테고리: [ 계정 | 장애 | 건의사항 | 기타 ]\n문의내용:&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr',
+                        ).toString(),
+                      ),
                     ),
                   ],
                 ),
@@ -145,7 +199,7 @@ class SettingListItem extends StatelessWidget {
         height: height ?? 60,
         decoration: BoxDecoration(
           color: DDColor.widgetBackgroud,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(GlobalVariables.radius),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(30, 0, 25, 0),

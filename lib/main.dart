@@ -1,6 +1,6 @@
-import 'package:app/view/home_view.dart';
+import 'package:app/view/home/home_view.dart';
 import 'package:app/view/signin_view.dart';
-import 'package:app/view/signup.view.dart';
+import 'package:app/view/signup/signup.view.dart';
 import 'package:app/view/spash_view.dart';
 import 'package:flutter/material.dart';
 

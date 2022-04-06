@@ -1,13 +1,11 @@
-import 'package:app/model/person.dto.dart';
-import 'package:app/util/colors.dart';
-import 'package:app/util/fire_control.dart';
+import 'package:app/util/theme/colors.dart';
+import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/theme/font.dart';
 import 'package:app/view/message_view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 class MessagePageView extends StatefulWidget {
   const MessagePageView({Key? key}) : super(key: key);
@@ -18,23 +16,25 @@ class MessagePageView extends StatefulWidget {
 
 class _MessagePageViewState extends State<MessagePageView> {
   List<Widget> chatroomList = [];
-  FireControl fireControl = FireControl(collectionName: "chat");
+  late FireControl _fireControl;
   double pageOpacity = 0;
-  bool isFireControlLoaded = false;
+  bool isListLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    fireControl.init().then((isSuccess) async {
-      pageOpacity = 1;
-      setState(() {});
 
-      if (isSuccess) {
-        await Future.delayed(const Duration(milliseconds: 250));
-        await listLoader();
-        isFireControlLoaded = true;
-        setState(() {});
-      }
+    ///
+    /// TODO: 추후 상태관리로 이동
+    assert(FireControl.instance != null, "FireControl was not initialized!");
+    if (FireControl.instance != null) {
+      _fireControl = FireControl.instance!;
+    }
+
+    listLoader().then((_) {
+      pageOpacity = 1.0;
+      isListLoaded = true;
+      setState(() {});
     });
   }
 
@@ -49,7 +49,7 @@ class _MessagePageViewState extends State<MessagePageView> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (isFireControlLoaded)
+            if (isListLoaded)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,9 +57,25 @@ class _MessagePageViewState extends State<MessagePageView> {
                     const PageTitleWidget(title: "메시지"),
                     Expanded(
                       child: chatroomList.isNotEmpty
-                          ? ListView(
-                              physics: const BouncingScrollPhysics(),
-                              children: [...chatroomList],
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                topLeft:
+                                    Radius.circular(GlobalVariables.radius),
+                                topRight:
+                                    Radius.circular(GlobalVariables.radius),
+                              ),
+                              child: ListView(
+                                physics: const BouncingScrollPhysics(),
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                        GlobalVariables.radius),
+                                    child: Column(
+                                      children: [...chatroomList],
+                                    ),
+                                  )
+                                ],
+                              ),
                             )
                           : Center(
                               child: Column(
@@ -74,7 +90,7 @@ class _MessagePageViewState extends State<MessagePageView> {
                                     ),
                                   ),
                                   Text(
-                                    "\n대화가 없습니다\n'홈'이나 '추천' 탭에서 대화를 시작해보세요\n\n\n\n",
+                                    "\n대화가 없습니다\n[홈]이나 [커뮤니티] 탭에서 대화를 시작해보세요\n\n\n\n",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: "NanumSR",
@@ -115,14 +131,7 @@ class _MessagePageViewState extends State<MessagePageView> {
   }
 
   Future<void> listLoader() async {
-    var value = await fireControl.getDocList();
-    // http
-    //     .get(Uri.parse(GlobalVariables.baseurl + "/users?userId=9"))
-    //     .then((value) {
-    //   print(convert.utf8.decode(value.bodyBytes));
-    // });
-    print(value);
-    print(GlobalVariables.userIdx);
+    var value = await _fireControl.getDocList();
 
     for (String i in value) {
       List<String> list = i.split("=");
@@ -136,7 +145,7 @@ class _MessagePageViewState extends State<MessagePageView> {
         }
 
         chatroomList.add(
-          chatroomItem(
+          ChatroomItem(
             imgSrc:
                 "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
             name: toId.toString(),
@@ -158,65 +167,86 @@ class _MessagePageViewState extends State<MessagePageView> {
       }
     }
   }
+}
 
-  Widget chatroomItem({
-    required String imgSrc,
-    required String name,
-    String lastMsg = "",
-    VoidCallback? onPressed,
-  }) =>
-      CupertinoButton(
-        padding: const EdgeInsets.all(0),
-        onPressed: onPressed,
-        child: Container(
-          height: 90,
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.grey.shade300, width: 0.5),
+class ChatroomItem extends StatelessWidget {
+  final String imgSrc;
+  final String name;
+  final String lastMsg;
+  final VoidCallback? onPressed;
+
+  const ChatroomItem({
+    Key? key,
+    required this.imgSrc,
+    required this.name,
+    this.lastMsg = "",
+    this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoButton(
+      padding: const EdgeInsets.all(0),
+      onPressed: onPressed,
+      child: Container(
+        height: 80,
+        decoration: const BoxDecoration(
+          color: DDColor.widgetBackgroud,
+          border: Border(
+            bottom: BorderSide(
+              color: DDColor.background,
             ),
           ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(60),
-                child: Image.network(
-                  imgSrc,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
+        ),
+        child: CupertinoButton(
+          padding: const EdgeInsets.all(.0),
+          onPressed: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: Image.network(
+                    imgSrc,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontFamily: "NanumSR",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 17,
-                        color: Colors.grey.shade800,
+                const SizedBox(width: 15.0),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.bold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.fontColor,
+                        ),
                       ),
-                    ),
-                    if (lastMsg.length != 0) SizedBox(height: 5),
-                    if (lastMsg.length != 0)
+                      const SizedBox(height: 2),
                       Text(
                         lastMsg,
                         style: TextStyle(
-                          fontFamily: "NanumSR",
-                          fontWeight: FontWeight.w900,
-                          fontSize: 17,
-                          color: Colors.grey.shade500,
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.bold,
+                          fontSize: DDFontSize.h5,
+                          color: DDColor.grey,
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }

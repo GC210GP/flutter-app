@@ -1,3 +1,5 @@
+import 'package:app/util/theme/colors.dart';
+import 'package:app/util/theme/font.dart';
 import 'package:flutter/material.dart';
 
 class PageTitleWidget extends StatelessWidget {
@@ -17,10 +19,10 @@ class PageTitleWidget extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          fontFamily: "NanumSR",
-          fontWeight: FontWeight.w900,
-          fontSize: 30,
-          color: Colors.grey.shade800,
+          fontFamily: DDFontFamily.nanumSR,
+          fontWeight: DDFontWeight.extraBold,
+          fontSize: DDFontSize.h15,
+          color: DDColor.fontColor,
         ),
       ),
     );
