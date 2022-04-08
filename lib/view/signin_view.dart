@@ -1,3 +1,6 @@
+import 'package:app/model/token.dto.dart';
+import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/widget/app_bar.dart';
@@ -180,7 +183,19 @@ class _SigninViewState extends State<SigninView> {
     required String userid,
     required String userpw,
   }) async {
-    isLoginFailed = true;
+    ///
+    ///
+    ///
+    // TODO: Refactoring
+    TokenDto? result = await GlobalVariables.httpConn
+        .auth(email: userid.trim(), password: userpw.trim());
+
+    if (result != null) {
+      isLoginFailed = false;
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+    } else {
+      isLoginFailed = true;
+    }
     setState(() {});
   }
 }
