@@ -4,7 +4,9 @@ import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:app/widget/page_title_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url;
 
 class CommunityEditorView extends StatefulWidget {
   const CommunityEditorView({Key? key}) : super(key: key);
@@ -82,6 +84,63 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
                 focusNode: focusNodeContent,
               ),
             ),
+
+            const SizedBox(height: 5.0),
+            if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
+              Stack(
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              "[게시글 작성 Tip!]\n1. 수혈이 필요한 환자분의 혈액형을 정확히 명시해주세요.\n2. 필요하신 혈액제제를 입력해주세요.\n3. 자세한 내용은 ",
+                          style: TextStyle(
+                            fontFamily: DDFontFamily.nanumSR,
+                            fontWeight: DDFontWeight.extraBold,
+                            fontSize: DDFontSize.h6,
+                            color: DDColor.grey,
+                          ),
+                        ),
+                        const TextSpan(
+                          text: "[안내 홈페이지]",
+                          style: TextStyle(
+                            fontFamily: DDFontFamily.nanumSR,
+                            fontWeight: DDFontWeight.extraBold,
+                            fontSize: DDFontSize.h6,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              "를 참고해주세요.\n4. 개인정보를 유추할 수 있는 전화번호, 주소 등은 입력하지 말아주세요.",
+                          style: TextStyle(
+                            fontFamily: DDFontFamily.nanumSR,
+                            fontWeight: DDFontWeight.extraBold,
+                            fontSize: DDFontSize.h6,
+                            color: DDColor.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 25,
+                    left: 70,
+                    child: CupertinoButton(
+                      child: const SizedBox(
+                        width: 78,
+                        height: 15,
+                      ),
+                      onPressed: () => url.launch(
+                        "https://biss.bloodinfo.net/direct_donation_hos.jsp",
+                        forceWebView: true,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
             SizedBox(height: 10.0),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
               DDButton(label: isModify ? "수정하기" : "등록하기", onPressed: () {})

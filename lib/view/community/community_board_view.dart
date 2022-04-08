@@ -92,7 +92,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                     ),
                   ),
                   DDButton(
-                    label: "도와주기",
+                    label: "대화 시작하기",
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(

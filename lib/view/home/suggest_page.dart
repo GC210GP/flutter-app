@@ -391,7 +391,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                                                   BorderRadius.circular(
                                                       GlobalVariables.radius),
                                               child: Text(
-                                                "도와주기",
+                                                "대화 시작하기",
                                                 style: TextStyle(
                                                   fontFamily: "NanumSR",
                                                   fontWeight: FontWeight.w900,
@@ -463,7 +463,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "로그인하시면\n도움이 필요한\n친구들을 찾아드립니다",
+                              "로그인하시면\n도움이 필요한 분을 찾아드려요!",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontFamily: "NanumSR",
@@ -477,60 +477,11 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                               label: "로그인",
                               width: 100,
                               onPressed: () {
-                                Navigator.pushNamed(context, "/signin");
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            DDButton(
-                              label: "Auth",
-                              width: 100,
-                              onPressed: () async {
-                                dynamic result = await httpConn.auth(
-                                    email: 'a016232@daum.com',
-                                    password: '1234');
-                                print(result);
-                              },
-                            ),
-                            DDButton(
-                              label: "Get",
-                              width: 100,
-                              onPressed: () async {
-                                dynamic result = await httpConn.get(
-                                  apiUrl: "/users",
-                                  queryString: {
-                                    "userId": 10,
-                                  },
-                                );
-                                print(result);
-                              },
-                            ),
-                            DDButton(
-                              label: "POST",
-                              width: 100,
-                              onPressed: () {},
-                            ),
-                            DDButton(
-                              label: "PATCH",
-                              width: 100,
-                              onPressed: () {},
-                            ),
-                            DDButton(
-                              label: "DELETE",
-                              width: 100,
-                              onPressed: () {},
-                            ),
-                            DDButton(
-                              label: "FCM",
-                              width: 100,
-                              onPressed: () {
-                                HttpConn().fbPost(
-                                  sendData: FcmDto(
-                                    token: Secret.testTarget,
-                                    title: "테스트",
-                                    body: "테스트입니다.",
-                                    data: {
-                                      "fromId": 4,
-                                    },
+                                // Navigator.pushNamed(context, "/signin");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CommunityEditorView(),
                                   ),
                                 );
                               },
