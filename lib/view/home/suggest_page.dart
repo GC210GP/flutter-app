@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:app/model/fcm.dto.dart';
 import 'package:app/model/person.dto.dart';
+import 'package:app/util/secret.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -518,13 +520,17 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                               onPressed: () {},
                             ),
                             DDButton(
-                              label: "COMM",
+                              label: "FCM",
                               width: 100,
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => CommunityEditorView(),
+                                HttpConn().fbPost(
+                                  sendData: FcmDto(
+                                    token: Secret.testTarget,
+                                    title: "테스트",
+                                    body: "테스트입니다.",
+                                    data: {
+                                      "fromId": 4,
+                                    },
                                   ),
                                 );
                               },

@@ -1,7 +1,10 @@
 import 'package:app/util/network/fire_control.dart';
+import 'package:app/util/noti/fcm_service.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({Key? key}) : super(key: key);
@@ -80,7 +83,20 @@ class _SplashViewState extends State<SplashView> {
 
     FireControl.setInstanceOnce(FireControl(collectionName: "chat"));
     assert(FireControl.instance != null);
-    FireControl.instance!.init().then((isOk) {
+
+    FcmService fcmService = FcmService();
+
+    FireControl.instance!.init().then((isOk) async {
+      // FCM Setting
+      await fcmService.init();
+      await fcmService.getUserPermission();
+      fcmService.startListener();
+      debugPrint(await fcmService.getToken());
+
+      /// Init Badge
+      // TODO: 안읽은 메시지 개수 카운트 / GV.badgeCount 반영
+      // FlutterAppBadger.updateBadgeCount(GlobalVariables.badgetCount);
+
       if (isOk) {
         Future.delayed(const Duration(milliseconds: 2000)).then((value) {
           isAnimationRunning = false;

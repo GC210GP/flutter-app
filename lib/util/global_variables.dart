@@ -3,9 +3,12 @@ import 'package:app/model/person.dto.dart';
 class GlobalVariables {
   static const String baseurl =
       "http://blooddonationnew-env.eba-zyvef2nw.ap-northeast-2.elasticbeanstalk.com";
+
   static int userIdx = 1;
 
   static double radius = 12.5;
+
+  static int badgetCount = 0;
 
   static List<UserDto> suggestionList = [];
 
