@@ -226,6 +226,10 @@ class HttpConn {
     return null;
   }
 
+  void setHeaderToken(String token) {
+    _headers[HttpHeaders.authorizationHeader] = "Bearer " + token;
+  }
+
   ///
   ///
   ///

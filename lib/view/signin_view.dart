@@ -2,17 +2,15 @@ import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
+import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/signup/signup.view.dart';
-import 'package:app/view/signup/signup_page5.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 class SigninView extends StatefulWidget {
   const SigninView({Key? key}) : super(key: key);
@@ -282,44 +280,9 @@ class _SigninViewState extends State<SigninView> {
           return;
         }
 
-        late Gender gender;
-        late BloodType bloodType;
+        GlobalVariables.userDto = readUserDto(userResult);
 
-        for (var i in Gender.values) {
-          if (i.name == userResult['data']['sex']) {
-            gender = i;
-            break;
-          }
-        }
-
-        for (var i in BloodType.values) {
-          if (i.name == userResult['data']['bloodType']) {
-            bloodType = i;
-            break;
-          }
-        }
-
-        // TODO: 자기 SNS 불러오기 기능
-        GlobalVariables.userDto = UserDto(
-          uid: userResult['data']['id'],
-          name: userResult['data']['name'],
-          nickname: userResult['data']['nickname'],
-          email: userResult['data']['email'],
-          sns: [],
-          phoneNumber: userResult['data']['phoneNumber'],
-          profileImageLocation: userResult['data']['profileImageLocation'],
-          birthdate: DateTime.parse(userResult['data']['birthdate']),
-          location: userResult['data']['location'],
-          sex: gender,
-          job: userResult['data']['job'],
-          fbToken: userResult['data']['fbToken'],
-          bloodType: bloodType,
-          isDormant: userResult['data']['isDormant'],
-          isDonated: userResult['data']['isDonated'],
-          createdDate: DateTime.parse(userResult['data']['createdDate']),
-          modifiedDate: DateTime.parse(userResult['data']['modifiedDate']),
-        );
-
+        PreferenceManager.instance.updateSavedToken(token: tokenResult.token);
         GlobalVariables.savedEmail = _controller.text;
         Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         isWorking = false;
@@ -332,4 +295,50 @@ class _SigninViewState extends State<SigninView> {
 
     setState(() {});
   }
+}
+
+///
+///
+///
+///
+///
+
+UserDto readUserDto(Map<String, dynamic> userResult) {
+  late Gender gender;
+  late BloodType bloodType;
+
+  for (var i in Gender.values) {
+    if (i.name == userResult['data']['sex']) {
+      gender = i;
+      break;
+    }
+  }
+
+  for (var i in BloodType.values) {
+    if (i.name == userResult['data']['bloodType']) {
+      bloodType = i;
+      break;
+    }
+  }
+
+  // TODO: 자기 SNS 불러오기 기능
+  return UserDto(
+    uid: userResult['data']['id'],
+    name: userResult['data']['name'],
+    nickname: userResult['data']['nickname'],
+    email: userResult['data']['email'],
+    sns: [],
+    phoneNumber: userResult['data']['phoneNumber'],
+    profileImageLocation: userResult['data']['profileImageLocation'],
+    birthdate: DateTime.parse(userResult['data']['birthdate']),
+    location: userResult['data']['location'],
+    sex: gender,
+    job: userResult['data']['job'],
+    fbToken: userResult['data']['fbToken'],
+    bloodType: bloodType,
+    isDormant: userResult['data']['isDormant'],
+    isDonated: userResult['data']['isDonated'],
+    createdDate: DateTime.parse(userResult['data']['createdDate']),
+    modifiedDate: DateTime.parse(userResult['data']['modifiedDate']),
+  );
 }
