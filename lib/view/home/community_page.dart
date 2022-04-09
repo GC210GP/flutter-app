@@ -1,6 +1,12 @@
+import 'package:app/model/association.dto.dart';
+import 'package:app/model/person.dto.dart';
+import 'package:app/model/post.dto.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/community/community_board_view.dart';
+import 'package:app/view/community/community_view.dart';
 import 'package:app/widget/community_item.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:app/widget/page_title_widget.dart';
@@ -11,6 +17,7 @@ enum Status {
   searching,
   starred,
   searchResult,
+  unauthorized,
 }
 
 class CommunityPageView extends StatefulWidget {
@@ -25,13 +32,19 @@ class _CommunityPageViewState extends State<CommunityPageView> {
   FocusNode focusNode = FocusNode();
   TextEditingController textController = TextEditingController();
 
-  Status status = Status.starred;
+  Status status = Status.unauthorized;
 
   double pageOpacity = 0;
+  bool isLoading = true;
+
+  List<AssociationDto> starredCommunity = [];
+  List<AssociationDto> searchedCommunity = [];
+  List<List<PostDto>> starredCommunityPosts = [];
 
   @override
   void initState() {
     super.initState();
+
     scrollController.addListener(() {
       setState(() {});
     });
@@ -46,14 +59,11 @@ class _CommunityPageViewState extends State<CommunityPageView> {
       } else {
         status = Status.searchResult;
       }
-
-      setState(() {});
     });
-
-    Future.delayed(const Duration(milliseconds: 0)).then((value) {
-      pageOpacity = 1;
-      scrollController.jumpTo(110.0);
-      setState(() {});
+    pageOpacity = 0;
+    setState(() {});
+    Future.delayed(const Duration(milliseconds: 100)).then((_) {
+      getStarredCommunity().then((value) {});
     });
   }
 
@@ -70,19 +80,38 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     return AnimatedOpacity(
       opacity: pageOpacity,
       duration: const Duration(milliseconds: 100),
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: Column(
-            children: [
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (isLoading)
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 100,
+                  padding: const EdgeInsets.only(bottom: 50.0),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 7.5,
+                    color: DDColor.primary.shade600,
+                    backgroundColor: DDColor.disabled,
+                  ),
+                ),
+              )
+            else if (status != Status.unauthorized)
               Expanded(
                 child: ListView(
                   controller: scrollController,
-                  padding: const EdgeInsets.only(top: 50.0, bottom: 20.0),
+                  padding: EdgeInsets.only(
+                      top: 50.0,
+                      bottom: starredCommunity != null
+                          ? (3 - starredCommunity.length) * 150 + 20.0
+                          : 20.0),
                   physics: const BouncingScrollPhysics(),
                   children: [
                     // 검색
+
                     Container(
                       height: 50.0,
                       margin: const EdgeInsets.only(bottom: 60),
@@ -93,6 +122,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                             hintText: "커뮤니티 검색...",
                             focusNode: focusNode,
                             controller: textController,
+                            onChanged: (value) => searchCommunity(value),
                           ),
                           Positioned(
                             top: 0,
@@ -129,9 +159,38 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                       ),
                     ),
 
-                    if (status == Status.starred) StarredItems(),
-                    if (status == Status.searchResult)
-                      SearchedItem(searchQuery: textController.text),
+                    if (status == Status.starred)
+                      StarredItems(
+                        communityList: starredCommunity,
+                        postsList: starredCommunityPosts,
+                        onMorePressed: (associationDto) => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CommunityView(
+                              associationDto: associationDto,
+                              isStarred: true,
+                            ),
+                          ),
+                        ).then(
+                          (value) => getStarredCommunity(),
+                        ),
+                        onStarPressed: (uaid) => removeCommunityStar(uaid),
+                      ),
+                    if (status == Status.searchResult ||
+                        status == Status.searching)
+                      SearchedItem(
+                        searchQuery: textController.text,
+                        searchResult: searchedCommunity,
+                        onCreatePressed: createCommunity,
+                        onItemPressed: (associationDto) => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CommunityView(
+                              associationDto: associationDto,
+                            ),
+                          ),
+                        ),
+                      ),
 
                     ///
                     ///
@@ -139,10 +198,220 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                   ],
                 ),
               )
+            else
+              const Expanded(child: UnauthorizedPage()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<List<PostDto>> getCommunityBoards(int aid) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+      apiUrl: "/posts?associationId=$aid&page=1&size=5&sort=id,desc",
+    );
+
+    List<PostDto> posts = [];
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      for (var i in result['data']['content']) {
+        posts.add(
+          PostDto(
+              pid: i["id"],
+              title: i["title"] ?? "",
+              content: i["content"] ?? "",
+              isActiveGiver: i["isActiveGiver"] ?? false,
+              isActiveReceiver: i["isActiveReceiver"] ?? false,
+              cratedDate:
+                  DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
+              modifiedDate:
+                  DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
+              userId: i['userId'],
+              userNickname: i['userNickname']),
+        );
+      }
+    }
+
+    return posts;
+  }
+
+  removeCommunityStar(int uaid) async {
+    Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+        .delete(apiUrl: "/user-associations/$uaid");
+
+    if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+      await getStarredCommunity();
+      setState(() {});
+    }
+  }
+
+  Future<void> getStarredCommunity() async {
+    pageOpacity = 0.0;
+    setState(() {});
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    isLoading = true;
+    starredCommunity.clear();
+    pageOpacity = 1.0;
+    setState(() {});
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.get(apiUrl: "/user-associations");
+
+    switch (result['httpConnStatus']) {
+      case httpConnStatus.success:
+        status = Status.starred;
+        break;
+      default:
+        status = Status.unauthorized;
+        break;
+    }
+
+    for (Map<String, dynamic> i in result["data"]) {
+      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+          .get(apiUrl: "/associations?associationId=${i['associationId']}");
+      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        starredCommunity.add(
+          AssociationDto(
+            aid: i['associationId'],
+            uaid: i['userAssociationId'],
+            associationName: i['associationName'],
+            cratedDate:
+                DateTime.parse(resultAssociation['data']['createdDate']),
+            modifiedDate:
+                DateTime.parse(resultAssociation['data']['modifiedDate']),
+          ),
+        );
+
+        // 포스트 가져옴
+        for (AssociationDto i in starredCommunity) {
+          starredCommunityPosts.add(await getCommunityBoards(i.aid));
+        }
+      }
+    }
+
+    pageOpacity = 0.0;
+    setState(() {});
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    isLoading = false;
+    pageOpacity = 1.0;
+    setState(() {});
+    await Future.delayed(const Duration(milliseconds: 50));
+    scrollController.jumpTo(110.0);
+    await Future.delayed(const Duration(milliseconds: 200));
+  }
+
+  bool isSearching = false;
+
+  Future<void> searchCommunity(String query) async {
+    if (!isSearching && query.isNotEmpty) {
+      isSearching = true;
+
+      searchedCommunity.clear();
+
+      Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+          apiUrl: "/associations/search-name", queryString: {"query": query});
+
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        for (Map<String, dynamic> i in result['data']) {
+          searchedCommunity.add(
+            AssociationDto(
+              aid: i['id'],
+              uaid: -1,
+              associationName: i['associationName'],
+              cratedDate: DateTime.parse(i['createdDate']),
+              modifiedDate: DateTime.parse(i['modifiedDate']),
+            ),
+          );
+        }
+      }
+      setState(() {});
+
+      isSearching = false;
+    }
+  }
+
+  Future<void> createCommunity(String name) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn
+        .post(apiUrl: "/associations", body: {"associationName": name});
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CommunityView(
+            associationDto: AssociationDto(
+              aid: result['id'],
+              uaid: -1,
+              associationName: result['associationName'],
+              cratedDate: DateTime.parse(result['createdDate']),
+              modifiedDate: DateTime.parse(result['modifiedDate']),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+  // 뷰 재활용하거나 모달 활용해야 함
+}
+
+///
+///
+///
+///
+///
+///
+///
+class UnauthorizedPage extends StatelessWidget {
+  const UnauthorizedPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const PageTitleWidget(
+          title: "커뮤니티",
+          margin: EdgeInsets.fromLTRB(0, 50.0, 0, 20.0),
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Text(
+                  "📝",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: DDFontFamily.nanumSR,
+                    fontWeight: DDFontWeight.extraBold,
+                    fontSize: DDFontSize.h1,
+                    color: DDColor.grey,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              Center(
+                child: Text(
+                  "커뮤니티 활동을 하려면 로그인이 필요해요!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: DDFontFamily.nanumSR,
+                    fontWeight: DDFontWeight.extraBold,
+                    fontSize: DDFontSize.h4,
+                    color: DDColor.grey,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 80.0),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -229,59 +498,70 @@ class CommunityItem extends StatelessWidget {
 
 class SearchedItem extends StatelessWidget {
   final String searchQuery;
+  final List<AssociationDto> searchResult;
+  final Function(String name)? onCreatePressed;
+  final Function(AssociationDto associationDto)? onItemPressed;
   const SearchedItem({
-    required this.searchQuery,
     Key? key,
+    required this.searchQuery,
+    required this.searchResult,
+    this.onCreatePressed,
+    this.onItemPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(GlobalVariables.radius),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (AssociationDto i in searchResult)
+            CommunityItem(
+                title: "${i.associationName}",
+                // isStarred: true,
+                onPressed: () =>
+                    {if (onItemPressed != null) onItemPressed!(i)}),
+          if (searchQuery.isNotEmpty)
+            CommunityItem(
+              title: '"${searchQuery}" 추가하기',
+              hashtagColor: DDColor.primary,
+              onPressed: () =>
+                  {if (onCreatePressed != null) onCreatePressed!(searchQuery)},
+            )
+        ],
+      ),
+    );
+  }
+}
+
+class StarredItems extends StatelessWidget {
+  final List<AssociationDto> communityList;
+  final List<List<PostDto>> postsList;
+  final Function(AssociationDto associationDto)? onMorePressed;
+  final Function(int uaid)? onStarPressed;
+
+  const StarredItems({
+    Key? key,
+    required this.communityList,
+    required this.postsList,
+    this.onMorePressed,
+    this.onStarPressed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(GlobalVariables.radius),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (int i = 0; i < 5; i++)
-                    CommunityItem(
-                      title: "가천대$i",
-                      isStarred: true,
-                    ),
-                  CommunityItem(
-                    title: '"$searchQuery" 추가하기',
-                    hashtagColor: DDColor.primary,
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 30.0)
-          ],
-        )
-      ],
-    );
-  }
-}
-
-class StarredItems extends StatelessWidget {
-  const StarredItems({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < communityList.length; i++)
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Stack(
                 children: [
-                  const PageTitleWidget(
-                    title: "#가천대",
-                    margin: EdgeInsets.only(bottom: 10.0),
+                  PageTitleWidget(
+                    title: communityList[i].associationName,
+                    margin: const EdgeInsets.only(bottom: 10.0),
                   ),
                   Positioned(
                     right: 0,
@@ -296,7 +576,10 @@ class StarredItems extends StatelessWidget {
                           color: Colors.yellowAccent.shade700,
                           size: 20.0,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (onStarPressed != null)
+                            onStarPressed!(communityList[i].uaid);
+                        },
                       ),
                     ),
                   )
@@ -307,18 +590,35 @@ class StarredItems extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (int i = 0; i < 3; i++)
+                    for (int n = 0; n < postsList[i].length; n++)
                       CommunityBoardItem(
-                          author: "성남주민1", title: "성남병원 지정헌혈 부탁드립니다.."),
+                        author: postsList[i][n].userNickname,
+                        title: postsList[i][n].title.length >= 20
+                            ? postsList[i][n].title.substring(0, 20)
+                            : postsList[i][n].title,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CommunityBoardView(
+                              postDto: postsList[i][n],
+                            ),
+                          ),
+                        ),
+                      ),
                     CommunityBoardItem(
                       author: "",
-                      title: "더보기\n",
+                      title: "더보기...\n",
                       fontColor: DDColor.grey,
+                      onPressed: () {
+                        if (onMorePressed != null) {
+                          onMorePressed!(communityList[i]);
+                        }
+                      },
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 30.0)
+              const SizedBox(height: 30.0),
             ],
           )
       ],

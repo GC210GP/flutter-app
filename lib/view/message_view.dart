@@ -10,7 +10,7 @@ import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart' as url;
 
 class MessageView extends StatefulWidget {
   const MessageView({
@@ -103,10 +103,13 @@ class _MessageViewState extends State<MessageView> {
               width: 80,
               margin: const EdgeInsets.only(right: 20.0),
               fontColor: DDColor.white,
-              color: DDColor.grey.withOpacity(0.5),
+              color: DDColor.grey,
               fontWeight: DDFontWeight.bold,
               fontSize: DDFontSize.h4,
-              onPressed: () => {},
+              onPressed: () => url.launch(
+                "https://biss.bloodinfo.net/direct_donation_hos.jsp",
+                forceWebView: true,
+              ),
             ),
           ),
         ],

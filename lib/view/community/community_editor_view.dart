@@ -1,3 +1,6 @@
+import 'package:app/model/post.dto.dart';
+import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/widget/app_bar.dart';
@@ -9,7 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
 
 class CommunityEditorView extends StatefulWidget {
-  const CommunityEditorView({Key? key}) : super(key: key);
+  final PostDto post;
+
+  const CommunityEditorView({
+    Key? key,
+    required this.post,
+  }) : super(key: key);
 
   @override
   _CommunityEditorViewState createState() => _CommunityEditorViewState();
@@ -20,8 +28,14 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
   FocusNode focusNodeTitle = FocusNode();
   FocusNode focusNodeContent = FocusNode();
 
+  late String title;
+  late String content;
+
   @override
   void initState() {
+    title = widget.post.title;
+    content = widget.post.content;
+
     focusNodeTitle.addListener(() {
       setState(() {});
     });
@@ -61,6 +75,8 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
             const SizedBox(height: 5.0),
             DDTextField(
               focusNode: focusNodeTitle,
+              labelText: title,
+              onChanged: (value) => title = value,
             ),
 
             //
@@ -82,6 +98,8 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
               child: DDTextField(
                 isMultiline: true,
                 focusNode: focusNodeContent,
+                labelText: content,
+                onChanged: (value) => content = value,
               ),
             ),
 
@@ -143,7 +161,16 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
 
             SizedBox(height: 10.0),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
-              DDButton(label: isModify ? "수정하기" : "등록하기", onPressed: () {})
+              DDButton(
+                label: isModify ? "수정하기" : "등록하기",
+                onPressed: () {
+                  commitBoard(
+                    content: content,
+                    title: title,
+                    postId: widget.post.pid,
+                  );
+                },
+              )
             else
               DDButton(
                   label: "수정완료",
@@ -160,5 +187,21 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
         ),
       ),
     );
+  }
+
+  Future<void> commitBoard(
+      {required String title,
+      required String content,
+      required int postId}) async {
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.patch(apiUrl: "/posts/$postId", body: {
+      "title": title,
+      "content": content,
+    });
+    debugPrint("${result.toString()}");
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      debugPrint("${result.toString()} / postId: $postId");
+      Navigator.pop(context);
+    }
   }
 }

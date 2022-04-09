@@ -51,42 +51,6 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
               width: MediaQuery.of(context).size.width,
               child: Builder(
                 builder: (context) {
-                  ///
-                  ///
-                  ///
-                  ///
-                  ///
-                  // 리스트에 아무도 없을 경우
-
-                  if (GlobalVariables.userDto == null) {
-                    caroselList.add(
-                      CaroselItemLayout(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "로그인하시면\n도움이 필요한 분을 찾아드려요!",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: DDFontFamily.nanumSR,
-                                fontWeight: DDFontWeight.extraBold,
-                                fontSize: DDFontSize.h3,
-                                color: DDColor.fontColor,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            DDButton(
-                              label: "로그인",
-                              width: 100,
-                              onPressed: () =>
-                                  Navigator.pushNamed(context, "/signin"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
                   return CarouselSlider(
                     carouselController: controller,
                     options: CarouselOptions(
@@ -114,24 +78,54 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   }
 
   void doSuggestion() {
-    caroselList.add(Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Center(
-          child: Text(
-            "아직 추천 리스트가 없어요 😭\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: DDFontFamily.nanumSR,
-              fontWeight: DDFontWeight.extraBold,
-              fontSize: DDFontSize.h4,
-              color: DDColor.grey,
-            ),
+    if (GlobalVariables.userDto == null) {
+      caroselList.add(
+        CaroselItemLayout(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "로그인하시면\n도움이 필요한 분을 찾아드려요!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: DDFontFamily.nanumSR,
+                  fontWeight: DDFontWeight.extraBold,
+                  fontSize: DDFontSize.h3,
+                  color: DDColor.fontColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              DDButton(
+                label: "로그인",
+                width: 100,
+                onPressed: () => Navigator.pushNamed(context, "/signin"),
+              ),
+            ],
           ),
         ),
-      ],
-    ));
+      );
+    } else {
+      caroselList.add(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Text(
+                "아직 추천 리스트가 없어요 😭\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: DDFontFamily.nanumSR,
+                  fontWeight: DDFontWeight.extraBold,
+                  fontSize: DDFontSize.h4,
+                  color: DDColor.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   // Future<void> getSuggestion() async {

@@ -4,16 +4,22 @@ class PostDto {
   int pid;
   String title;
   String content;
-  bool isActive;
+  bool isActiveGiver;
+  bool isActiveReceiver;
   DateTime cratedDate;
-  DateTime updatedDate;
+  DateTime modifiedDate;
+  int userId;
+  String userNickname;
 
   PostDto({
     required this.pid,
     required this.title,
     required this.content,
-    required this.isActive,
+    required this.isActiveGiver,
+    required this.isActiveReceiver,
     required this.cratedDate,
-    required this.updatedDate,
+    required this.modifiedDate,
+    required this.userId,
+    required this.userNickname,
   });
 }
