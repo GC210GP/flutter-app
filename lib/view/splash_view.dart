@@ -1,3 +1,4 @@
+import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/noti/fcm_service.dart';
 import 'package:app/util/theme/colors.dart';
@@ -91,7 +92,8 @@ class _SplashViewState extends State<SplashView> {
       await fcmService.init();
       await fcmService.getUserPermission();
       fcmService.startListener();
-      debugPrint(await fcmService.getToken());
+      GlobalVariables.fcmToken = await fcmService.getToken();
+      debugPrint(GlobalVariables.fcmToken);
 
       /// Init Badge
       // TODO: 안읽은 메시지 개수 카운트 / GV.badgeCount 반영

@@ -5,13 +5,14 @@ class GlobalVariables {
   static const String baseurl =
       "http://blooddonationnew-env.eba-zyvef2nw.ap-northeast-2.elasticbeanstalk.com";
 
-  static int userIdx = 1;
-
   static double radius = 12.5;
 
   static int badgetCount = 0;
 
-  static List<UserDto> suggestionList = [];
+  // User 관련 상태
+  static String savedEmail = "";
+  static String fcmToken = "";
+  static UserDto? userDto;
 
   // TODO: 바꾸기
   static String defaultImgUrl =

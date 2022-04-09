@@ -1,12 +1,18 @@
+import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/signup/signup.view.dart';
+import 'package:app/view/signup/signup_page5.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class SigninView extends StatefulWidget {
   const SigninView({Key? key}) : super(key: key);
@@ -19,6 +25,16 @@ class _SigninViewState extends State<SigninView> {
   String userId = "";
   String userPw = "";
   bool isLoginFailed = false;
+  bool isWorking = false;
+
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    _controller.text = GlobalVariables.savedEmail;
+    userId = GlobalVariables.savedEmail;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +101,8 @@ class _SigninViewState extends State<SigninView> {
                     DDTextField(
                       margin: const EdgeInsets.only(top: 5.0, bottom: 15.0),
                       onChanged: (value) => userId = value,
+                      controller: _controller,
+                      keyboardType: TextInputType.emailAddress,
                     ),
 
                     Text(
@@ -127,14 +145,29 @@ class _SigninViewState extends State<SigninView> {
                     ///
 
                     Center(
-                      child: DDButton(
-                        width: 115,
-                        margin: const EdgeInsets.only(bottom: 50.0),
-                        label: "로그인",
-                        onPressed: () =>
-                            doLogin(userid: userId, userpw: userPw),
+                      child: Stack(
+                        children: [
+                          DDButton(
+                            width: 115,
+                            // margin: const EdgeInsets.only(bottom: 50.0),
+                            label: "로그인",
+                            onPressed: () =>
+                                doLogin(userid: userId, userpw: userPw),
+                          ),
+                          if (isWorking)
+                            Positioned.fill(
+                              child: Container(
+                                color: Colors.white.withOpacity(0.5),
+                                child: const CupertinoActivityIndicator(
+                                  radius: 15.0,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
+
+                    const SizedBox(height: 50.0),
 
                     ///
                     ///
@@ -187,15 +220,116 @@ class _SigninViewState extends State<SigninView> {
     ///
     ///
     // TODO: Refactoring
-    TokenDto? result = await GlobalVariables.httpConn
+
+    setState(() {
+      isWorking = true;
+    });
+
+    TokenDto? tokenResult = await GlobalVariables.httpConn
         .auth(email: userid.trim(), password: userpw.trim());
 
-    if (result != null) {
+    if (tokenResult != null) {
       isLoginFailed = false;
-      Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+
+      Map<String, dynamic> userResult =
+          await GlobalVariables.httpConn.get(apiUrl: "/users/current");
+
+      if (userResult['httpConnStatus'] == httpConnStatus.success) {
+        // 로그인 시, fcm 토큰 업데이트
+        await GlobalVariables.httpConn
+            .patch(apiUrl: "/users/${tokenResult.id}", body: {
+          "fbToken": GlobalVariables.fcmToken,
+        });
+        debugPrint("FB Token changed!");
+
+        // 회원가입 이후 별도 정보 입력 안한 경우!
+        // TODO: 백엔드에 Auth 요청하기
+        if (DateTime.parse(userResult['data']['birthdate']).hashCode ==
+            DateTime(1).hashCode) {
+          AddUserUserDto user = AddUserUserDto(
+            name: "unknown",
+            nickname: "unknown",
+            email: userResult['data']['email'],
+            sns: [],
+            phoneNumber: "unknown",
+            profileImageLocation: "",
+            birthdate: DateTime(1),
+            location: "unknown",
+            sex: Gender.MALE,
+            job: "",
+            fbToken: userResult['data']['fbToken'],
+            bloodType: BloodType.PLUS_A,
+            isDormant: false,
+            isDonated: false,
+            createdDate: DateTime(1),
+            updatedDate: DateTime(1),
+            frequency: 0,
+            password: userpw.trim(),
+            recency: DateTime(1),
+          );
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SignupView(
+                userData: user,
+                uid: tokenResult.id,
+                pageIndex: 6,
+              ),
+            ),
+          );
+          isWorking = false;
+          return;
+        }
+
+        late Gender gender;
+        late BloodType bloodType;
+
+        for (var i in Gender.values) {
+          if (i.name == userResult['data']['sex']) {
+            gender = i;
+            break;
+          }
+        }
+
+        for (var i in BloodType.values) {
+          if (i.name == userResult['data']['bloodType']) {
+            bloodType = i;
+            break;
+          }
+        }
+
+        // TODO: 자기 SNS 불러오기 기능
+        GlobalVariables.userDto = UserDto(
+          uid: userResult['data']['id'],
+          name: userResult['data']['name'],
+          nickname: userResult['data']['nickname'],
+          email: userResult['data']['email'],
+          sns: [],
+          phoneNumber: userResult['data']['phoneNumber'],
+          profileImageLocation: userResult['data']['profileImageLocation'],
+          birthdate: DateTime.parse(userResult['data']['birthdate']),
+          location: userResult['data']['location'],
+          sex: gender,
+          job: userResult['data']['job'],
+          fbToken: userResult['data']['fbToken'],
+          bloodType: bloodType,
+          isDormant: userResult['data']['isDormant'],
+          isDonated: userResult['data']['isDonated'],
+          createdDate: DateTime.parse(userResult['data']['createdDate']),
+          modifiedDate: DateTime.parse(userResult['data']['modifiedDate']),
+        );
+
+        GlobalVariables.savedEmail = _controller.text;
+        Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+        isWorking = false;
+        return;
+      }
     } else {
       isLoginFailed = true;
+      isWorking = true;
     }
+
     setState(() {});
   }
 }

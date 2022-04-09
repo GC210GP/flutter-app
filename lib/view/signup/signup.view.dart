@@ -1,3 +1,7 @@
+import 'package:app/model/person.dto.dart';
+import 'package:app/model/token.dto.dart';
+import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/signup/signup_page1.dart';
@@ -7,17 +11,74 @@ import 'package:app/view/signup/signup_page4.dart';
 import 'package:app/view/signup/signup_page5.dart';
 import 'package:app/view/signup/signup_page6.dart';
 import 'package:app/view/signup/signup_page7.dart';
+import 'package:app/view/signup/signup_page8.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class SignupView extends StatefulWidget {
-  const SignupView({Key? key}) : super(key: key);
+  final int pageIndex;
+  final AddUserUserDto? userData;
+  final int? uid;
+
+  const SignupView({
+    Key? key,
+    this.pageIndex = 0,
+    this.userData,
+    this.uid,
+  }) : super(key: key);
 
   @override
   _SignupViewState createState() => _SignupViewState();
 }
 
 class _SignupViewState extends State<SignupView> {
+  // 대소문자, 특수문자, 숫자 하나씩
+  RegExp passwordRegex = RegExp(
+      r"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-`~!@#$%^&*()_+=])[A-Za-z\d-`~!@#$%^&*()_+=]{8,}$");
+  RegExp phoneRegex = RegExp(r"01(?:0|1|[6-9])-(?:\d{3}|\d{4})-\d{4}$");
+  RegExp emailRegex =
+      RegExp(r"[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$");
+  // 영문,숫자 4~10자리
+  RegExp idRegex = RegExp(r"(?=.*[a-zA-Z])[-a-zA-Z0-9_.]{4,10}$");
+
+  late int currUid;
+  Status signinStatus = Status.processing;
+
+  AddUserUserDto user = AddUserUserDto(
+    name: "unknown",
+    nickname: "unknown",
+    email: "unknown",
+    sns: [],
+    phoneNumber: "unknown",
+    profileImageLocation: "",
+    birthdate: DateTime(1),
+    location: "unknown",
+    sex: Gender.MALE,
+    job: "",
+    fbToken: "",
+    bloodType: BloodType.PLUS_A,
+    isDormant: false,
+    isDonated: false,
+    createdDate: DateTime(1),
+    updatedDate: DateTime(1),
+    frequency: 0,
+    password: '',
+    recency: DateTime(1),
+  );
+
+  late int pageIdx;
+
+  @override
+  void initState() {
+    currUid = widget.uid ?? -1;
+    pageIdx = widget.pageIndex;
+    if (widget.userData != null) {
+      user = widget.userData!;
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,51 +92,169 @@ class _SignupViewState extends State<SignupView> {
         foregroundColor: Colors.transparent,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      body:
-          //
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (pageIdx == 0)
+            Expanded(
+              child: SignupPage1(
+                title: "이용약관",
+                content: exampleText,
+                buttonTitle: "이용약관 동의",
+                onPressed: () => changePage(1),
+              ),
+            )
+          else if (pageIdx == 1)
+            Expanded(
+              child: SignupPage1(
+                title: "개인정보보호방침",
+                content: exampleText,
+                buttonTitle: "개인정보보호방침 동의",
+                onPressed: () => changePage(2),
+              ),
+            )
+          else if (pageIdx == 2)
+            Expanded(
+              child: SignupPage2(
+                title: "이메일을 입력해주세요",
+                errorMessage: "이메일을 올바르게 입력해주세요",
+                validator: emailRegex,
+                keyboardType: TextInputType.emailAddress,
+                onPressed: (email) {
+                  user.email = email;
+                  changePage(3);
+                },
+                onBackPressed: () => Navigator.pop(context),
+              ),
+            )
+          else if (pageIdx == 3)
+            Expanded(
+              child: SignupPage2(
+                onPressed: (password) {
+                  user.password = password;
+                  changePage(4);
+                },
+                isObscureText: true,
+                keyboardType: TextInputType.text,
+                validator: passwordRegex,
+                onBackPressed: () => changePage(2),
+                title: "비밀번호를 입력해주세요",
+                errorMessage: "대/소문자, 특수문자, 숫자 하나씩 입력해주세요",
+              ),
+            )
+          else if (pageIdx == 4)
+            Expanded(
+              child: SignupPage2(
+                onPressed: (_) async {
+                  // 유저 생성
+                  user.fbToken = GlobalVariables.fcmToken;
+                  if (await createUser(user)) {
+                    changePage(5);
+                  }
+                },
+                onBackPressed: () => changePage(3),
+                keyboardType: TextInputType.text,
+                isObscureText: true,
+                correctionCheck: (input) {
+                  return input == user.password;
+                },
+                title: "한 번 더 입력해주세요",
+                errorMessage: "비밀번호가 일치하지 않습니다!",
+                isTransition: false,
+              ),
+            )
+          else if (pageIdx == 5)
+            Expanded(
+              child: SignupPage3(
+                email: user.email,
+                onCheckValidation: (code) async {
+                  if (await checkUserEmailValidation(code)) {
+                    await Future.delayed(const Duration(seconds: 1));
+                    changePage(6);
+                    return true;
+                  } else {
+                    return false;
+                  }
+                },
+                // onBackPressed: () => changePage(2),
+              ),
+            )
 
-          //     SignupPage1(
-          //   title: "이용약관",
-          //   content: exampleText,
-          //   buttonTitle: "이용약관 동의",
-          //   onPressed: () {},
-          // ),
+          ///
+          ///
+          ///
 
-          //     SignupPage1(
-          //   title: "개인정보보호방침",
-          //   content: exampleText,
-          //   buttonTitle: "개인정보보호방침 동의",
-          //   onPressed: () {},
-          // ),
+          else if (pageIdx == 6)
+            Expanded(
+              child: SignPage4(
+                onPressed: (String name, String imgUrl) {
+                  user.name = name;
+                  user.profileImageLocation = imgUrl;
+                  changePage(7);
+                },
+                label: "이름 (실명)",
+              ),
+            )
+          else if (pageIdx == 7)
+            Expanded(
+              child: SignPage4(
+                imgUrl: user.profileImageLocation,
+                onPressed: (String nickname, String imgUrl) {
+                  user.nickname = nickname;
+                  user.profileImageLocation = imgUrl;
+                  changePage(8);
+                },
+                onBackPressed: () => changePage(8),
+                label: "닉네임",
+              ),
+            )
+          else if (pageIdx == 8)
+            Expanded(
+              child: SignPage5(
+                onPressed: ({
+                  String? address,
+                  DateTime? birthdate,
+                  BloodType? bloodType,
+                  bool? isDonated,
+                  String? job,
+                  Gender? sex,
+                }) {
+                  user.location = address!;
+                  user.birthdate = birthdate!;
+                  user.sex = sex!;
+                  user.isDonated = isDonated!;
+                  user.job = job!;
+                  user.bloodType = bloodType!;
 
-          //     SignupPage2(
-          //   onPressed: () {},
-          //   onBackPressed: () {},
-          //   title: "이메일을 입력해주세요",
-          //   errorMessage: "이메일을 올바르게 입력해주세요",
-          // ),
-
-          // SignupPage3(),
-
-          //     SignupPage2(
-          //   onPressed: () {},
-          //   onBackPressed: () {},
-          //   title: "비밀번호를 입력해주세요",
-          //   errorMessage: "비밀번호를 올바르게 입력해주세요",
-          // ),
-
-          //     SignupPage2(
-          //   onPressed: () {},
-          //   onBackPressed: () {},
-          //   title: "한 번 더 입력해주세요",
-          //   errorMessage: "비밀번호가 다릅니다",
-          // ),
-
-          // SignPage4(),
-
-          SignPage5(),
-      // SignPage6(),
-      // SignPage7(),
+                  changePage(9);
+                },
+                onBackPressed: () => changePage(7),
+              ),
+            )
+          else if (pageIdx == 9)
+            Expanded(
+              child: SignPage6(
+                onPressed: ((value) {
+                  user.sns = value;
+                  changeUserWorker(user);
+                }),
+                onBackPressed: () => changePage(8),
+              ),
+            )
+          else if (pageIdx == 10)
+            Expanded(
+              child: SignPage7(),
+            )
+          else if (pageIdx == 11)
+            Expanded(
+              child: SignPage8(
+                status: signinStatus,
+                onPressed: () => Navigator.pop(context),
+              ),
+            )
+        ],
+      ),
     );
   }
 
@@ -85,29 +264,119 @@ class _SignupViewState extends State<SignupView> {
   ///
   ///
 
-  Future<void> doSignup() async {
-    // var body = convert.json.encode({
-    //   "name": name,
-    //   "nickname": nickname,
-    //   "email": email,
-    //   "password": password,
-    //   "phoneNumber": phoneNumber,
-    //   "profileImageLocation": "img1",
-    //   "birthdate": DateFormat("yyyy-MM-dd").format(birthdate).toString(),
-    //   "location": location,
-    //   "sex": sex,
-    //   "job": job,
-    //   "bloodType": bloodType.toString().split(".")[1],
-    //   "recency": DateFormat("yyyy-MM-dd").format(birthdate).toString(),
-    //   "frequency": "1",
-    //   "isDonated": "false",
-    //   "isDormant": "false"
-    // });
+  bool isWorking = false;
 
-    // Map<String, String> headers = {
-    //   HttpHeaders.contentTypeHeader: 'application/json',
-    //   HttpHeaders.acceptHeader: 'application/json',
-    // };
+  void changePage(int idx) => setState(() {
+        pageIdx = idx;
+      });
+
+  Future<bool> createUser(AddUserUserDto userData) async {
+    if (!isWorking) {
+      isWorking = true;
+
+      Map<String, dynamic> result =
+          await GlobalVariables.httpConn.post(apiUrl: "/auth/signup", body: {
+        "name": userData.name,
+        "nickname": userData.nickname,
+        "email": userData.email,
+        "password": userData.password,
+        "phoneNumber": userData.phoneNumber,
+        "profileImageLocation": userData.profileImageLocation,
+        "birthdate": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "location": userData.location,
+        "sex": userData.sex.name,
+        "job": userData.job,
+        "bloodType": userData.bloodType.name,
+        "recency": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "frequency": userData.frequency.toString(),
+        "isDonated": userData.isDonated.toString(),
+        "isDormant": userData.isDormant.toString(),
+        "fbToken": userData.fbToken,
+      });
+
+      print(result);
+
+      if (result["httpConnStatus"] == httpConnStatus.success) {
+        currUid = result["data"]["id"];
+        debugPrint("currUid: $currUid");
+
+        TokenDto? loginResult = await GlobalVariables.httpConn
+            .auth(email: userData.email, password: userData.password);
+
+        if (loginResult != null) {
+          result = await GlobalVariables.httpConn
+              .post(apiUrl: "/users/validate-email");
+          if (result["httpConnStatus"] == httpConnStatus.success) {
+            isWorking = true;
+            return true;
+          }
+        }
+      }
+      isWorking = false;
+      return false;
+    }
+    return false;
+  }
+
+  Future<bool> checkUserEmailValidation(int code) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.post(
+      apiUrl: "/users/validate-email-send-code",
+      queryString: {
+        "emailCode": code.toString(),
+      },
+    );
+    return result['httpConnStatus'] == httpConnStatus.success;
+  }
+
+  Future<void> changeUserWorker(AddUserUserDto userDto) async {
+    changePage(10);
+    bool result = await changeUser(userDto);
+
+    if (result) {
+      signinStatus = Status.success;
+    } else {
+      signinStatus = Status.fail;
+    }
+
+    changePage(11);
+  }
+
+  Future<bool> changeUser(AddUserUserDto userDto) async {
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.patch(apiUrl: "/users/$currUid", body: {
+      "name": userDto.name,
+      "nickname": userDto.nickname,
+      "profileImageLocation": userDto.profileImageLocation,
+      "birthdate":
+          DateFormat("yyyy-MM-dd").format(userDto.birthdate).toString(),
+      // "location": userDto.location,
+      "sex": userDto.sex.name,
+      "job": userDto.job,
+      "bloodType": userDto.bloodType.name,
+      "isDonated": userDto.isDonated.toString(),
+    });
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      bool isSuccess = true;
+
+      for (SnsDto i in userDto.sns) {
+        Map<String, dynamic> resultSns = await GlobalVariables.httpConn.post(
+          apiUrl: "/users/sns",
+          body: {
+            "userId": currUid.toString(),
+            "snsType": i.snsType.name,
+            "snsProfile": i.snsProfile,
+          },
+        );
+        if (result['httpConnStatus'] != httpConnStatus.success) {
+          isSuccess = false;
+        }
+      }
+
+      if (isSuccess) return true;
+    }
+
+    return false;
   }
 
   ///

@@ -97,7 +97,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => MessageView(
-                          fromId: GlobalVariables.userIdx,
+                          fromId: GlobalVariables.userDto!.uid,
                           toId: 4,
                           toName: "태평주민",
                         ),

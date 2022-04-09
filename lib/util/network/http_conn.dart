@@ -209,7 +209,7 @@ class HttpConn {
 
       int userIdx = int.parse(payload['sub']);
       DateTime exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
-      Auth auth = Auth.UNKNOWN;
+      Auth auth = Auth.ROLE_NEED_EMAIL;
       for (Auth i in Auth.values) {
         if (i.toString() == payload['auth']) auth = i;
       }
@@ -231,9 +231,10 @@ class HttpConn {
   ///
   /// 결과를 Map 형태로 리턴
   Map<String, dynamic> resultBuilder(http.Response response) {
-    Map<String, dynamic> result = convert.jsonDecode(response.body);
-
-    result = convert.jsonDecode(response.body);
+    Map<String, dynamic> result = {};
+    if (convert.utf8.decode(response.bodyBytes).isNotEmpty) {
+      result = convert.jsonDecode(convert.utf8.decode(response.bodyBytes));
+    }
 
     if (response.statusCode < 400) {
       result["httpConnStatus"] = httpConnStatus.success;

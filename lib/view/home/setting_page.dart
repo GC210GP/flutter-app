@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:app/view/home/home_view.dart';
 import 'package:app/view/settting_text_view.dart';
 import 'package:app/view/signup/signup.view.dart';
 import 'package:app/widget/page_title_widget.dart';
@@ -59,7 +60,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                       height: 100,
                       children: [
                         Text(
-                          "테스트1",
+                          GlobalVariables.userDto != null
+                              ? GlobalVariables.userDto!.nickname
+                              : "\n로그인이 필요합니다.",
                           style: TextStyle(
                             fontFamily: "NanumSR",
                             fontWeight: FontWeight.w900,
@@ -68,7 +71,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                           ),
                         ),
                         Text(
-                          "김도균",
+                          GlobalVariables.userDto != null
+                              ? GlobalVariables.userDto!.name
+                              : "",
                           style: TextStyle(
                             fontFamily: "NanumSR",
                             fontWeight: FontWeight.w900,
@@ -77,7 +82,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                           ),
                         ),
                         Text(
-                          "test@naver.com",
+                          GlobalVariables.userDto != null
+                              ? GlobalVariables.userDto!.email
+                              : "",
                           style: TextStyle(
                             fontFamily: "NanumSR",
                             fontWeight: FontWeight.w900,
@@ -86,7 +93,30 @@ class _SettingPageViewState extends State<SettingPageView> {
                           ),
                         ),
                       ],
-                      onPressed: () {},
+                      onPressed: GlobalVariables.userDto != null
+                          ? () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => CupertinoAlertDialog(
+                                  title: const Text("로그아웃 하시겠습니까?"),
+                                  actions: [
+                                    CupertinoButton(
+                                      child: Text(
+                                        "예",
+                                        style:
+                                            TextStyle(color: DDColor.primary),
+                                      ),
+                                      onPressed: doLogout,
+                                    ),
+                                    CupertinoButton(
+                                      child: Text("아니오"),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          : null,
                     ),
 
                     ///
@@ -169,6 +199,18 @@ class _SettingPageViewState extends State<SettingPageView> {
         ),
       ),
     );
+  }
+
+  Future<void> doLogout() async {
+    GlobalVariables.fcmToken = "";
+    GlobalVariables.userDto = null;
+
+    await GlobalVariables.httpConn.patch(
+      apiUrl: "/users/${GlobalVariables.userDto!.uid}",
+      body: {"fbToken": ""},
+    );
+
+    Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
   }
 }
 

@@ -34,6 +34,10 @@ class _SignupPage1State extends State<SignupPage1> {
       isBottom = _controller.offset >= _controller.position.maxScrollExtent;
       if (tmp != isBottom) setState(() {});
     });
+    Future.delayed(const Duration(milliseconds: 0)).then((value) {
+      pageOpacity = 1.0;
+      setState(() {});
+    });
     super.initState();
   }
 
@@ -43,57 +47,74 @@ class _SignupPage1State extends State<SignupPage1> {
     super.dispose();
   }
 
+  double pageOpacity = 0.0;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 50),
-          Center(
-            child: Text(
-              widget.title,
-              style: TextStyle(
-                fontFamily: DDFontFamily.nanumSR,
-                fontWeight: DDFontWeight.extraBold,
-                fontSize: DDFontSize.h15,
-                color: DDColor.fontColor,
+    return AnimatedOpacity(
+      opacity: pageOpacity,
+      duration: const Duration(milliseconds: 100),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 50),
+            Center(
+              child: Text(
+                widget.title,
+                style: TextStyle(
+                  fontFamily: DDFontFamily.nanumSR,
+                  fontWeight: DDFontWeight.extraBold,
+                  fontSize: DDFontSize.h15,
+                  color: DDColor.fontColor,
+                ),
               ),
             ),
-          ),
 
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(top: 50.0, bottom: 20.0),
-              decoration: BoxDecoration(
-                  color: DDColor.white,
-                  borderRadius: BorderRadius.circular(GlobalVariables.radius),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 15,
-                      color: Colors.black.withOpacity(0.05),
-                    )
-                  ]),
-              child: ListView(
-                controller: _controller,
-                padding: const EdgeInsets.all(20.0),
-                physics: const BouncingScrollPhysics(),
-                children: [Text(widget.content)],
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(top: 50.0, bottom: 20.0),
+                decoration: BoxDecoration(
+                    color: DDColor.white,
+                    borderRadius: BorderRadius.circular(GlobalVariables.radius),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        color: Colors.black.withOpacity(0.05),
+                      )
+                    ]),
+                child: ListView(
+                  controller: _controller,
+                  padding: const EdgeInsets.all(20.0),
+                  physics: const BouncingScrollPhysics(),
+                  children: [Text(widget.content)],
+                ),
               ),
             ),
-          ),
 
-          DDButton(
-            label: widget.buttonTitle,
-            onPressed: isBottom ? widget.onPressed : null,
-          ),
-          const SizedBox(height: 50),
+            DDButton(
+              label: widget.buttonTitle,
+              onPressed: isBottom
+                  ? () async {
+                      pageOpacity = 0.0;
+                      setState(() {});
+                      await Future.delayed(const Duration(milliseconds: 100));
 
-          ///
-          ///
-          ///
-        ],
+                      widget.onPressed!();
+                      _controller.jumpTo(0.0);
+                      pageOpacity = 1.0;
+                      setState(() {});
+                    }
+                  : null,
+            ),
+            const SizedBox(height: 50),
+
+            ///
+            ///
+            ///
+          ],
+        ),
       ),
     );
   }

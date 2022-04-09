@@ -11,7 +11,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SignPage5 extends StatefulWidget {
-  final VoidCallback? onPressed;
+  final Function({
+    required BloodType bloodType,
+    required bool isDonated,
+    required DateTime birthdate,
+    required Gender sex,
+    required String job,
+    required String address,
+  })? onPressed;
   final VoidCallback? onBackPressed;
 
   const SignPage5({
@@ -26,212 +33,279 @@ class SignPage5 extends StatefulWidget {
 
 class _SignPage5State extends State<SignPage5> {
   late AddressApiConn addressApiConn;
+  BloodType bloodType = BloodType.PLUS_A;
+  bool isDonated = false;
+  DateTime birthdate = DateTime(DateTime.now().year);
+  Gender sex = Gender.MALE;
+  String job = "";
+  String addressProvince = "";
+  String addressCity = "";
+
+  double pageOpacity = 0.0;
+  bool isError = false;
 
   @override
   void initState() {
     addressApiConn = AddressApiConn();
     addressApiConn.getProvince().then((value) => setState(() {}));
+
+    Future.delayed(const Duration(milliseconds: 0)).then((value) {
+      pageOpacity = 1.0;
+      setState(() {});
+    });
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ListView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(top: 70.0, bottom: 50.0),
-        children: [
-          Center(
-            child: SizedBox(
-              width: 250,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: ProfileItem(
-                      nickname: "홍길동",
-                      email: "uhug@naver.com",
-                      imgUrl: GlobalVariables.defaultImgUrl,
-                    ),
-                  ),
-
-                  const SizedBox(height: 25.0),
-
-                  Center(
-                    child: Text(
-                      "거의 다왔어요!",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+    return AnimatedOpacity(
+      opacity: pageOpacity,
+      duration: const Duration(milliseconds: 100),
+      child: Center(
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(top: 70.0, bottom: 50.0),
+          children: [
+            Center(
+              child: SizedBox(
+                width: 250,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: ProfileItem(
+                        nickname: "홍길동",
+                        email: "uhug@naver.com",
+                        imgUrl: GlobalVariables.defaultImgUrl,
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      "추가 정보를 입력해주세요",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h3,
-                        color: DDColor.fontColor,
+
+                    const SizedBox(height: 25.0),
+
+                    Center(
+                      child: Text(
+                        "거의 다왔어요!",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 50.0),
-
-                  Center(
-                    child: Text(
-                      "혈액형",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "추가 정보를 입력해주세요",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h3,
+                          color: DDColor.fontColor,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  BloodTypePicker(),
 
-                  const SizedBox(height: 20.0),
+                    const SizedBox(height: 50.0),
 
-                  Center(
-                    child: Text(
-                      "헌혈유무",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "혈액형",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  BinaryPicker(),
+                    const SizedBox(height: 5.0),
+                    BloodTypePicker(
+                      onChanged: ((value) => bloodType = value),
+                    ),
 
-                  const Divider(
-                    height: 60.0,
-                  ),
+                    const SizedBox(height: 20.0),
 
-                  Center(
-                    child: Text(
-                      "태어난 연도",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "헌혈유무",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  YearPicker(),
+                    const SizedBox(height: 5.0),
+                    BinaryPicker(
+                      onChanged: (value) => isDonated = value,
+                    ),
 
-                  const SizedBox(height: 20.0),
+                    const Divider(
+                      height: 60.0,
+                    ),
 
-                  Center(
-                    child: Text(
-                      "성별",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "태어난 연도",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  GenderPicker(),
+                    const SizedBox(height: 5.0),
+                    YearPicker(
+                        onChanged: (value) => birthdate = DateTime(value)),
 
-                  const SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
 
-                  Center(
-                    child: Text(
-                      "직업",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "성별",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  DDTextField(),
+                    const SizedBox(height: 5.0),
+                    GenderPicker(onChanged: (value) => sex = value),
 
-                  const SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
 
-                  Center(
-                    child: Text(
-                      "거주지",
-                      style: TextStyle(
-                        fontFamily: DDFontFamily.nanumSR,
-                        fontWeight: DDFontWeight.extraBold,
-                        fontSize: DDFontSize.h4,
-                        color: DDColor.grey,
+                    Center(
+                      child: Text(
+                        "직업",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 5.0),
-                  DDDropdownButton(
-                    disabledHint: Text("광역시도..."),
-                    items: [...addressApiConn.province.values],
-                    onChanged: (value) async {
-                      if (value != null) {
-                        int provinceCode =
-                            addressApiConn.province.keys.toList()[addressApiConn
-                                .province.values
-                                .toList()
-                                .indexOf(value)];
+                    const SizedBox(height: 5.0),
+                    DDTextField(onChanged: (p0) => job = p0),
 
-                        await addressApiConn.getCity(
-                            provinceCode: provinceCode);
+                    const SizedBox(height: 20.0),
 
-                        setState(() {});
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 5),
-                  DDDropdownButton(
-                    disabledHint: Text("시군구..."),
-                    items: [...addressApiConn.city.values],
-                    onChanged: (value) {},
-                  ),
-
-                  const SizedBox(height: 50.0),
-
-                  Center(
-                    child: DDButton(
-                      width: 80,
-                      label: "확인",
-                      onPressed: widget.onPressed,
+                    Center(
+                      child: Text(
+                        "거주지",
+                        style: TextStyle(
+                          fontFamily: DDFontFamily.nanumSR,
+                          fontWeight: DDFontWeight.extraBold,
+                          fontSize: DDFontSize.h4,
+                          color: DDColor.grey,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 5.0),
+                    DDDropdownButton(
+                      disabledHint: Text("광역시도..."),
+                      items: [...addressApiConn.province.values],
+                      onChanged: (value) async {
+                        if (value != null) {
+                          int provinceCode =
+                              addressApiConn.province.keys.toList()[
+                                  addressApiConn.province.values
+                                      .toList()
+                                      .indexOf(value)];
 
-                  const SizedBox(height: 20.0),
+                          await addressApiConn.getCity(
+                              provinceCode: provinceCode);
 
-                  Center(
-                    child: DDButton(
-                      width: 40.0,
-                      height: 40.0,
-                      label: "←",
-                      onPressed: widget.onBackPressed,
-                      color: DDColor.disabled,
+                          addressProvince = value;
+                          addressCity = [...addressApiConn.city.values][0];
+
+                          setState(() {});
+                        }
+                      },
                     ),
-                  ),
+                    const SizedBox(height: 5),
+                    DDDropdownButton(
+                      disabledHint: Text("시군구..."),
+                      labelText: addressCity,
+                      items: [...addressApiConn.city.values],
+                      onChanged: (value) {
+                        if (value != null) {
+                          addressCity = value;
+                        }
+                      },
+                    ),
 
-                  ///
-                  ///
-                  ///
-                ],
+                    const SizedBox(height: 20.0),
+
+                    if (isError)
+                      Center(
+                        child: Text(
+                          "모든 항목을 빠짐없이 입력해주세요!",
+                          style: TextStyle(
+                            fontFamily: DDFontFamily.nanumSR,
+                            fontWeight: DDFontWeight.extraBold,
+                            fontSize: DDFontSize.h5,
+                            color: DDColor.primary,
+                          ),
+                        ),
+                      )
+                    else
+                      SizedBox(height: 14.5),
+
+                    const SizedBox(height: 20.0),
+
+                    Center(
+                      child: DDButton(
+                        width: 80,
+                        label: "확인",
+                        onPressed: () {
+                          if (widget.onPressed != null) {
+                            if ("$addressProvince $addressCity".isNotEmpty &&
+                                job.isNotEmpty) {
+                              widget.onPressed!(
+                                address: "$addressProvince $addressCity",
+                                birthdate: birthdate,
+                                bloodType: bloodType,
+                                isDonated: isDonated,
+                                job: job,
+                                sex: sex,
+                              );
+                            } else {
+                              isError = true;
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 20.0),
+
+                    Center(
+                      child: DDButton(
+                        width: 40.0,
+                        height: 40.0,
+                        child: const Icon(Icons.arrow_back_rounded),
+                        onPressed: widget.onBackPressed,
+                        color: DDColor.disabled,
+                      ),
+                    ),
+
+                    ///
+                    ///
+                    ///
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -249,7 +323,12 @@ class _SignPage5State extends State<SignPage5> {
 ///
 // 날짜 피커
 class YearPicker extends StatefulWidget {
-  const YearPicker({Key? key}) : super(key: key);
+  final Function(int value)? onChanged;
+
+  const YearPicker({
+    Key? key,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   State<YearPicker> createState() => _YearPickerState();
@@ -299,6 +378,11 @@ class _YearPickerState extends State<YearPicker> {
                       itemExtent: 40.0,
                       onSelectedItemChanged: (index) {
                         birth = DateTime.now().year - index;
+
+                        if (widget.onChanged != null) {
+                          widget.onChanged!(birth);
+                        }
+
                         setState(() {});
                       },
                       diameterRatio: 1.1,
@@ -335,7 +419,12 @@ class _YearPickerState extends State<YearPicker> {
 ///
 
 class BinaryPicker extends StatefulWidget {
-  const BinaryPicker({Key? key}) : super(key: key);
+  final Function(bool value)? onChanged;
+
+  const BinaryPicker({
+    Key? key,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   State<BinaryPicker> createState() => _BinaryPickerState();
@@ -378,6 +467,11 @@ class _BinaryPickerState extends State<BinaryPicker> {
                     onPressed: () {
                       binary = genders[i];
                       binaryLabel = binaryLabels[i];
+
+                      if (widget.onChanged != null) {
+                        widget.onChanged!(binary);
+                      }
+
                       Navigator.pop(context);
                       setState(() {});
                     },
@@ -392,7 +486,12 @@ class _BinaryPickerState extends State<BinaryPicker> {
 }
 
 class GenderPicker extends StatefulWidget {
-  const GenderPicker({Key? key}) : super(key: key);
+  final Function(Gender value)? onChanged;
+
+  const GenderPicker({
+    Key? key,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   State<GenderPicker> createState() => _GenderPickerState();
@@ -435,6 +534,11 @@ class _GenderPickerState extends State<GenderPicker> {
                     onPressed: () {
                       gender = genders[i];
                       genderLabel = genderLabels[i];
+
+                      if (widget.onChanged != null) {
+                        widget.onChanged!(gender);
+                      }
+
                       Navigator.pop(context);
                       setState(() {});
                     },
@@ -449,7 +553,12 @@ class _GenderPickerState extends State<GenderPicker> {
 }
 
 class BloodTypePicker extends StatefulWidget {
-  const BloodTypePicker({Key? key}) : super(key: key);
+  final Function(BloodType value)? onChanged;
+
+  const BloodTypePicker({
+    Key? key,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   State<BloodTypePicker> createState() => _BloodTypePickerState();
@@ -510,6 +619,11 @@ class _BloodTypePickerState extends State<BloodTypePicker> {
                     onPressed: () {
                       bloodType = bloodTypes[i];
                       bloodTypeLabel = bloodTypeLabels[i];
+
+                      if (widget.onChanged != null) {
+                        widget.onChanged!(bloodType);
+                      }
+
                       Navigator.pop(context);
                       setState(() {});
                     },

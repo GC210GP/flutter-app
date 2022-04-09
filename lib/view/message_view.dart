@@ -48,7 +48,8 @@ class _MessageViewState extends State<MessageView> {
 
       for (ChatMessage i in data) {
         chatBubbles.add(
-          ChatBubble(msg: i.msg, isLeft: i.senderId != GlobalVariables.userIdx),
+          ChatBubble(
+              msg: i.msg, isLeft: i.senderId != GlobalVariables.userDto!.uid),
         );
       }
 

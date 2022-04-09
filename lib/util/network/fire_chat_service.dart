@@ -97,7 +97,7 @@ class FireChatService {
   sendMessage({required String message}) {
     _chatdata.content.add(
       ChatMessage(
-        senderId: GlobalVariables.userIdx,
+        senderId: GlobalVariables.userDto!.uid,
         timestamp: DateTime.now(),
         msg: message,
       ),
