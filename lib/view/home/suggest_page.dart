@@ -5,6 +5,7 @@ import 'package:app/model/person.dto.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
+import 'package:app/util/theme/font.dart';
 import 'package:app/widget/button.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,11 +25,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
   CarouselController controller = CarouselController();
 
   double pageOpacity = 0;
-  HttpConn httpConn = HttpConn();
+
+  List<Widget> caroselList = [];
 
   @override
   void initState() {
     super.initState();
+    doSuggestion();
     Future.delayed(const Duration(milliseconds: 0)).then((value) {
       pageOpacity = 1;
       setState(() {});
@@ -48,8 +51,6 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
               width: MediaQuery.of(context).size.width,
               child: Builder(
                 builder: (context) {
-                  List<Widget> caroselList = [];
-
                   ///
                   ///
                   ///
@@ -67,13 +68,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                               "로그인하시면\n도움이 필요한 분을 찾아드려요!",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontFamily: "NanumSR",
-                                fontWeight: FontWeight.w900,
-                                fontSize: 20,
-                                color: Colors.grey.shade900,
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.extraBold,
+                                fontSize: DDFontSize.h3,
+                                color: DDColor.fontColor,
                               ),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             DDButton(
                               label: "로그인",
                               width: 100,
@@ -110,6 +111,27 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
         ],
       ),
     );
+  }
+
+  void doSuggestion() {
+    caroselList.add(Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(
+          child: Text(
+            "아직 추천 리스트가 없어요 😭\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: DDFontFamily.nanumSR,
+              fontWeight: DDFontWeight.extraBold,
+              fontSize: DDFontSize.h4,
+              color: DDColor.grey,
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 
   // Future<void> getSuggestion() async {
@@ -172,6 +194,19 @@ class CaroselItemLayout extends StatelessWidget {
 ///
 ///
 ///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
 
 class ShadowBox extends StatelessWidget {
   final Alignment? alignment;
@@ -219,7 +254,12 @@ class ShadowBox extends StatelessWidget {
 ///
 
 class SuggestionUpperBar extends StatefulWidget {
-  const SuggestionUpperBar({Key? key}) : super(key: key);
+  final int count;
+
+  const SuggestionUpperBar({
+    Key? key,
+    this.count = 0,
+  }) : super(key: key);
 
   @override
   State<SuggestionUpperBar> createState() => _SuggestionUpperBarState();
@@ -236,51 +276,54 @@ class _SuggestionUpperBarState extends State<SuggestionUpperBar> {
           height: 40,
           child: Stack(
             children: [
-              Image(
+              const Image(
                 width: 35,
                 image: AssetImage("./assets/icon/applogo.png"),
               ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: DDColor.primary.shade400,
-                    borderRadius: BorderRadius.circular(20),
+              if (widget.count != 0)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: DDColor.primary.shade400,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 2.5,
-                right: 2.5,
-                child: Container(
-                  width: 15,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: DDColor.white,
-                    borderRadius: BorderRadius.circular(15),
+              if (widget.count != 0)
+                Positioned(
+                  bottom: 2.5,
+                  right: 2.5,
+                  child: Container(
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: DDColor.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 2,
-                right: 5.5,
-                child: Text(
-                  "2",
-                  style: TextStyle(
-                    fontFamily: "NanumSR",
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12.5,
-                    color: DDColor.primary.shade400,
+              if (widget.count != 0)
+                Positioned(
+                  bottom: 2,
+                  right: 5.5,
+                  child: Text(
+                    widget.count.toString(),
+                    style: TextStyle(
+                      fontFamily: DDFontFamily.nanumSR,
+                      fontWeight: DDFontWeight.extraBold,
+                      fontSize: DDFontSize.h6,
+                      color: DDColor.primary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }
