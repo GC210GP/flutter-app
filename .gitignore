@@ -50,3 +50,7 @@ app.*.map.json
 /android/app/google-services.json
 
 /lib/util/secret.dart
+
+# For android deployment
+/secret
+/android/key.properties
