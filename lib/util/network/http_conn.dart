@@ -267,9 +267,10 @@ class HttpConn {
       query = "?";
       List<String> keys = queryString.keys.toList();
       List<dynamic> values = queryString.values.toList();
-      for (int i = 0; i < keys.length; i++) {
-        query += keys[i] + "=" + values[i].toString();
+      for (int i = 0; i < keys.length - 1; i++) {
+        query += keys[i] + "=" + values[i].toString() + "&";
       }
+      query += keys[keys.length - 1] + "=" + values[keys.length - 1].toString();
     }
     return query;
   }
