@@ -1,5 +1,4 @@
 import 'package:app/model/association.dto.dart';
-import 'package:app/model/person.dto.dart';
 import 'package:app/model/post.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -118,7 +117,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                       child: Stack(
                         children: [
                           DDTextField(
-                            padding: EdgeInsets.fromLTRB(45, 21, 15, 0),
+                            padding: const EdgeInsets.fromLTRB(45, 21, 15, 0),
                             hintText: "커뮤니티 검색...",
                             focusNode: focusNode,
                             controller: textController,
@@ -518,13 +517,13 @@ class SearchedItem extends StatelessWidget {
         children: [
           for (AssociationDto i in searchResult)
             CommunityItem(
-                title: "${i.associationName}",
+                title: i.associationName.toString(),
                 // isStarred: true,
                 onPressed: () =>
                     {if (onItemPressed != null) onItemPressed!(i)}),
           if (searchQuery.isNotEmpty)
             CommunityItem(
-              title: '"${searchQuery}" 추가하기',
+              title: '"$searchQuery" 추가하기',
               hashtagColor: DDColor.primary,
               onPressed: () =>
                   {if (onCreatePressed != null) onCreatePressed!(searchQuery)},
@@ -577,8 +576,9 @@ class StarredItems extends StatelessWidget {
                           size: 20.0,
                         ),
                         onPressed: () {
-                          if (onStarPressed != null)
+                          if (onStarPressed != null) {
                             onStarPressed!(communityList[i].uaid);
+                          }
                         },
                       ),
                     ),

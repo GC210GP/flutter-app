@@ -243,7 +243,7 @@ class _SignupViewState extends State<SignupView> {
               ),
             )
           else if (pageIdx == 10)
-            Expanded(
+            const Expanded(
               child: SignPage7(),
             )
           else if (pageIdx == 11)
@@ -293,8 +293,6 @@ class _SignupViewState extends State<SignupView> {
         "isDormant": userData.isDormant.toString(),
         "fbToken": userData.fbToken,
       });
-
-      print(result);
 
       if (result["httpConnStatus"] == httpConnStatus.success) {
         currUid = result["data"]["id"];

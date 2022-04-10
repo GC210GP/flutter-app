@@ -1,15 +1,11 @@
-import 'dart:convert';
-
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
-import 'package:app/view/home/home_view.dart';
 import 'package:app/view/settting_text_view.dart';
 import 'package:app/view/signup/signup.view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
-import 'dart:convert' as convert;
 
 class SettingPageView extends StatefulWidget {
   const SettingPageView({Key? key}) : super(key: key);
@@ -109,7 +105,7 @@ class _SettingPageViewState extends State<SettingPageView> {
                                       onPressed: doLogout,
                                     ),
                                     CupertinoButton(
-                                      child: Text("아니오"),
+                                      child: const Text("아니오"),
                                       onPressed: () => Navigator.pop(context),
                                     ),
                                   ],
@@ -168,9 +164,7 @@ class _SettingPageViewState extends State<SettingPageView> {
                         ),
                       ),
                     ),
-                    Divider(
-                      height: 50,
-                    ),
+                    const Divider(height: 50.0),
                     SettingListItem(
                       title: "🏠  더블디 홈페이지",
                       margin: const EdgeInsets.only(bottom: 10.0),

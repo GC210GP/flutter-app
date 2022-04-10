@@ -209,7 +209,7 @@ class _SignPage5State extends State<SignPage5> {
                     ),
                     const SizedBox(height: 5.0),
                     DDDropdownButton(
-                      disabledHint: Text("광역시도..."),
+                      disabledHint: const Text("광역시도..."),
                       items: [...addressApiConn.province.values],
                       onChanged: (value) async {
                         if (value != null) {
@@ -231,7 +231,7 @@ class _SignPage5State extends State<SignPage5> {
                     ),
                     const SizedBox(height: 5),
                     DDDropdownButton(
-                      disabledHint: Text("시군구..."),
+                      disabledHint: const Text("시군구..."),
                       labelText: addressCity,
                       items: [...addressApiConn.city.values],
                       onChanged: (value) {
@@ -256,7 +256,7 @@ class _SignPage5State extends State<SignPage5> {
                         ),
                       )
                     else
-                      SizedBox(height: 14.5),
+                      const SizedBox(height: 14.5),
 
                     const SizedBox(height: 20.0),
 
@@ -352,7 +352,7 @@ class _YearPickerState extends State<YearPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 50.0,
       child: CupertinoButton(
         padding: const EdgeInsets.all(0),

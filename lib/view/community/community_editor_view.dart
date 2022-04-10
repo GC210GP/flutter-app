@@ -159,7 +159,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
                 ],
               ),
 
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
               DDButton(
                 label: isModify ? "수정하기" : "등록하기",
@@ -180,9 +180,9 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
                     focusNodeContent.unfocus();
                   }),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
-              SizedBox(height: 50.0)
+              const SizedBox(height: 50.0)
             else
-              SizedBox(height: 10.0)
+              const SizedBox(height: 10.0)
           ],
         ),
       ),
@@ -198,7 +198,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
       "title": title,
       "content": content,
     });
-    debugPrint("${result.toString()}");
+    debugPrint(result.toString());
     if (result['httpConnStatus'] == httpConnStatus.success) {
       debugPrint("${result.toString()} / postId: $postId");
       Navigator.pop(context);

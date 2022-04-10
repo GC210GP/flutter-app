@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// ignore: non_constant_identifier_names
 PreferredSizeWidget DDAppBar(
   BuildContext context, {
   String title = "",

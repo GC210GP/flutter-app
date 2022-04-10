@@ -4,7 +4,6 @@ import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class SignupPage2 extends StatefulWidget {
   final Function(String inputText)? onPressed;
@@ -159,7 +158,7 @@ class _SignupPage2State extends State<SignupPage2> {
                       Positioned.fill(
                         child: Container(
                           color: Colors.white.withOpacity(0.5),
-                          child: CupertinoActivityIndicator(radius: 13.0),
+                          child: const CupertinoActivityIndicator(radius: 13.0),
                         ),
                       ),
                   ],

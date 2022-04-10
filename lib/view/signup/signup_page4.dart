@@ -118,7 +118,7 @@ class _SignPage4State extends State<SignPage4> {
                             Positioned.fill(
                               child: Container(
                                 color: Colors.white.withOpacity(0.5),
-                                child: CupertinoActivityIndicator(),
+                                child: const CupertinoActivityIndicator(),
                               ),
                             ),
                         ],
