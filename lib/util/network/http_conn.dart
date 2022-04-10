@@ -32,6 +32,8 @@ class HttpConn {
     required String apiUrl,
     Map<String, dynamic>? queryString,
   }) async {
+    print(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString));
+
     http.Response response = await http.get(
       Uri.parse(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString)),
       headers: _headers,

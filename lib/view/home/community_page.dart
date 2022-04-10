@@ -5,7 +5,9 @@ import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/community/community_board_view.dart';
+import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/view/community/community_view.dart';
+import 'package:app/widget/button.dart';
 import 'package:app/widget/community_item.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:app/widget/page_title_widget.dart';
@@ -58,6 +60,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
       } else {
         status = Status.searchResult;
       }
+      setState(() {});
     });
     pageOpacity = 0;
     setState(() {});
@@ -81,135 +84,169 @@ class _CommunityPageViewState extends State<CommunityPageView> {
       duration: const Duration(milliseconds: 100),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            if (isLoading)
-              Center(
-                child: Container(
-                  width: 50,
-                  height: 100,
-                  padding: const EdgeInsets.only(bottom: 50.0),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 7.5,
-                    color: DDColor.primary.shade600,
-                    backgroundColor: DDColor.disabled,
-                  ),
-                ),
-              )
-            else if (status != Status.unauthorized)
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                      top: 50.0,
-                      bottom: starredCommunity != null
-                          ? (3 - starredCommunity.length) * 150 + 20.0
-                          : 20.0),
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    // 검색
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (isLoading)
+                  Center(
+                    child: Container(
+                      width: 50,
+                      height: 100,
+                      padding: const EdgeInsets.only(bottom: 50.0),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 7.5,
+                        color: DDColor.primary.shade600,
+                        backgroundColor: DDColor.disabled,
+                      ),
+                    ),
+                  )
+                else if (status != Status.unauthorized)
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      padding: EdgeInsets.only(
+                          top: 50.0,
+                          bottom: starredCommunity != null
+                              ? (3 - starredCommunity.length) * 150 + 20.0
+                              : 20.0),
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        // 검색
 
-                    Container(
-                      height: 50.0,
-                      margin: const EdgeInsets.only(bottom: 60),
-                      child: Stack(
-                        children: [
-                          DDTextField(
-                            padding: const EdgeInsets.fromLTRB(45, 21, 15, 0),
-                            hintText: "커뮤니티 검색...",
-                            focusNode: focusNode,
-                            controller: textController,
-                            onChanged: (value) => searchCommunity(value),
-                          ),
-                          Positioned(
-                            top: 0,
-                            bottom: 3,
-                            left: 15.0,
-                            child: Icon(
-                              CupertinoIcons.search,
-                              color: DDColor.disabled,
-                              size: 25.0,
-                            ),
-                          ),
-                          if (textController.text.isNotEmpty)
-                            Positioned(
-                              top: 0,
-                              bottom: 0,
-                              right: 15.0,
-                              child: CupertinoButton(
-                                padding: const EdgeInsets.all(0.0),
+                        Container(
+                          height: 50.0,
+                          margin: const EdgeInsets.only(bottom: 60),
+                          child: Stack(
+                            children: [
+                              DDTextField(
+                                padding:
+                                    const EdgeInsets.fromLTRB(45, 21, 15, 0),
+                                hintText: "커뮤니티 검색...",
+                                focusNode: focusNode,
+                                controller: textController,
+                                onChanged: (value) => searchCommunity(value),
+                              ),
+                              Positioned(
+                                top: 0,
+                                bottom: 3,
+                                left: 15.0,
                                 child: Icon(
-                                  CupertinoIcons.xmark_circle_fill,
+                                  CupertinoIcons.search,
                                   color: DDColor.disabled,
                                   size: 25.0,
                                 ),
-                                onPressed: () {
-                                  textController.text = "";
-                                  focusNode.unfocus();
-                                  status = Status.starred;
-                                  scrollController.jumpTo(110.0);
-                                  setState(() {});
-                                },
                               ),
-                            )
-                        ],
-                      ),
+                              if (textController.text.isNotEmpty)
+                                Positioned(
+                                  top: 0,
+                                  bottom: 0,
+                                  right: 15.0,
+                                  child: CupertinoButton(
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: Icon(
+                                      CupertinoIcons.xmark_circle_fill,
+                                      color: DDColor.disabled,
+                                      size: 25.0,
+                                    ),
+                                    onPressed: () {
+                                      textController.text = "";
+                                      focusNode.unfocus();
+                                      status = Status.starred;
+                                      scrollController.jumpTo(110.0);
+                                      setState(() {});
+                                    },
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
+
+                        if (status == Status.starred)
+                          StarredItems(
+                            communityList: starredCommunity,
+                            postsList: starredCommunityPosts,
+                            onMorePressed: (associationDto) => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityView(
+                                  associationDto: associationDto,
+                                  isStarred: true,
+                                ),
+                              ),
+                            ).then(
+                              (value) => getStarredCommunity(),
+                            ),
+                            onStarPressed: (uaid) => removeCommunityStar(uaid),
+                          ),
+                        if (status == Status.searchResult ||
+                            status == Status.searching)
+                          SearchedItem(
+                            searchQuery: textController.text,
+                            searchResult: searchedCommunity,
+                            onCreatePressed: createCommunity,
+                            onItemPressed: (associationDto) => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityView(
+                                  associationDto: associationDto,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ///
+                        ///
+                        ///
+                      ],
                     ),
+                  )
+                else
+                  const Expanded(child: UnauthorizedPage()),
+              ],
+            ),
 
-                    if (status == Status.starred)
-                      StarredItems(
-                        communityList: starredCommunity,
-                        postsList: starredCommunityPosts,
-                        onMorePressed: (associationDto) => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CommunityView(
-                              associationDto: associationDto,
-                              isStarred: true,
-                            ),
-                          ),
-                        ).then(
-                          (value) => getStarredCommunity(),
-                        ),
-                        onStarPressed: (uaid) => removeCommunityStar(uaid),
-                      ),
-                    if (status == Status.searchResult ||
-                        status == Status.searching)
-                      SearchedItem(
-                        searchQuery: textController.text,
-                        searchResult: searchedCommunity,
-                        onCreatePressed: createCommunity,
-                        onItemPressed: (associationDto) => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CommunityView(
-                              associationDto: associationDto,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    ///
-                    ///
-                    ///
-                  ],
+            // 글쓰기 버튼
+            if (status == Status.starred || status == Status.searchResult)
+              Positioned(
+                right: 10,
+                bottom: 30,
+                child: Container(
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 7,
+                      offset: const Offset(0.0, 3.0),
+                    ),
+                  ], borderRadius: BorderRadius.circular(50.0)),
+                  child: DDButton(
+                    width: 50,
+                    height: 50,
+                    borderRadius: 50,
+                    child: const Icon(Icons.edit),
+                    onPressed: createPost,
+                  ),
                 ),
-              )
-            else
-              const Expanded(child: UnauthorizedPage()),
+              ),
           ],
         ),
       ),
     );
   }
 
+  ///
+  ///
+  ///
+  ///
+  ///
+
   Future<List<PostDto>> getCommunityBoards(int aid) async {
     Map<String, dynamic> result =
         await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
       "associationId": aid,
-      "page": 1,
+      "page": 0,
       "size": 5,
       "sort": "modifiedDate,desc",
     });
@@ -357,7 +394,45 @@ class _CommunityPageViewState extends State<CommunityPageView> {
       );
     }
   }
-  // 뷰 재활용하거나 모달 활용해야 함
+
+  ///
+  ///
+  ///
+
+  createPost({int? boardId}) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.post(
+      apiUrl: "/posts",
+      body: {
+        "title": "",
+        "content": "",
+        "isActive": "false",
+      },
+    );
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CommunityEditorView(
+            post: PostDto(
+              pid: result['id'],
+              title: result['title'] ?? "",
+              content: result['content'] ?? "",
+              isActiveGiver: result['isActiveGiver'] ?? false,
+              isActiveReceiver: result['isActiveReceiver'] ?? false,
+              cratedDate: DateTime.parse(
+                  result["createdDate"] ?? DateTime(1).toString()),
+              modifiedDate: DateTime.parse(
+                  result["modifiedDate"] ?? DateTime(1).toString()),
+              userId: result['userId'],
+              userNickname: result['userNickname'],
+            ),
+          ),
+        ),
+      ).then(
+        (value) => getStarredCommunity(),
+      );
+    }
+  }
 }
 
 ///
