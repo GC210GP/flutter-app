@@ -27,11 +27,13 @@ class UserDto {
   bool isDonated;
 
   DateTime createdDate;
-  DateTime updatedDate;
+  DateTime modifiedDate;
 
   List<AssociationDto> associations;
   List<int> likedUid;
   List<PostDto> posts;
+
+  String fbToken;
 
   UserDto({
     required this.uid,
@@ -45,11 +47,12 @@ class UserDto {
     required this.location,
     required this.sex,
     required this.job,
+    required this.fbToken,
     required this.bloodType,
     required this.isDormant,
     required this.isDonated,
     required this.createdDate,
-    required this.updatedDate,
+    required this.modifiedDate,
 
     // TODO: 임시 (자신의 association, post 확인 시 사용하는 attribute)
     this.associations = const <AssociationDto>[],
@@ -75,6 +78,7 @@ class AddUserUserDto extends UserDto {
     required String location,
     required Gender sex,
     required String job,
+    required String fbToken,
     required BloodType bloodType,
     required bool isDormant,
     required bool isDonated,
@@ -95,12 +99,38 @@ class AddUserUserDto extends UserDto {
           location: location,
           sex: sex,
           job: job,
+          fbToken: fbToken,
           bloodType: bloodType,
           isDormant: isDormant,
           isDonated: isDonated,
           createdDate: createdDate,
-          updatedDate: updatedDate,
+          modifiedDate: updatedDate,
         );
+
+  @override
+  String toString() {
+    return """{          
+          name: $name,
+          nickname: $nickname,
+          email: $email,
+          recency: $recency,
+          frequency: $frequency,
+          password: $password,
+          sns: $sns,
+          phoneNumber: $phoneNumber,
+          profileImageLocation: $profileImageLocation,
+          birthdate: $birthdate,
+          location: $location,
+          sex: $sex,
+          job: $job,
+          fbToken: $fbToken,
+          bloodType: $bloodType,
+          isDormant: $isDormant,
+          isDonated: $isDonated,
+          createdDate: $createdDate,
+          modifiedDate: $modifiedDate,
+        }""";
+  }
 }
 
 // SNS
@@ -112,17 +142,23 @@ class SnsDto {
     required this.snsType,
     required this.snsProfile,
   });
+
+  @override
+  String toString() {
+    return "{snsType: $snsType, snsProfile: $snsProfile}";
+  }
 }
 
-class AddSnsDto {
-  int userId;
-  AddSnsDto({
-    required this.userId,
-    required SnsType snsType,
-    required snsProfile,
-  });
-}
+// class AddSnsDto {
+//   int userId;
+//   AddSnsDto({
+//     required this.userId,
+//     required SnsType snsType,
+//     required snsProfile,
+//   });
+// }
 
+// TODO: 아래 4개 unkonwn 타입 백엔드 요청
 enum Gender {
   MALE,
   FEMALE,
@@ -150,5 +186,4 @@ enum Auth {
   ROLE_USER,
   ROLE_NEED_EMAIL,
   ROLE_ADMIN,
-  UNKNOWN,
 }

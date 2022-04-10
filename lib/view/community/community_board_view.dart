@@ -1,14 +1,24 @@
+import 'package:app/model/person.dto.dart';
+import 'package:app/model/post.dto.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../message_view.dart';
 
 class CommunityBoardView extends StatefulWidget {
-  const CommunityBoardView({Key? key}) : super(key: key);
+  final PostDto postDto;
+
+  const CommunityBoardView({
+    Key? key,
+    required this.postDto,
+  }) : super(key: key);
 
   @override
   _CommunityBoardViewState createState() => _CommunityBoardViewState();
@@ -18,8 +28,12 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
   final ScrollController _controller = ScrollController();
   bool isTop = true;
 
+  late PostDto postDto;
+
   @override
   void initState() {
+    postDto = widget.postDto;
+
     _controller.addListener(() {
       isTop = _controller.offset <= 10.0;
       setState(() {});
@@ -59,28 +73,65 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                       physics: const BouncingScrollPhysics(),
                       children: [
                         SizedBox(height: 10.0),
-                        Text(
-                          "제 친구가 많이 아파요..ㅠ",
-                          style: TextStyle(
-                            fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.extraBold,
-                            fontSize: DDFontSize.h3,
-                            color: DDColor.fontColor,
-                          ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          "테평주민",
-                          style: TextStyle(
-                            fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.extraBold,
-                            fontSize: DDFontSize.h4,
-                            color: DDColor.grey,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  postDto.title,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.extraBold,
+                                    fontSize: DDFontSize.h3,
+                                    color: DDColor.fontColor,
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  postDto.userNickname,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.extraBold,
+                                    fontSize: DDFontSize.h4,
+                                    color: DDColor.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (postDto.userId == GlobalVariables.userDto!.uid)
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  child: DDButton(
+                                    width: 35,
+                                    height: 35,
+                                    child: const Icon(
+                                      Icons.edit_rounded,
+                                      size: 20,
+                                    ),
+                                    color: DDColor.grey,
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => CommunityEditorView(
+                                          post: widget.postDto,
+                                        ),
+                                      ),
+                                    ).then((_) async {
+                                      postDto = (await updatePost(
+                                          widget.postDto.pid))!;
+                                      setState(() {});
+                                    }),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         SizedBox(height: 35),
                         Text(
-                          "안녕하세요.. 지금 태평에 살고 있는데 친구가 서울대병원에 입원중입니다. \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n친구가 혈액암으로 투병중인데 요즘 코로나라 헌혈을 받기가 너무 힘들다고 하네요.. \n\n혹시 현혈이 가능하시다면 연락바랍니다!",
+                          postDto.content,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
                             fontWeight: DDFontWeight.extraBold,
@@ -97,14 +148,14 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => MessageView(
-                          fromId: GlobalVariables.userIdx,
-                          toId: 4,
-                          toName: "태평주민",
+                          fromId: GlobalVariables.userDto!.uid,
+                          toId: postDto.userId,
+                          toName: postDto.userNickname,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 75),
+                  const SizedBox(height: 75),
                 ],
               ),
             ),
@@ -112,5 +163,29 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
         ],
       ),
     );
+  }
+
+  Future<PostDto?> updatePost(int pid) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+      apiUrl: "/posts/$pid",
+    );
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      return PostDto(
+        pid: result['data']['id'],
+        title: result['data']['title'] ?? "",
+        content: result['data']['content'] ?? "",
+        isActiveGiver: result['data']['isActiveGiver'] ?? false,
+        isActiveReceiver: result['data']['isActiveReceiver'] ?? false,
+        cratedDate: DateTime.parse(
+            result['data']["createdDate"] ?? DateTime(1).toString()),
+        modifiedDate: DateTime.parse(
+            result['data']["modifiedDate"] ?? DateTime(1).toString()),
+        userId: result['data']['userId'],
+        userNickname: result['data']['userNickname'],
+      );
+    }
+
+    return null;
   }
 }

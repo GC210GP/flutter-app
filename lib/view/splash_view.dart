@@ -1,7 +1,10 @@
+import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/noti/fcm_service.dart';
+import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:app/view/signin_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_app_badger/flutter_app_badger.dart';
@@ -91,17 +94,32 @@ class _SplashViewState extends State<SplashView> {
       await fcmService.init();
       await fcmService.getUserPermission();
       fcmService.startListener();
-      debugPrint(await fcmService.getToken());
+      GlobalVariables.fcmToken = await fcmService.getToken();
+      debugPrint(GlobalVariables.fcmToken);
 
       /// Init Badge
       // TODO: 안읽은 메시지 개수 카운트 / GV.badgeCount 반영
       // FlutterAppBadger.updateBadgeCount(GlobalVariables.badgetCount);
 
       if (isOk) {
-        Future.delayed(const Duration(milliseconds: 2000)).then((value) {
-          isAnimationRunning = false;
-          Navigator.pushReplacementNamed(context, "/home");
-        });
+        // Token 검사 / 세션 유지 진행
+        await PreferenceManager.instance.init();
+        if (PreferenceManager.instance.readSavedToken() != null) {
+          GlobalVariables.httpConn
+              .setHeaderToken(PreferenceManager.instance.readSavedToken()!);
+
+          Map<String, dynamic> userResult =
+              await GlobalVariables.httpConn.get(apiUrl: "/users/current");
+
+          if (userResult['httpConnStatus'] == httpConnStatus.success) {
+            GlobalVariables.userDto = readUserDto(userResult);
+          }
+        }
+
+        // 마무리
+        await Future.delayed(const Duration(milliseconds: 2000));
+        isAnimationRunning = false;
+        Navigator.pushReplacementNamed(context, "/home");
       } else {
         // TODO: Firebase 연결실패
       }

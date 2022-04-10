@@ -26,6 +26,7 @@ class DDTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final String? hintText;
   final double? fontSize;
+  // final RegExp? validator;
 
   const DDTextField({
     Key? key,
@@ -48,6 +49,7 @@ class DDTextField extends StatefulWidget {
     this.isMultiline = false,
     this.obscureText = false,
     this.controller,
+    // this.validator,
     this.fontSize,
     this.hintText,
     this.autofocus = false,
@@ -103,6 +105,11 @@ class _DDTextFieldState extends State<DDTextField> {
         focusNode: _focusNode,
         cursorColor: DDColor.primary,
         initialValue: widget.labelText,
+        // validator: (value) => widget.validator != null
+        //     ? widget.validator!.hasMatch(value ?? "")
+        //         ? "OO"
+        //         : "XX"
+        //     : null,
         style: TextStyle(
           color: DDColor.fontColor,
           fontSize: widget.fontSize ?? DDFontSize.h4,

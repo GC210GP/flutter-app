@@ -1,7 +1,10 @@
+import 'package:app/model/association.dto.dart';
+import 'package:app/model/post.dto.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
-import 'package:app/view/community/community_board_view.dart';
+import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/community_item.dart';
@@ -10,7 +13,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CommunityView extends StatefulWidget {
-  const CommunityView({Key? key}) : super(key: key);
+  final AssociationDto associationDto;
+  final bool isStarred;
+
+  const CommunityView({
+    Key? key,
+    required this.associationDto,
+    this.isStarred = false,
+  }) : super(key: key);
 
   @override
   _CommunityViewState createState() => _CommunityViewState();
@@ -19,14 +29,23 @@ class CommunityView extends StatefulWidget {
 class _CommunityViewState extends State<CommunityView> {
   final ScrollController _controller = ScrollController();
   bool isTop = true;
-  bool isStarred = false;
+
+  List<PostDto> posts = [];
+  late bool isStarred;
 
   @override
   void initState() {
+    isStarred = widget.isStarred;
+
     _controller.addListener(() {
       isTop = _controller.offset <= 10.0;
       setState(() {});
     });
+
+    getCommunityBoards(widget.associationDto.aid, 1).then((value) {
+      setState(() {});
+    });
+
     super.initState();
   }
 
@@ -60,9 +79,10 @@ class _CommunityViewState extends State<CommunityView> {
                     children: [
                       Row(
                         children: [
-                          const PageTitleWidget(
-                            title: "#성남시",
-                            margin: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                          PageTitleWidget(
+                            title: widget.associationDto.associationName,
+                            margin:
+                                const EdgeInsets.only(top: 15.0, bottom: 15.0),
                           ),
                           Container(
                             margin:
@@ -76,7 +96,13 @@ class _CommunityViewState extends State<CommunityView> {
                                     : DDColor.disabled,
                                 size: 20.0,
                               ),
-                              onPressed: () {},
+                              onPressed: () => isStarred
+                                  ? removeCommunityStar(
+                                      widget.associationDto.uaid,
+                                    )
+                                  : addCommunityStar(
+                                      widget.associationDto.aid,
+                                    ),
                             ),
                           ),
                         ],
@@ -110,7 +136,7 @@ class _CommunityViewState extends State<CommunityView> {
                             color: DDColor.grey.withOpacity(0.5),
                             height: 35.0,
                             width: 85,
-                            onPressed: () => {},
+                            onPressed: editPost,
                           ),
                         ),
                       ),
@@ -121,17 +147,29 @@ class _CommunityViewState extends State<CommunityView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        CommunityBoardItem(
-                            author: "성남주민", title: "성남병원 지정헌혈 부탁드립니다.."),
-                        CommunityBoardItem(
-                            author: "분당주민", title: "지금 제생병원에 있습니다. 정말 급합니다!"),
-                        CommunityBoardItem(
-                            author: "이매주민", title: "서울대병원 지정헌혈 부탁드립니다.."),
-                        CommunityBoardItem(
-                            author: "위례주민", title: "분당제생병원 지정헌혈 부탁드립니다.."),
-                        for (int i = 0; i < 20; i++)
-                          CommunityBoardItem(
-                              author: "정자주민", title: "저희 가족을 도와주세요"),
+                        if (posts.isNotEmpty)
+                          for (PostDto i in posts)
+                            CommunityBoardItem(
+                              author: i.userNickname,
+                              title: i.title.length >= 10
+                                  ? i.title.substring(0, 10)
+                                  : i.title,
+                            )
+                        else
+                          Container(
+                            height: 100,
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                              "글이 없습니다.\n새 글을 작성해보세요!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.extraBold,
+                                fontSize: DDFontSize.h4,
+                                color: DDColor.grey,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -144,43 +182,119 @@ class _CommunityViewState extends State<CommunityView> {
     );
   }
 
-  Widget item({required String author, required String title}) => Container(
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.shade100,
+  ///
+  ///
+  ///
+  ///
+  ///
+
+  editPost({int? boardId}) async {
+    if (boardId == null) {
+      Map<String, dynamic> result = await GlobalVariables.httpConn.post(
+        apiUrl: "/posts",
+        body: {
+          "title": "",
+          "content": "",
+          "isActive": "false",
+        },
+      );
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CommunityEditorView(
+              post: PostDto(
+                pid: result['id'],
+                title: result['title'] ?? "",
+                content: result['content'] ?? "",
+                isActiveGiver: result['isActiveGiver'] ?? false,
+                isActiveReceiver: result['isActiveReceiver'] ?? false,
+                cratedDate: DateTime.parse(
+                    result["createdDate"] ?? DateTime(1).toString()),
+                modifiedDate: DateTime.parse(
+                    result["modifiedDate"] ?? DateTime(1).toString()),
+                userId: result['userId'],
+                userNickname: result['userNickname'],
+              ),
             ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                author,
-                style: TextStyle(
-                  fontFamily: "NanumSR",
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: "NanumSR",
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ],
-          ),
-        ),
+        );
+      }
+    } else {
+      Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+        apiUrl: "/posts/$boardId",
       );
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CommunityEditorView(
+              post: PostDto(
+                pid: result['data']['id'],
+                title: result['data']['title'] ?? "",
+                content: result['data']['content'] ?? "",
+                isActiveGiver: result['data']['isActiveGiver'] ?? false,
+                isActiveReceiver: result['data']['isActiveReceiver'] ?? false,
+                cratedDate: DateTime.parse(
+                    result['data']["createdDate"] ?? DateTime(1).toString()),
+                modifiedDate: DateTime.parse(
+                    result['data']["modifiedDate"] ?? DateTime(1).toString()),
+                userId: result['data']['userId'],
+                userNickname: result['data']['userNickname'],
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<List<String>> getCommunityBoards(int aid, int pageNum) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+      apiUrl: "/posts?associationId=$aid&page=$pageNum&size=20&sort=id,desc",
+    );
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      for (var i in result['data']['content']) {
+        posts.add(
+          PostDto(
+              pid: i["id"],
+              title: i["title"] ?? "",
+              content: i["content"] ?? "",
+              isActiveGiver: i["isActiveGiver"] ?? false,
+              isActiveReceiver: i["isActiveReceiver"] ?? false,
+              cratedDate:
+                  DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
+              modifiedDate:
+                  DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
+              userId: i['userId'],
+              userNickname: i['userNickname']),
+        );
+      }
+    }
+
+    return [];
+  }
+
+  removeCommunityStar(int uaid) async {
+    Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+        .delete(apiUrl: "/user-associations/$uaid");
+
+    if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+      setState(() {
+        isStarred = false;
+      });
+    }
+  }
+
+  addCommunityStar(int aid) async {
+    Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+        .post(apiUrl: "/user-associations", body: {"associationId": "$aid"});
+
+    if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+      setState(() {
+        isStarred = true;
+      });
+    }
+  }
 }

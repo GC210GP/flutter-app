@@ -93,10 +93,10 @@ class _MessagePageViewState extends State<MessagePageView> {
                                     "\n대화가 없습니다\n[홈]이나 [커뮤니티] 탭에서 대화를 시작해보세요\n\n\n\n",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: "NanumSR",
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 15,
-                                      color: Colors.grey.shade500,
+                                      fontFamily: DDFontFamily.nanumSR,
+                                      fontWeight: DDFontWeight.extraBold,
+                                      fontSize: DDFontSize.h4,
+                                      color: DDColor.grey,
                                     ),
                                   ),
                                 ],
@@ -133,12 +133,15 @@ class _MessagePageViewState extends State<MessagePageView> {
   Future<void> listLoader() async {
     var value = await _fireControl.getDocList();
 
+    // 로그인 안되어있을 시,
+    if (GlobalVariables.userDto == null) return;
+
     for (String i in value) {
       List<String> list = i.split("=");
-      if (list.contains(GlobalVariables.userIdx.toString())) {
+      if (list.contains(GlobalVariables.userDto!.uid.toString())) {
         int toId = -1;
 
-        if (list[0] == GlobalVariables.userIdx.toString()) {
+        if (list[0] == GlobalVariables.userDto!.uid.toString()) {
           toId = int.parse(list[1]);
         } else {
           toId = int.parse(list[0]);
@@ -149,14 +152,15 @@ class _MessagePageViewState extends State<MessagePageView> {
             imgSrc:
                 "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
             name: toId.toString(),
-            lastMsg:
-                GlobalVariables.userIdx.toString() + "->" + toId.toString(),
+            lastMsg: GlobalVariables.userDto!.uid.toString() +
+                "->" +
+                toId.toString(),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => MessageView(
                   chatroomId: i,
-                  fromId: GlobalVariables.userIdx,
+                  fromId: GlobalVariables.userDto!.uid,
                   toId: toId,
                   toName: toId.toString(),
                 ),
