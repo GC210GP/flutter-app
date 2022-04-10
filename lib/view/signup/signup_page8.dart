@@ -89,12 +89,12 @@ class Complete extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 150.0,
-          height: 150.0,
-          padding: const EdgeInsets.only(top: 10.0),
+          width: 100.0,
+          height: 100.0,
+          padding: const EdgeInsets.only(top: 7.0),
           decoration: BoxDecoration(
             color: Colors.greenAccent.shade400,
-            borderRadius: BorderRadius.circular(150.0),
+            borderRadius: BorderRadius.circular(100.0),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
@@ -106,7 +106,7 @@ class Complete extends StatelessWidget {
           child: const Icon(
             CupertinoIcons.checkmark_alt,
             color: DDColor.white,
-            size: 100.0,
+            size: 60.0,
           ),
         ),
         const SizedBox(height: 25.0),
@@ -132,12 +132,12 @@ class Fail extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 150.0,
-          height: 150.0,
-          padding: const EdgeInsets.only(top: 10.0),
+          width: 100.0,
+          height: 100.0,
+          padding: const EdgeInsets.only(top: 7.0),
           decoration: BoxDecoration(
-            color: Colors.redAccent.shade400,
-            borderRadius: BorderRadius.circular(150.0),
+            color: DDColor.primary.shade400,
+            borderRadius: BorderRadius.circular(100.0),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
@@ -149,7 +149,7 @@ class Fail extends StatelessWidget {
           child: const Icon(
             CupertinoIcons.xmark,
             color: DDColor.white,
-            size: 80.0,
+            size: 60.0,
           ),
         ),
         const SizedBox(height: 25.0),
@@ -164,7 +164,8 @@ class Fail extends StatelessWidget {
         ),
         const SizedBox(height: 1.0),
         Text(
-          "잠시 후 다시 시도해주세요 😭",
+          "[로그인]에서 이이디/비밀번호를 입력하시면\n다시 회원가입을 진행할 수 있습니다.",
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: DDFontFamily.nanumSR,
             fontWeight: DDFontWeight.extraBold,

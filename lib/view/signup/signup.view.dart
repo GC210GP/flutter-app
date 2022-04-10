@@ -43,7 +43,7 @@ class _SignupViewState extends State<SignupView> {
   RegExp idRegex = RegExp(r"(?=.*[a-zA-Z])[-a-zA-Z0-9_.]{4,10}$");
 
   late int currUid;
-  Status signinStatus = Status.processing;
+  Status signinStatus = Status.success;
 
   AddUserUserDto user = AddUserUserDto(
     name: "unknown",
@@ -118,13 +118,14 @@ class _SignupViewState extends State<SignupView> {
             Expanded(
               child: SignupPage2(
                 title: "이메일을 입력해주세요",
-                errorMessage: "이메일을 올바르게 입력해주세요",
+                errorMessage: "올바르지 않거나 이미 등록된 이메일입니다",
                 validator: emailRegex,
                 keyboardType: TextInputType.emailAddress,
                 onPressed: (email) {
                   user.email = email;
                   changePage(3);
                 },
+                correctionCheck: isEmailExist,
                 onBackPressed: () => Navigator.pop(context),
               ),
             )
@@ -156,7 +157,7 @@ class _SignupViewState extends State<SignupView> {
                 onBackPressed: () => changePage(3),
                 keyboardType: TextInputType.text,
                 isObscureText: true,
-                correctionCheck: (input) {
+                correctionCheck: (input) async {
                   return input == user.password;
                 },
                 title: "한 번 더 입력해주세요",
@@ -263,6 +264,19 @@ class _SignupViewState extends State<SignupView> {
   ///
   ///
   ///
+
+  Future<bool> isEmailExist(String? input) async {
+    if (input != null) {
+      Map<String, dynamic> result = await GlobalVariables.httpConn
+          .post(apiUrl: "/users/validate-duplicate", body: {"email": input});
+
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
 
   bool isWorking = false;
 

@@ -11,7 +11,7 @@ class SignupPage2 extends StatefulWidget {
   final String title;
   final String errorMessage;
   final RegExp? validator;
-  final bool Function(String)? correctionCheck;
+  final Future<bool> Function(String)? correctionCheck;
   final bool isObscureText;
   final TextInputType? keyboardType;
   final bool isTransition;
@@ -130,8 +130,8 @@ class _SignupPage2State extends State<SignupPage2> {
 
                               // 사용자 지정 correction check
                               if (widget.correctionCheck != null) {
-                                isCorrect =
-                                    widget.correctionCheck!(inputValue.trim());
+                                isCorrect = await widget
+                                    .correctionCheck!(inputValue.trim());
                               }
 
                               if (isCorrect && widget.onPressed != null) {
