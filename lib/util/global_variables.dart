@@ -1,5 +1,7 @@
 import 'package:app/model/person.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/http_conn.dart';
+import 'package:flutter/material.dart';
 
 class GlobalVariables {
   static const String baseurl =
@@ -13,6 +15,8 @@ class GlobalVariables {
   static String savedEmail = "";
   static String fcmToken = "";
   static UserDto? userDto;
+
+  static BuildContext? currentContext;
 
   // TODO: 바꾸기
   static String defaultImgUrl =

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/view/home/community_page.dart';
 import 'package:app/view/home/message_page.dart';
@@ -30,6 +31,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     pageIdx = widget.index ?? 1;
+    GlobalVariables.currentContext = context;
     super.initState();
   }
 

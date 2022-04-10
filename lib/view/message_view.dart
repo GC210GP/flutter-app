@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:app/model/fcm.dto.dart';
 import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/fire_chat_service.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
@@ -11,17 +13,18 @@ import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
+import 'package:http/http.dart' as http;
 
 class MessageView extends StatefulWidget {
   const MessageView({
     Key? key,
     this.chatroomId,
-    required this.toName,
+    // required this.toName,
     required this.fromId,
     required this.toId,
   }) : super(key: key);
 
-  final String toName;
+  // final String toName;
   final String? chatroomId;
 
   final int fromId;
@@ -39,6 +42,9 @@ class _MessageViewState extends State<MessageView> {
   late FireChatService fireChatService;
   List<Widget> chatBubbles = [];
 
+  String toName = "알 수 없음";
+  String toToken = "";
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +57,16 @@ class _MessageViewState extends State<MessageView> {
           ChatBubble(
               msg: i.msg, isLeft: i.senderId != GlobalVariables.userDto!.uid),
         );
+      }
+
+      Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+        apiUrl: "/users",
+        queryString: {"userId": widget.toId},
+      );
+
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        toName = result['data']['nickname'] ?? "알 수 없음";
+        toToken = result['data']['fbToken'] ?? "";
       }
 
       setState(() {});
@@ -94,7 +110,7 @@ class _MessageViewState extends State<MessageView> {
       backgroundColor: DDColor.background,
       appBar: DDAppBar(
         context,
-        title: widget.toName,
+        title: toName,
         actions: [
           Center(
             child: DDButton(
@@ -186,20 +202,15 @@ class _MessageViewState extends State<MessageView> {
                         height: 40,
                         width: 55,
                         child: CupertinoButton(
-                            color: controller.text.isNotEmpty
-                                ? DDColor.primary
-                                : DDColor.disabled,
-                            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                            borderRadius:
-                                BorderRadius.circular(GlobalVariables.radius),
-                            child: const Icon(CupertinoIcons.paperplane_fill,
-                                size: 20),
-                            onPressed: () {
-                              fireChatService.sendMessage(
-                                message: controller.text,
-                              );
-                              controller.text = "";
-                            }),
+                          color: DDColor.primary,
+                          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                          borderRadius:
+                              BorderRadius.circular(GlobalVariables.radius),
+                          child: const Icon(CupertinoIcons.paperplane_fill,
+                              size: 20),
+                          onPressed:
+                              controller.text.isNotEmpty ? sendMessage : null,
+                        ),
                       )
                     ],
                   ),
@@ -210,6 +221,26 @@ class _MessageViewState extends State<MessageView> {
         ],
       ),
     );
+  }
+
+  void sendMessage() {
+    fireChatService.sendMessage(
+      message: controller.text,
+    );
+
+    GlobalVariables.httpConn.fbPost(
+      sendData: FcmDto(
+        token: toToken,
+        title: GlobalVariables.userDto!.nickname,
+        body: controller.text,
+        data: {
+          "toId": widget.fromId,
+          "fromId": widget.toId,
+          "toName": GlobalVariables.userDto!.nickname,
+        },
+      ),
+    );
+    controller.text = "";
   }
 }
 

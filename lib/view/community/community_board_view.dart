@@ -162,7 +162,6 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                 builder: (_) => MessageView(
                                   fromId: GlobalVariables.userDto!.uid,
                                   toId: postDto.userId,
-                                  toName: postDto.userNickname,
                                 ),
                               ),
                             ),
