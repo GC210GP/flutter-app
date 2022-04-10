@@ -206,9 +206,13 @@ class _CommunityPageViewState extends State<CommunityPageView> {
   }
 
   Future<List<PostDto>> getCommunityBoards(int aid) async {
-    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
-      apiUrl: "/posts?associationId=$aid&page=1&size=5&sort=id,desc",
-    );
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
+      "associationId": aid,
+      "page": 1,
+      "size": 5,
+      "sort": "modifiedDate,desc",
+    });
 
     List<PostDto> posts = [];
 

@@ -104,9 +104,13 @@ class _SplashViewState extends State<SplashView> {
       if (isOk) {
         // Token 검사 / 세션 유지 진행
         await PreferenceManager.instance.init();
-        if (PreferenceManager.instance.readSavedToken() != null) {
+
+        GlobalVariables.savedEmail =
+            PreferenceManager.instance.read(PrefItem.savedEmail) ?? "";
+
+        if (PreferenceManager.instance.read(PrefItem.token) != null) {
           GlobalVariables.httpConn
-              .setHeaderToken(PreferenceManager.instance.readSavedToken()!);
+              .setHeaderToken(PreferenceManager.instance.read(PrefItem.token)!);
 
           Map<String, dynamic> userResult =
               await GlobalVariables.httpConn.get(apiUrl: "/users/current");

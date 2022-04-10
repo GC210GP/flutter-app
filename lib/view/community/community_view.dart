@@ -42,7 +42,7 @@ class _CommunityViewState extends State<CommunityView> {
       setState(() {});
     });
 
-    getCommunityBoards(widget.associationDto.aid, 1).then((value) {
+    getCommunityBoards(widget.associationDto.aid, 0).then((value) {
       setState(() {});
     });
 
@@ -250,9 +250,13 @@ class _CommunityViewState extends State<CommunityView> {
   }
 
   Future<List<String>> getCommunityBoards(int aid, int pageNum) async {
-    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
-      apiUrl: "/posts?associationId=$aid&page=$pageNum&size=20&sort=id,desc",
-    );
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
+      "associationId": aid,
+      "page": pageNum,
+      "size": 20,
+      "sort": "modifiedDate,desc",
+    });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
       for (var i in result['data']['content']) {

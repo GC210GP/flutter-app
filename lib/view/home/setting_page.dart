@@ -1,4 +1,5 @@
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/view/settting_text_view.dart';
 import 'package:app/view/signup/signup.view.dart';
@@ -196,13 +197,14 @@ class _SettingPageViewState extends State<SettingPageView> {
   }
 
   Future<void> doLogout() async {
-    GlobalVariables.fcmToken = "";
-    GlobalVariables.userDto = null;
-
     await GlobalVariables.httpConn.patch(
       apiUrl: "/users/${GlobalVariables.userDto!.uid}",
       body: {"fbToken": ""},
     );
+
+    GlobalVariables.fcmToken = "";
+    GlobalVariables.userDto = null;
+    PreferenceManager.instance.delete(target: PrefItem.token);
 
     Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
   }

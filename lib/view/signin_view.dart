@@ -282,15 +282,16 @@ class _SigninViewState extends State<SigninView> {
 
         GlobalVariables.userDto = readUserDto(userResult);
 
-        PreferenceManager.instance.updateSavedToken(token: tokenResult.token);
-        GlobalVariables.savedEmail = _controller.text;
+        PreferenceManager.instance
+            .update(token: tokenResult.token, savedEmail: userid.trim());
+        GlobalVariables.savedEmail = userid.trim();
         Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         isWorking = false;
         return;
       }
     } else {
       isLoginFailed = true;
-      isWorking = true;
+      isWorking = false;
     }
 
     setState(() {});

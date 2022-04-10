@@ -4,7 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: constant_identifier_names
 const String LOG = "PrefManager:: ";
 
-enum PrefItem { token }
+enum PrefItem {
+  token,
+  savedEmail,
+}
 
 class PreferenceManager {
   // Singleton
@@ -16,7 +19,9 @@ class PreferenceManager {
 
   bool _isInit = false;
 
+  // Items
   String? _token;
+  String? _savedEmail;
 
   // 초기화
   Future<void> init() async {
@@ -26,6 +31,7 @@ class PreferenceManager {
 
     // 저장된 값 불러오기 load()
     _token = _prefs.getString(PrefItem.token.name);
+    _savedEmail = _prefs.getString(PrefItem.savedEmail.name);
 
     debugPrint("$LOG init done.");
   }
@@ -38,45 +44,75 @@ class PreferenceManager {
 
   /// ### CREATE
   void createPref({
-    required String token,
+    String? token,
+    String? savedEmail,
   }) {
     checkInit();
 
     debugPrint("$LOG Create Start");
-    _prefs.setString(PrefItem.token.name, token);
-    _token = token;
+
+    if (token != null) {
+      _prefs.setString(PrefItem.token.name, token);
+      _token = token;
+    }
+    if (savedEmail != null) {
+      _prefs.setString(PrefItem.savedEmail.name, savedEmail);
+      _savedEmail = savedEmail;
+    }
+
     debugPrint("$LOG Create End");
   }
 
   ///
   /// ### READ
-  String? readSavedToken() => _token;
+  String? read(PrefItem target) {
+    if (target == PrefItem.token) {
+      return _token;
+    }
+    if (target == PrefItem.savedEmail) {
+      return _savedEmail;
+    }
+    return null;
+  }
 
   ///
   /// ### UPDATE
-  void updateSavedToken({
-    required String token,
+  void update({
+    String? token,
+    String? savedEmail,
   }) {
     checkInit();
 
     debugPrint("$LOG Update start");
 
-    _prefs.setString(PrefItem.token.name, token);
-    _token = token;
+    if (token != null) {
+      _prefs.setString(PrefItem.token.name, token);
+      _token = token;
+    }
+    if (savedEmail != null) {
+      _prefs.setString(PrefItem.savedEmail.name, savedEmail);
+      _savedEmail = savedEmail;
+    }
 
     debugPrint("$LOG Update done");
   }
 
   ///
   /// ### DELETE
-  void deleteSavedToken({
-    required int index,
+  void delete({
+    required PrefItem target,
   }) {
     checkInit();
     debugPrint("$LOG Delete start");
 
-    _prefs.remove(PrefItem.token.name);
-    _token = null;
+    if (target == PrefItem.token) {
+      _prefs.remove(PrefItem.token.name);
+      _token = null;
+    }
+    if (target == PrefItem.savedEmail) {
+      _prefs.remove(PrefItem.savedEmail.name);
+      _savedEmail = null;
+    }
 
     debugPrint("$LOG Delete done");
   }
