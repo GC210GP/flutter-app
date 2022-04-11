@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// ignore: non_constant_identifier_names
 PreferredSizeWidget DDAppBar(
   BuildContext context, {
   String title = "",
   List<Widget>? actions,
+  VoidCallback? onBackPressed,
 }) =>
     AppBar(
       backgroundColor: Colors.transparent,
@@ -27,7 +29,7 @@ PreferredSizeWidget DDAppBar(
       titleSpacing: -10.0,
       title: CupertinoButton(
         alignment: Alignment.centerLeft,
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => onBackPressed ?? Navigator.pop(context),
         padding: const EdgeInsets.all(0.0),
         child: Text(
           title,

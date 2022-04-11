@@ -7,12 +7,16 @@ class FcmService {
   late FirebaseMessaging _messaging;
   late final FlutterLocalNotificationsPlugin? _flutterLocalNotificationsPlugin;
   late final AndroidNotificationChannel? _channel;
+  late final Function(NotificationHandleDto)? _onNotificationArrived;
 
   ///
   ///
   ///
   /// Initialize
-  Future<void> init() async {
+  Future<void> init(
+      {Function(NotificationHandleDto)? onNotificationArrived}) async {
+    _onNotificationArrived = onNotificationArrived;
+
     await Firebase.initializeApp();
     _messaging = FirebaseMessaging.instance;
 
@@ -149,7 +153,7 @@ class FcmService {
     // If you're going to use other Firebase services in the background, such as Firestore,
     // make sure you call `initializeApp` before using other Firebase services.
     await Firebase.initializeApp();
-    print("Handling a background message: ${message.messageId}");
+    debugPrint("Handling a background message: ${message.messageId}");
   }
 
   ///
@@ -184,6 +188,26 @@ class FcmService {
     debugPrint(message.data.toString());
     debugPrint("노티 터치 앱 실행");
 
+    Map<String, dynamic> tmp = {};
+
+    for (String i in message.data
+        .toString()
+        .replaceAll("{", "")
+        .replaceAll("}", "")
+        .split(",")) {
+      tmp[i.split(":")[0].trim()] = i.split(":")[1].trim();
+    }
+
+    NotificationHandleDto arrivedData = NotificationHandleDto(
+      toId: int.parse(tmp["toId"]),
+      toName: tmp["toName"],
+      fromId: int.parse(tmp["fromId"]),
+    );
+
+    if (_onNotificationArrived != null) {
+      _onNotificationArrived!(arrivedData);
+    }
+
     // TODO: 안읽은 메시지 개수 카운트 / GV.badgeCount 반영
     // FlutterAppBadger.updateBadgeCount(GlobalVariables.badgetCount);
 
@@ -202,4 +226,16 @@ class FcmService {
       debugPrint('notification payload: $payload');
     }
   }
+}
+
+class NotificationHandleDto {
+  String toName;
+  int fromId;
+  int toId;
+
+  NotificationHandleDto({
+    required this.toId,
+    required this.toName,
+    required this.fromId,
+  });
 }

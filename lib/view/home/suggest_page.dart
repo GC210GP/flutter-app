@@ -1,18 +1,10 @@
-import 'dart:io';
-
-import 'package:app/model/fcm.dto.dart';
-import 'package:app/model/person.dto.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
-import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/widget/button.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:url_launcher/url_launcher.dart' as url;
-import '../message_view.dart';
 
 class SuggestionPageView extends StatefulWidget {
   const SuggestionPageView({Key? key}) : super(key: key);

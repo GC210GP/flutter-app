@@ -4,6 +4,7 @@ import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/noti/fcm_service.dart';
 import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:app/view/message_view.dart';
 import 'package:app/view/signin_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +24,7 @@ class _SplashViewState extends State<SplashView> {
 
   @override
   void initState() {
+    GlobalVariables.currentContext = context;
     worker();
     super.initState();
   }
@@ -91,7 +93,17 @@ class _SplashViewState extends State<SplashView> {
 
     FireControl.instance!.init().then((isOk) async {
       // FCM Setting
-      await fcmService.init();
+      await fcmService.init(onNotificationArrived: (data) {
+        Navigator.push(
+          GlobalVariables.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => MessageView(
+              fromId: data.fromId,
+              toId: data.toId,
+            ),
+          ),
+        );
+      });
       await fcmService.getUserPermission();
       fcmService.startListener();
       GlobalVariables.fcmToken = await fcmService.getToken();
@@ -104,9 +116,13 @@ class _SplashViewState extends State<SplashView> {
       if (isOk) {
         // Token 검사 / 세션 유지 진행
         await PreferenceManager.instance.init();
-        if (PreferenceManager.instance.readSavedToken() != null) {
+
+        GlobalVariables.savedEmail =
+            PreferenceManager.instance.read(PrefItem.savedEmail) ?? "";
+
+        if (PreferenceManager.instance.read(PrefItem.token) != null) {
           GlobalVariables.httpConn
-              .setHeaderToken(PreferenceManager.instance.readSavedToken()!);
+              .setHeaderToken(PreferenceManager.instance.read(PrefItem.token)!);
 
           Map<String, dynamic> userResult =
               await GlobalVariables.httpConn.get(apiUrl: "/users/current");

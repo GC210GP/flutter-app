@@ -4,7 +4,6 @@ import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class SignupPage2 extends StatefulWidget {
   final Function(String inputText)? onPressed;
@@ -12,7 +11,7 @@ class SignupPage2 extends StatefulWidget {
   final String title;
   final String errorMessage;
   final RegExp? validator;
-  final bool Function(String)? correctionCheck;
+  final Future<bool> Function(String)? correctionCheck;
   final bool isObscureText;
   final TextInputType? keyboardType;
   final bool isTransition;
@@ -131,8 +130,8 @@ class _SignupPage2State extends State<SignupPage2> {
 
                               // 사용자 지정 correction check
                               if (widget.correctionCheck != null) {
-                                isCorrect =
-                                    widget.correctionCheck!(inputValue.trim());
+                                isCorrect = await widget
+                                    .correctionCheck!(inputValue.trim());
                               }
 
                               if (isCorrect && widget.onPressed != null) {
@@ -159,7 +158,7 @@ class _SignupPage2State extends State<SignupPage2> {
                       Positioned.fill(
                         child: Container(
                           color: Colors.white.withOpacity(0.5),
-                          child: CupertinoActivityIndicator(radius: 13.0),
+                          child: const CupertinoActivityIndicator(radius: 13.0),
                         ),
                       ),
                   ],

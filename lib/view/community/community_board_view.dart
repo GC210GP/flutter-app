@@ -1,4 +1,3 @@
-import 'package:app/model/person.dto.dart';
 import 'package:app/model/post.dto.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
@@ -7,7 +6,6 @@ import 'package:app/util/theme/font.dart';
 import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../message_view.dart';
@@ -72,7 +70,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                       padding: const EdgeInsets.only(bottom: 50.0),
                       physics: const BouncingScrollPhysics(),
                       children: [
-                        SizedBox(height: 10.0),
+                        const SizedBox(height: 10.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -88,7 +86,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                     color: DDColor.fontColor,
                                   ),
                                 ),
-                                SizedBox(height: 3),
+                                const SizedBox(height: 3.0),
                                 Text(
                                   postDto.userNickname,
                                   style: TextStyle(
@@ -100,36 +98,36 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                 ),
                               ],
                             ),
-                            if (postDto.userId == GlobalVariables.userDto!.uid)
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.centerRight,
-                                  child: DDButton(
-                                    width: 35,
-                                    height: 35,
-                                    child: const Icon(
-                                      Icons.edit_rounded,
-                                      size: 20,
-                                    ),
-                                    color: DDColor.grey,
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => CommunityEditorView(
-                                          post: widget.postDto,
-                                        ),
-                                      ),
-                                    ).then((_) async {
-                                      postDto = (await updatePost(
-                                          widget.postDto.pid))!;
-                                      setState(() {});
-                                    }),
-                                  ),
-                                ),
-                              ),
+                            // if (postDto.userId == GlobalVariables.userDto!.uid)
+                            //   Expanded(
+                            //     child: Container(
+                            //       alignment: Alignment.centerRight,
+                            //       child: DDButton(
+                            //         width: 35,
+                            //         height: 35,
+                            //         child: const Icon(
+                            //           Icons.edit_rounded,
+                            //           size: 20,
+                            //         ),
+                            //         color: DDColor.grey,
+                            //         onPressed: () => Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //             builder: (_) => CommunityEditorView(
+                            //               post: widget.postDto,
+                            //             ),
+                            //           ),
+                            //         ).then((_) async {
+                            //           postDto =
+                            //               (await getPost(widget.postDto.pid))!;
+                            //           setState(() {});
+                            //         }),
+                            //       ),
+                            //     ),
+                            //   ),
                           ],
                         ),
-                        SizedBox(height: 35),
+                        const SizedBox(height: 35.0),
                         Text(
                           postDto.content,
                           style: TextStyle(
@@ -143,17 +141,30 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                     ),
                   ),
                   DDButton(
-                    label: "대화 시작하기",
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MessageView(
-                          fromId: GlobalVariables.userDto!.uid,
-                          toId: postDto.userId,
-                          toName: postDto.userNickname,
-                        ),
-                      ),
-                    ),
+                    label: (postDto.userId == GlobalVariables.userDto!.uid)
+                        ? "글 수정하기"
+                        : "대화 시작하기",
+                    onPressed: (postDto.userId == GlobalVariables.userDto!.uid)
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityEditorView(
+                                  post: widget.postDto,
+                                ),
+                              ),
+                            ).then((_) async {
+                              postDto = (await getPost(widget.postDto.pid))!;
+                              setState(() {});
+                            })
+                        : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MessageView(
+                                  fromId: GlobalVariables.userDto!.uid,
+                                  toId: postDto.userId,
+                                ),
+                              ),
+                            ),
                   ),
                   const SizedBox(height: 75),
                 ],
@@ -165,7 +176,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
     );
   }
 
-  Future<PostDto?> updatePost(int pid) async {
+  Future<PostDto?> getPost(int pid) async {
     Map<String, dynamic> result = await GlobalVariables.httpConn.get(
       apiUrl: "/posts/$pid",
     );

@@ -1,10 +1,8 @@
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
-import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class SignupPage3 extends StatefulWidget {
   // final VoidCallback? onBackPressed;

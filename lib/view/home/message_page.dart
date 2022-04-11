@@ -1,3 +1,5 @@
+import 'package:app/util/network/fire_chat_service.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/global_variables.dart';
@@ -133,6 +135,11 @@ class _MessagePageViewState extends State<MessagePageView> {
   Future<void> listLoader() async {
     var value = await _fireControl.getDocList();
 
+    setState(() {
+      chatroomList.clear();
+      isListLoaded = false;
+    });
+
     // 로그인 안되어있을 시,
     if (GlobalVariables.userDto == null) return;
 
@@ -140,6 +147,9 @@ class _MessagePageViewState extends State<MessagePageView> {
       List<String> list = i.split("=");
       if (list.contains(GlobalVariables.userDto!.uid.toString())) {
         int toId = -1;
+        String userNickname = "알 수 없음";
+        String lastChat = "알 수 없음";
+        bool isRecent = false;
 
         if (list[0] == GlobalVariables.userDto!.uid.toString()) {
           toId = int.parse(list[1]);
@@ -147,14 +157,49 @@ class _MessagePageViewState extends State<MessagePageView> {
           toId = int.parse(list[0]);
         }
 
+        ///
+        ///
+        ///
+        ///
+        ///
+
+        FireChatService fireChatService = FireChatService();
+        fireChatService.initChatroom(
+          fromId: GlobalVariables.userDto!.uid,
+          toId: toId,
+        );
+        fireChatService = FireChatService(onChanged: (data) async {
+          lastChat = data.last.msg;
+          isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
+          setState(() {});
+        });
+
+        await fireChatService.initChatroom(
+          fromId: GlobalVariables.userDto!.uid,
+          toId: toId,
+        );
+
+        ///
+        ///
+        ///
+        ///
+        ///
+
+        Map<String, dynamic> result =
+            await GlobalVariables.httpConn.get(apiUrl: "/users", queryString: {
+          "userId": toId,
+        });
+
+        if (result['httpConnStatus'] == httpConnStatus.success) {
+          userNickname = result['data']['nickname'];
+        }
+
         chatroomList.add(
           ChatroomItem(
-            imgSrc:
-                "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-            name: toId.toString(),
-            lastMsg: GlobalVariables.userDto!.uid.toString() +
-                "->" +
-                toId.toString(),
+            imgSrc: result['data']['profileImageLocation'],
+            name: userNickname,
+            lastMsg: lastChat,
+            isRecent: isRecent,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -162,14 +207,19 @@ class _MessagePageViewState extends State<MessagePageView> {
                   chatroomId: i,
                   fromId: GlobalVariables.userDto!.uid,
                   toId: toId,
-                  toName: toId.toString(),
                 ),
               ),
+            ).then(
+              (value) => listLoader(),
             ),
           ),
         );
       }
     }
+
+    setState(() {
+      isListLoaded = true;
+    });
   }
 }
 
@@ -178,6 +228,7 @@ class ChatroomItem extends StatelessWidget {
   final String name;
   final String lastMsg;
   final VoidCallback? onPressed;
+  final bool isRecent;
 
   const ChatroomItem({
     Key? key,
@@ -185,6 +236,7 @@ class ChatroomItem extends StatelessWidget {
     required this.name,
     this.lastMsg = "",
     this.onPressed,
+    this.isRecent = false,
   }) : super(key: key);
 
   @override
@@ -246,6 +298,23 @@ class ChatroomItem extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (isRecent)
+                  Container(
+                    margin: const EdgeInsets.only(right: 10.0),
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: DDColor.primary,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 2.0,
+                          offset: const Offset(.0, 1.0),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

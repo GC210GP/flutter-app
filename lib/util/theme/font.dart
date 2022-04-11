@@ -17,23 +17,6 @@ class DDFontSize {
   static const double h6 = 12;
 }
 
-// 12
-// 13
-// 13.5
-
-// 14
-// 15
-// 16
-
-// 20
-// 22
-// 23
-
-// 24
-// 30
-
-// 45
-
 class DDFontWeight {
   static const light = FontWeight.w300;
   static const regular = FontWeight.w500;

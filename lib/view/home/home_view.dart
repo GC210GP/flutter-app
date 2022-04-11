@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/view/home/community_page.dart';
 import 'package:app/view/home/message_page.dart';
@@ -10,17 +11,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  final int? index;
+
+  const HomeView({
+    Key? key,
+    this.index,
+  }) : super(key: key);
 
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  int pageIdx = 1;
+  late int pageIdx;
 
   CustomButtomNavigationController controller =
       CustomButtomNavigationController();
+
+  @override
+  void initState() {
+    pageIdx = widget.index ?? 1;
+    GlobalVariables.currentContext = context;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

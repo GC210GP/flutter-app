@@ -4,6 +4,7 @@ import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/community/community_board_view.dart';
 import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
@@ -42,7 +43,7 @@ class _CommunityViewState extends State<CommunityView> {
       setState(() {});
     });
 
-    getCommunityBoards(widget.associationDto.aid, 1).then((value) {
+    getCommunityBoards(widget.associationDto.aid, 0).then((value) {
       setState(() {});
     });
 
@@ -107,39 +108,39 @@ class _CommunityViewState extends State<CommunityView> {
                           ),
                         ],
                       ),
-                      Positioned(
-                        top: .0,
-                        bottom: .0,
-                        right: .0,
-                        child: Center(
-                          child: DDButton(
-                            label: "글쓰기",
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.edit_rounded,
-                                  size: DDFontSize.h4,
-                                ),
-                                SizedBox(width: 5.0),
-                                Text(
-                                  "글쓰기 ",
-                                  style: TextStyle(
-                                    fontFamily: DDFontFamily.nanumSR,
-                                    color: DDColor.white,
-                                    fontWeight: DDFontWeight.extraBold,
-                                    fontSize: DDFontSize.h4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            color: DDColor.grey.withOpacity(0.5),
-                            height: 35.0,
-                            width: 85,
-                            onPressed: editPost,
-                          ),
-                        ),
-                      ),
+                      // Positioned(
+                      //   top: .0,
+                      //   bottom: .0,
+                      //   right: .0,
+                      //   child: Center(
+                      //     child: DDButton(
+                      //       label: "글쓰기",
+                      //       child: Row(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         children: const [
+                      //           Icon(
+                      //             Icons.edit_rounded,
+                      //             size: DDFontSize.h4,
+                      //           ),
+                      //           SizedBox(width: 5.0),
+                      //           Text(
+                      //             "글쓰기 ",
+                      //             style: TextStyle(
+                      //               fontFamily: DDFontFamily.nanumSR,
+                      //               color: DDColor.white,
+                      //               fontWeight: DDFontWeight.extraBold,
+                      //               fontSize: DDFontSize.h4,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       color: DDColor.grey.withOpacity(0.5),
+                      //       height: 35.0,
+                      //       width: 85,
+                      //       onPressed: editPost,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   ClipRRect(
@@ -154,6 +155,14 @@ class _CommunityViewState extends State<CommunityView> {
                               title: i.title.length >= 10
                                   ? i.title.substring(0, 10)
                                   : i.title,
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CommunityBoardView(
+                                    postDto: i,
+                                  ),
+                                ),
+                              ),
                             )
                         else
                           Container(
@@ -188,71 +197,16 @@ class _CommunityViewState extends State<CommunityView> {
   ///
   ///
 
-  editPost({int? boardId}) async {
-    if (boardId == null) {
-      Map<String, dynamic> result = await GlobalVariables.httpConn.post(
-        apiUrl: "/posts",
-        body: {
-          "title": "",
-          "content": "",
-          "isActive": "false",
-        },
-      );
-      if (result['httpConnStatus'] == httpConnStatus.success) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CommunityEditorView(
-              post: PostDto(
-                pid: result['id'],
-                title: result['title'] ?? "",
-                content: result['content'] ?? "",
-                isActiveGiver: result['isActiveGiver'] ?? false,
-                isActiveReceiver: result['isActiveReceiver'] ?? false,
-                cratedDate: DateTime.parse(
-                    result["createdDate"] ?? DateTime(1).toString()),
-                modifiedDate: DateTime.parse(
-                    result["modifiedDate"] ?? DateTime(1).toString()),
-                userId: result['userId'],
-                userNickname: result['userNickname'],
-              ),
-            ),
-          ),
-        );
-      }
-    } else {
-      Map<String, dynamic> result = await GlobalVariables.httpConn.get(
-        apiUrl: "/posts/$boardId",
-      );
-      if (result['httpConnStatus'] == httpConnStatus.success) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CommunityEditorView(
-              post: PostDto(
-                pid: result['data']['id'],
-                title: result['data']['title'] ?? "",
-                content: result['data']['content'] ?? "",
-                isActiveGiver: result['data']['isActiveGiver'] ?? false,
-                isActiveReceiver: result['data']['isActiveReceiver'] ?? false,
-                cratedDate: DateTime.parse(
-                    result['data']["createdDate"] ?? DateTime(1).toString()),
-                modifiedDate: DateTime.parse(
-                    result['data']["modifiedDate"] ?? DateTime(1).toString()),
-                userId: result['data']['userId'],
-                userNickname: result['data']['userNickname'],
-              ),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
   Future<List<String>> getCommunityBoards(int aid, int pageNum) async {
-    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
-      apiUrl: "/posts?associationId=$aid&page=$pageNum&size=20&sort=id,desc",
-    );
+    posts.clear();
+
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
+      "associationId": aid,
+      "page": pageNum,
+      "size": 20,
+      "sort": "modifiedDate,desc",
+    });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
       for (var i in result['data']['content']) {
