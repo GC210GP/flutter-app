@@ -308,25 +308,27 @@ class _CommunityPageViewState extends State<CommunityPageView> {
         break;
     }
 
-    for (Map<String, dynamic> i in result["data"]) {
-      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
-          .get(apiUrl: "/associations?associationId=${i['associationId']}");
-      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
-        starredCommunity.add(
-          AssociationDto(
-            aid: i['associationId'],
-            uaid: i['userAssociationId'],
-            associationName: i['associationName'],
-            cratedDate:
-                DateTime.parse(resultAssociation['data']['createdDate']),
-            modifiedDate:
-                DateTime.parse(resultAssociation['data']['modifiedDate']),
-          ),
-        );
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      for (Map<String, dynamic> i in result["data"]) {
+        Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+            .get(apiUrl: "/associations?associationId=${i['associationId']}");
+        if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+          starredCommunity.add(
+            AssociationDto(
+              aid: i['associationId'],
+              uaid: i['userAssociationId'],
+              associationName: i['associationName'],
+              cratedDate:
+                  DateTime.parse(resultAssociation['data']['createdDate']),
+              modifiedDate:
+                  DateTime.parse(resultAssociation['data']['modifiedDate']),
+            ),
+          );
 
-        // 포스트 가져옴
-        for (AssociationDto i in starredCommunity) {
-          starredCommunityPosts.add(await getCommunityBoards(i.aid));
+          // 포스트 가져옴
+          for (AssociationDto i in starredCommunity) {
+            starredCommunityPosts.add(await getCommunityBoards(i.aid));
+          }
         }
       }
     }

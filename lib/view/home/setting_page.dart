@@ -1,7 +1,9 @@
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/view/settting_text_view.dart';
+import 'package:app/view/signin_view.dart';
 import 'package:app/view/signup/signup.view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -113,7 +115,12 @@ class _SettingPageViewState extends State<SettingPageView> {
                                 ),
                               );
                             }
-                          : null,
+                          : () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SigninView(),
+                                ),
+                              ),
                     ),
 
                     ///
@@ -181,8 +188,11 @@ class _SettingPageViewState extends State<SettingPageView> {
                         Uri(
                           scheme: 'mailto',
                           path: 'doubld@gmail.com',
-                          query:
-                              'subject=[더블디] ${'OOO'}님 계정 및 기타문의&body=카테고리: [ 계정 | 장애 | 건의사항 | 기타 ]\n문의내용:&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr',
+                          query: GlobalVariables.emailQuery(
+                            GlobalVariables.userDto != null
+                                ? GlobalVariables.userDto!.name
+                                : null,
+                          ),
                         ).toString(),
                       ),
                     ),
@@ -205,6 +215,7 @@ class _SettingPageViewState extends State<SettingPageView> {
     GlobalVariables.fcmToken = "";
     GlobalVariables.userDto = null;
     PreferenceManager.instance.delete(target: PrefItem.token);
+    GlobalVariables.httpConn.setHeaderToken("");
 
     Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
   }
