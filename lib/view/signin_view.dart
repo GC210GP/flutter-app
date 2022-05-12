@@ -11,6 +11,7 @@ import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url;
 
 class SigninView extends StatefulWidget {
   const SigninView({Key? key}) : super(key: key);
@@ -165,7 +166,30 @@ class _SigninViewState extends State<SigninView> {
                       ),
                     ),
 
-                    const SizedBox(height: 50.0),
+                    Center(
+                      child: DDButton(
+                        margin: const EdgeInsets.only(top: 10.0, bottom: 40.0),
+                        height: 30,
+                        child: Text(
+                          "아이디/비밀번호가 기억나지 않아요 😭",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: DDFontFamily.nanumSR,
+                            fontWeight: DDFontWeight.extraBold,
+                            fontSize: DDFontSize.h4,
+                            color: DDColor.fontColor,
+                          ),
+                        ),
+                        color: DDColor.background,
+                        onPressed: () => url.launch(
+                          Uri(
+                            scheme: 'mailto',
+                            path: 'doubld@gmail.com',
+                            query: GlobalVariables.emailAccountQuery,
+                          ).toString(),
+                        ),
+                      ),
+                    ),
 
                     ///
                     ///

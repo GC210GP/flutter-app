@@ -181,8 +181,7 @@ class _SettingPageViewState extends State<SettingPageView> {
                         Uri(
                           scheme: 'mailto',
                           path: 'doubld@gmail.com',
-                          query:
-                              'subject=[더블디] ${'OOO'}님 계정 및 기타문의&body=카테고리: [ 계정 | 장애 | 건의사항 | 기타 ]\n문의내용:&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr',
+                          query: GlobalVariables.emailQuery("OOO"),
                         ).toString(),
                       ),
                     ),
