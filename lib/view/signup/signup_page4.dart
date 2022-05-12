@@ -255,7 +255,7 @@ class _SignPage4State extends State<SignPage4> {
       // Save the thumbnail as a PNG.
 
       image.writeAsBytesSync(ip.encodeJpg(thumbnail));
-      print(await image.length());
+      debugPrint("${await image.length()}");
     }
 
     Map<String, dynamic> result;
