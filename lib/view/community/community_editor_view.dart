@@ -14,10 +14,12 @@ import 'package:url_launcher/url_launcher.dart' as url;
 
 class CommunityEditorView extends StatefulWidget {
   final PostDto post;
+  final bool isModify;
 
   const CommunityEditorView({
     Key? key,
     required this.post,
+    required this.isModify,
   }) : super(key: key);
 
   @override
@@ -25,7 +27,6 @@ class CommunityEditorView extends StatefulWidget {
 }
 
 class _CommunityEditorViewState extends State<CommunityEditorView> {
-  bool isModify = false;
   FocusNode focusNodeTitle = FocusNode();
   FocusNode focusNodeContent = FocusNode();
 
@@ -57,11 +58,10 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DDColor.background,
-      appBar: DDAppBar(context, title: "뒤로", onBackPressed: () async {
-        //  글에 아무 내용 없을 시 삭제
-        await deletePost(widget.post.pid);
-        Navigator.pop(context);
-      }),
+      appBar: DDAppBar(
+        context,
+        title: "뒤로",
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
         child: Column(
@@ -211,14 +211,17 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
             const SizedBox(height: 10.0),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
               DDButton(
-                label: isModify ? "수정하기" : "등록하기",
-                onPressed: () {
-                  commitBoard(
-                    content: content,
-                    title: title,
-                    postId: widget.post.pid,
-                  );
-                },
+                label: widget.isModify ? "수정하기" : "등록하기",
+                onPressed: widget.isModify
+                    ? () => commitPost(
+                          content: content,
+                          title: title,
+                          postId: widget.post.pid,
+                        )
+                    : () => createPost(
+                          title: title,
+                          content: content,
+                        ),
               )
             else
               DDButton(
@@ -238,7 +241,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
     );
   }
 
-  Future<void> commitBoard(
+  Future<void> commitPost(
       {required String title,
       required String content,
       required int postId}) async {
@@ -271,6 +274,33 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
       );
     } else {
       Navigator.pop(context);
+    }
+  }
+
+  ///
+  ///
+  ///
+
+  createPost({
+    required String title,
+    required String content,
+  }) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.post(
+      apiUrl: "/posts",
+      body: {
+        "title": title,
+        "content": content,
+        "isActiveGiver": "false",
+        "isActiveReceiver": "false",
+        "associationId": widget.post.associationId.toString()
+      },
+    );
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      // 토스트
+      Navigator.pop(context);
+    } else {
+      // 토스트
     }
   }
 }

@@ -149,6 +149,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => CommunityEditorView(
+                                  isModify: true,
                                   post: widget.postDto,
                                 ),
                               ),
@@ -185,10 +186,11 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
       return PostDto(
         pid: result['data']['id'],
         title: result['data']['title'] ?? "",
+        associationId: result['data']["associationId"] ?? -1,
         content: result['data']['content'] ?? "",
         isActiveGiver: result['data']['isActiveGiver'] ?? false,
         isActiveReceiver: result['data']['isActiveReceiver'] ?? false,
-        cratedDate: DateTime.parse(
+        createdDate: DateTime.parse(
             result['data']["createdDate"] ?? DateTime(1).toString()),
         modifiedDate: DateTime.parse(
             result['data']["modifiedDate"] ?? DateTime(1).toString()),

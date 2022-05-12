@@ -51,10 +51,10 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
                       aspectRatio: 1 / 2,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) {
-                        print("index: $index / reason: $reason");
+                        debugPrint("index: $index / reason: $reason");
                       },
                       onScrolled: (value) {
-                        print("value: $value");
+                        debugPrint("value: $value");
                       },
                     ),
                     items: caroselList,
@@ -104,7 +104,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
           children: [
             Center(
               child: Text(
-                "아직 추천 리스트가 없어요 😭\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.",
+                "아직 추천 리스트가 없어요 😭\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.\n\n",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: DDFontFamily.nanumSR,

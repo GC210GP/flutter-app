@@ -34,6 +34,8 @@ class _CommunityViewState extends State<CommunityView> {
   List<PostDto> posts = [];
   late bool isStarred;
 
+  bool isStarredWorking = false;
+
   @override
   void initState() {
     isStarred = widget.isStarred;
@@ -108,39 +110,72 @@ class _CommunityViewState extends State<CommunityView> {
                           ),
                         ],
                       ),
-                      // Positioned(
-                      //   top: .0,
-                      //   bottom: .0,
-                      //   right: .0,
-                      //   child: Center(
-                      //     child: DDButton(
-                      //       label: "글쓰기",
-                      //       child: Row(
-                      //         mainAxisAlignment: MainAxisAlignment.center,
-                      //         children: const [
-                      //           Icon(
-                      //             Icons.edit_rounded,
-                      //             size: DDFontSize.h4,
-                      //           ),
-                      //           SizedBox(width: 5.0),
-                      //           Text(
-                      //             "글쓰기 ",
-                      //             style: TextStyle(
-                      //               fontFamily: DDFontFamily.nanumSR,
-                      //               color: DDColor.white,
-                      //               fontWeight: DDFontWeight.extraBold,
-                      //               fontSize: DDFontSize.h4,
-                      //             ),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //       color: DDColor.grey.withOpacity(0.5),
-                      //       height: 35.0,
-                      //       width: 85,
-                      //       onPressed: editPost,
-                      //     ),
-                      //   ),
-                      // ),
+
+                      ///
+                      ///
+                      ///
+
+                      Positioned(
+                        top: .0,
+                        bottom: .0,
+                        right: .0,
+                        child: Center(
+                          child: DDButton(
+                            label: "글쓰기",
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.edit_rounded,
+                                  size: DDFontSize.h4,
+                                ),
+                                SizedBox(width: 5.0),
+                                Text(
+                                  "글쓰기 ",
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    color: DDColor.white,
+                                    fontWeight: DDFontWeight.extraBold,
+                                    fontSize: DDFontSize.h4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            color: DDColor.grey.withOpacity(0.5),
+                            height: 35.0,
+                            width: 85,
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityEditorView(
+                                  isModify: false,
+                                  post: PostDto(
+                                    pid: -1,
+                                    title: "",
+                                    content: "",
+                                    associationId: widget.associationDto.aid,
+                                    isActiveGiver: false,
+                                    isActiveReceiver: false,
+                                    createdDate: DateTime(0),
+                                    modifiedDate: DateTime(0),
+                                    userId: GlobalVariables.userDto!.uid,
+                                    userNickname:
+                                        GlobalVariables.userDto!.nickname,
+                                  ),
+                                ),
+                              ),
+                            ).then(
+                              (value) => getCommunityBoards(
+                                      widget.associationDto.aid, 0)
+                                  .then(
+                                (value) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   ClipRRect(
@@ -162,6 +197,12 @@ class _CommunityViewState extends State<CommunityView> {
                                     postDto: i,
                                   ),
                                 ),
+                              ).then(
+                                (value) => getCommunityBoards(
+                                        widget.associationDto.aid, 0)
+                                    .then((value) {
+                                  setState(() {});
+                                }),
                               ),
                             )
                         else
@@ -204,7 +245,7 @@ class _CommunityViewState extends State<CommunityView> {
         await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
       "associationId": aid,
       "page": pageNum,
-      "size": 20,
+      // "size": 20,
       "sort": "modifiedDate,desc",
     });
 
@@ -212,17 +253,19 @@ class _CommunityViewState extends State<CommunityView> {
       for (var i in result['data']['content']) {
         posts.add(
           PostDto(
-              pid: i["id"],
-              title: i["title"] ?? "",
-              content: i["content"] ?? "",
-              isActiveGiver: i["isActiveGiver"] ?? false,
-              isActiveReceiver: i["isActiveReceiver"] ?? false,
-              cratedDate:
-                  DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
-              modifiedDate:
-                  DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
-              userId: i['userId'],
-              userNickname: i['userNickname']),
+            pid: i["id"],
+            title: i["title"] ?? "",
+            content: i["content"] ?? "",
+            associationId: i["associationId"] ?? -1,
+            isActiveGiver: i["isActiveGiver"] ?? false,
+            isActiveReceiver: i["isActiveReceiver"] ?? false,
+            createdDate:
+                DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
+            modifiedDate:
+                DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
+            userId: i['userId'],
+            userNickname: i['userNickname'],
+          ),
         );
       }
     }
@@ -231,24 +274,38 @@ class _CommunityViewState extends State<CommunityView> {
   }
 
   removeCommunityStar(int uaid) async {
-    Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
-        .delete(apiUrl: "/user-associations/$uaid");
+    if (!isStarredWorking) {
+      isStarredWorking = true;
 
-    if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
-      setState(() {
-        isStarred = false;
-      });
+      // TODO: 추가할 때는 uid를 모름
+      if (uaid == -1) {
+        return;
+      }
+
+      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+          .delete(apiUrl: "/user-associations/$uaid");
+
+      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        setState(() {
+          isStarred = false;
+        });
+      }
+      isStarredWorking = false;
     }
   }
 
   addCommunityStar(int aid) async {
-    Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
-        .post(apiUrl: "/user-associations", body: {"associationId": "$aid"});
+    if (!isStarredWorking) {
+      isStarredWorking = true;
+      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+          .post(apiUrl: "/user-associations", body: {"associationId": "$aid"});
 
-    if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
-      setState(() {
-        isStarred = true;
-      });
+      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        setState(() {
+          isStarred = true;
+        });
+      }
+      isStarredWorking = false;
     }
   }
 }

@@ -14,4 +14,9 @@ class AssociationDto {
     required this.cratedDate,
     required this.modifiedDate,
   });
+
+  @override
+  String toString() {
+    return "{aid: $aid, uaid: $uaid, associationName: $associationName, cratedDate: $cratedDate, modifiedDate: $modifiedDate}";
+  }
 }

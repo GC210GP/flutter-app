@@ -65,7 +65,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     pageOpacity = 0;
     setState(() {});
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
-      getStarredCommunity().then((value) {});
+      getStarredCommunity();
     });
   }
 
@@ -77,8 +77,20 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     super.dispose();
   }
 
+  double starredMargin = 0;
+
   @override
   Widget build(BuildContext context) {
+    if (starredCommunity.length < 4) {
+      starredMargin = 100;
+      starredMargin += starredCommunity.length * 90;
+      for (var i in starredCommunityPosts) {
+        starredMargin += (i.length + 1) * 90;
+      }
+      starredMargin = MediaQuery.of(context).size.height - starredMargin;
+      starredMargin = starredMargin < 0 ? 100 : starredMargin;
+    }
+
     return AnimatedOpacity(
       opacity: pageOpacity,
       duration: const Duration(milliseconds: 100),
@@ -109,9 +121,9 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                       controller: scrollController,
                       padding: EdgeInsets.only(
                           top: 50.0,
-                          bottom: starredCommunity != null
-                              ? (3 - starredCommunity.length) * 150 + 20.0
-                              : 20.0),
+                          bottom: starredCommunity.length < 4
+                              ? (starredMargin)
+                              : 100.0),
                       physics: const BouncingScrollPhysics(),
                       children: [
                         // 검색
@@ -151,23 +163,27 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                                       color: DDColor.disabled,
                                       size: 25.0,
                                     ),
-                                    onPressed: () {
-                                      textController.text = "";
-                                      focusNode.unfocus();
-                                      status = Status.starred;
-                                      scrollController.jumpTo(110.0);
-                                      setState(() {});
-                                    },
+                                    onPressed: clearSearchBar,
                                   ),
                                 )
                             ],
                           ),
                         ),
 
+                        // if (status == Status.starred &&
+                        //     starredCommunity.isEmpty)
+                        //   Container(
+                        //     height:
+                        //         MediaQuery.of(context).size.height / 2 - 100,
+                        //     alignment: Alignment.center,
+                        //     child: Text("검색을 통해 새로운 커뮤니티를 찾아보세요"),
+                        //   ),
+
                         if (status == Status.starred)
                           StarredItems(
                             communityList: starredCommunity,
                             postsList: starredCommunityPosts,
+                            onAfterPostListPressed: getStarredCommunity,
                             onMorePressed: (associationDto) => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -179,13 +195,54 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                             ).then(
                               (value) => getStarredCommunity(),
                             ),
-                            onStarPressed: (uaid) => removeCommunityStar(uaid),
+                            onStarPressed: (uaid, name) => showDialog(
+                              context: context,
+                              builder: (_) => CupertinoAlertDialog(
+                                title: Text('즐겨찾기 목록에서 삭제합니다\n"$name"'),
+                                actions: [
+                                  CupertinoButton(
+                                    child: Text(
+                                      "예",
+                                      style: TextStyle(color: DDColor.primary),
+                                    ),
+                                    onPressed: () {
+                                      removeCommunityStar(uaid);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  CupertinoButton(
+                                    child: const Text("아니오"),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
+
+                        if (status == Status.starred &&
+                            starredCommunity.isNotEmpty)
+                          Center(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 20.0),
+                              child: Text(
+                                "맨 위로 올리면 커뮤니티를 검색할 수 있습니다",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: DDFontFamily.nanumSR,
+                                  fontWeight: DDFontWeight.extraBold,
+                                  fontSize: DDFontSize.h4,
+                                  color: DDColor.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+
                         if (status == Status.searchResult ||
                             status == Status.searching)
                           SearchedItem(
                             searchQuery: textController.text,
                             searchResult: searchedCommunity,
+                            clearSearchBar: clearSearchBar,
                             onCreatePressed: createCommunity,
                             onItemPressed: (associationDto) => Navigator.push(
                               context,
@@ -194,6 +251,8 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                                   associationDto: associationDto,
                                 ),
                               ),
+                            ).then(
+                              (value) => getStarredCommunity(),
                             ),
                           ),
 
@@ -209,27 +268,27 @@ class _CommunityPageViewState extends State<CommunityPageView> {
             ),
 
             // 글쓰기 버튼
-            if (status == Status.starred || status == Status.searchResult)
-              Positioned(
-                right: 10,
-                bottom: 30,
-                child: Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 7,
-                      offset: const Offset(0.0, 3.0),
-                    ),
-                  ], borderRadius: BorderRadius.circular(50.0)),
-                  child: DDButton(
-                    width: 50,
-                    height: 50,
-                    borderRadius: 50,
-                    child: const Icon(Icons.edit),
-                    onPressed: createPost,
-                  ),
-                ),
-              ),
+            // if (status == Status.starred || status == Status.searchResult)
+            //   Positioned(
+            //     right: 10,
+            //     bottom: 30,
+            //     child: Container(
+            //       decoration: BoxDecoration(boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black.withOpacity(0.2),
+            //           blurRadius: 7,
+            //           offset: const Offset(0.0, 3.0),
+            //         ),
+            //       ], borderRadius: BorderRadius.circular(50.0)),
+            //       child: DDButton(
+            //         width: 50,
+            //         height: 50,
+            //         borderRadius: 50,
+            //         child: const Icon(Icons.edit),
+            //         onPressed: createPost,
+            //       ),
+            //     ),
+            //   ),
           ],
         ),
       ),
@@ -260,9 +319,10 @@ class _CommunityPageViewState extends State<CommunityPageView> {
               pid: i["id"],
               title: i["title"] ?? "",
               content: i["content"] ?? "",
+              associationId: i["associationId"] ?? -1,
               isActiveGiver: i["isActiveGiver"] ?? false,
               isActiveReceiver: i["isActiveReceiver"] ?? false,
-              cratedDate:
+              createdDate:
                   DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
               modifiedDate:
                   DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
@@ -273,6 +333,14 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     }
 
     return posts;
+  }
+
+  clearSearchBar() {
+    textController.text = "";
+    focusNode.unfocus();
+    status = Status.starred;
+    // scrollController.jumpTo(110.0);
+    setState(() {});
   }
 
   removeCommunityStar(int uaid) async {
@@ -292,6 +360,8 @@ class _CommunityPageViewState extends State<CommunityPageView> {
 
     isLoading = true;
     starredCommunity.clear();
+    starredCommunityPosts.clear();
+
     pageOpacity = 1.0;
     setState(() {});
     await Future.delayed(const Duration(milliseconds: 200));
@@ -312,6 +382,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
       for (Map<String, dynamic> i in result["data"]) {
         Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
             .get(apiUrl: "/associations?associationId=${i['associationId']}");
+
         if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
           starredCommunity.add(
             AssociationDto(
@@ -324,12 +395,12 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                   DateTime.parse(resultAssociation['data']['modifiedDate']),
             ),
           );
-
-          // 포스트 가져옴
-          for (AssociationDto i in starredCommunity) {
-            starredCommunityPosts.add(await getCommunityBoards(i.aid));
-          }
         }
+      }
+
+      // 포스트 가져옴
+      for (AssociationDto ii in starredCommunity) {
+        starredCommunityPosts.add(await getCommunityBoards(ii.aid));
       }
     }
 
@@ -393,45 +464,6 @@ class _CommunityPageViewState extends State<CommunityPageView> {
             ),
           ),
         ),
-      );
-    }
-  }
-
-  ///
-  ///
-  ///
-
-  createPost({int? boardId}) async {
-    Map<String, dynamic> result = await GlobalVariables.httpConn.post(
-      apiUrl: "/posts",
-      body: {
-        "title": "",
-        "content": "",
-        "isActive": "false",
-      },
-    );
-    if (result['httpConnStatus'] == httpConnStatus.success) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CommunityEditorView(
-            post: PostDto(
-              pid: result['id'],
-              title: result['title'] ?? "",
-              content: result['content'] ?? "",
-              isActiveGiver: result['isActiveGiver'] ?? false,
-              isActiveReceiver: result['isActiveReceiver'] ?? false,
-              cratedDate: DateTime.parse(
-                  result["createdDate"] ?? DateTime(1).toString()),
-              modifiedDate: DateTime.parse(
-                  result["modifiedDate"] ?? DateTime(1).toString()),
-              userId: result['userId'],
-              userNickname: result['userNickname'],
-            ),
-          ),
-        ),
-      ).then(
-        (value) => getStarredCommunity(),
       );
     }
   }
@@ -581,12 +613,14 @@ class SearchedItem extends StatelessWidget {
   final List<AssociationDto> searchResult;
   final Function(String name)? onCreatePressed;
   final Function(AssociationDto associationDto)? onItemPressed;
+  final VoidCallback? clearSearchBar;
   const SearchedItem({
     Key? key,
     required this.searchQuery,
     required this.searchResult,
     this.onCreatePressed,
     this.onItemPressed,
+    this.clearSearchBar,
   }) : super(key: key);
 
   @override
@@ -600,8 +634,10 @@ class SearchedItem extends StatelessWidget {
             CommunityItem(
                 title: i.associationName.toString(),
                 // isStarred: true,
-                onPressed: () =>
-                    {if (onItemPressed != null) onItemPressed!(i)}),
+                onPressed: () {
+                  if (onItemPressed != null) onItemPressed!(i);
+                  if (clearSearchBar != null) clearSearchBar!();
+                }),
           if (searchQuery.isNotEmpty)
             CommunityItem(
               title: '"$searchQuery" 추가하기',
@@ -619,12 +655,14 @@ class StarredItems extends StatelessWidget {
   final List<AssociationDto> communityList;
   final List<List<PostDto>> postsList;
   final Function(AssociationDto associationDto)? onMorePressed;
-  final Function(int uaid)? onStarPressed;
+  final Function(int uaid, String? name)? onStarPressed;
+  final VoidCallback? onAfterPostListPressed;
 
   const StarredItems({
     Key? key,
     required this.communityList,
     required this.postsList,
+    this.onAfterPostListPressed,
     this.onMorePressed,
     this.onStarPressed,
   }) : super(key: key);
@@ -658,7 +696,8 @@ class StarredItems extends StatelessWidget {
                         ),
                         onPressed: () {
                           if (onStarPressed != null) {
-                            onStarPressed!(communityList[i].uaid);
+                            onStarPressed!(communityList[i].uaid,
+                                communityList[i].associationName);
                           }
                         },
                       ),
@@ -684,6 +723,12 @@ class StarredItems extends StatelessWidget {
                               postDto: postsList[i][n],
                             ),
                           ),
+                        ).then(
+                          (_) {
+                            if (onAfterPostListPressed != null) {
+                              onAfterPostListPressed!();
+                            }
+                          },
                         ),
                       ),
                     CommunityBoardItem(
