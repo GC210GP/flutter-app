@@ -3,6 +3,7 @@ import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/toast.dart';
 import 'package:app/view/home/home_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
@@ -245,6 +246,15 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
       {required String title,
       required String content,
       required int postId}) async {
+    if (title.isEmpty) {
+      DDToast.showToast("⚠️ 글 제목이 비어있어요");
+      return;
+    }
+    if (content.isEmpty) {
+      DDToast.showToast("⚠️ 내용이 비어있어요");
+      return;
+    }
+
     Map<String, dynamic> result =
         await GlobalVariables.httpConn.patch(apiUrl: "/posts/$postId", body: {
       "title": title.isEmpty ? "[빈 제목]" : title,
@@ -253,7 +263,10 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
     debugPrint(result.toString());
     if (result['httpConnStatus'] == httpConnStatus.success) {
       debugPrint("${result.toString()} / postId: $postId");
+      DDToast.showToast("글이 수정되었어요 🎉");
       Navigator.pop(context);
+    } else {
+      DDToast.showToast("글 수정을 실패했어요 😢");
     }
   }
 
@@ -262,6 +275,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
         await GlobalVariables.httpConn.delete(apiUrl: "/posts/$pid");
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
+      DDToast.showToast("글이 삭제되었어요 🎉");
       Navigator.pop(context);
       await Navigator.pushAndRemoveUntil(
         context,
@@ -273,6 +287,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
         (route) => false,
       );
     } else {
+      DDToast.showToast("글 삭제를 실패했어요 😢");
       Navigator.pop(context);
     }
   }
@@ -285,6 +300,15 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
     required String title,
     required String content,
   }) async {
+    if (title.isEmpty) {
+      DDToast.showToast("⚠️ 글 제목이 비어있어요");
+      return;
+    }
+    if (content.isEmpty) {
+      DDToast.showToast("⚠️ 내용이 비어있어요");
+      return;
+    }
+
     Map<String, dynamic> result = await GlobalVariables.httpConn.post(
       apiUrl: "/posts",
       body: {
@@ -297,10 +321,10 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
     );
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      // 토스트
+      DDToast.showToast("글이 등록되었어요 🎉");
       Navigator.pop(context);
     } else {
-      // 토스트
+      DDToast.showToast("글 등록을 실패했어요 😢");
     }
   }
 }

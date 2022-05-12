@@ -36,6 +36,9 @@ dependencies:
   # State managemnet
   get: ^4.6.1
 
+  # 토스트
+  fluttertoast: ^8.0.9
+
   # 토큰 정보 저장
   shared_preferences: ^2.0.13
   

@@ -5,6 +5,7 @@ import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/toast.dart';
 import 'package:app/view/signup/signup.view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
@@ -126,7 +127,7 @@ class _SigninViewState extends State<SigninView> {
 
                     if (isLoginFailed)
                       Text(
-                        "계정 정보가 올바르지 않습니다",
+                        "계정 정보를 확인해주세요!",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
@@ -310,6 +311,7 @@ class _SigninViewState extends State<SigninView> {
             .update(token: tokenResult.token, savedEmail: userid.trim());
         GlobalVariables.savedEmail = userid.trim();
         Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+        DDToast.showToast("👋");
         isWorking = false;
         return;
       }

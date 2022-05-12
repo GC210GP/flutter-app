@@ -2,6 +2,7 @@ import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/preference_manager.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:app/util/toast.dart';
 import 'package:app/view/settting_text_view.dart';
 import 'package:app/view/signin_view.dart';
 import 'package:app/view/signup/signup.view.dart';
@@ -216,6 +217,8 @@ class _SettingPageViewState extends State<SettingPageView> {
     GlobalVariables.userDto = null;
     PreferenceManager.instance.delete(target: PrefItem.token);
     GlobalVariables.httpConn.setHeaderToken("");
+
+    DDToast.showToast("로그아웃 되었습니다 👋");
 
     Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
   }
