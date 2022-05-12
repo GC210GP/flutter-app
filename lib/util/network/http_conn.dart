@@ -4,6 +4,7 @@ import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/secret.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:jwt_decode/jwt_decode.dart';
@@ -32,7 +33,7 @@ class HttpConn {
     required String apiUrl,
     Map<String, dynamic>? queryString,
   }) async {
-    print(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString));
+    debugPrint(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString));
 
     http.Response response = await http.get(
       Uri.parse(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString)),
