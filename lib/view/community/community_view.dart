@@ -251,7 +251,12 @@ class _CommunityViewState extends State<CommunityView> {
     });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      for (var i in result['data']['content']) {
+      print(result);
+
+      // aid = result['data']['associationId'];
+      List<dynamic> postRaws = result['data']['postResponseDto']['content'];
+
+      for (var i in postRaws) {
         posts.add(
           PostDto(
             pid: i["id"],
@@ -266,6 +271,15 @@ class _CommunityViewState extends State<CommunityView> {
                 DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
             userId: i['userId'],
             userNickname: i['userNickname'],
+            // associationDto: AssociationDto(
+            //   aid: associationRaw['id'],
+            //   associationName: associationRaw['associationName'],
+            //   createdDate: DateTime.parse(
+            //       associationRaw['createdDate'] ?? DateTime(1).toString()),
+            //   modifiedDate: DateTime.parse(
+            //       associationRaw['modifiedDate'] ?? DateTime(1).toString()),
+            //   uaid: -1, // TODO 참고
+            // ),
           ),
         );
       }
