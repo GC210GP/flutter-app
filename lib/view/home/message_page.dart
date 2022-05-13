@@ -143,78 +143,113 @@ class _MessagePageViewState extends State<MessagePageView> {
     // 로그인 안되어있을 시,
     if (GlobalVariables.userDto == null) return;
 
+    List<List<String>> targetChatroomLists = [];
+    List<ChatroomItemDto> chatroomItemDtos = [];
+
+    int totalCount = 0;
+    int doneCount = 0;
+
     for (String i in value) {
       List<String> list = i.split("=");
       if (list.contains(GlobalVariables.userDto!.uid.toString())) {
-        int toId = -1;
-        String userNickname = "알 수 없음";
-        String lastChat = "알 수 없음";
-        bool isRecent = false;
-
-        if (list[0] == GlobalVariables.userDto!.uid.toString()) {
-          toId = int.parse(list[1]);
-        } else {
-          toId = int.parse(list[0]);
-        }
-
-        ///
-        ///
-        ///
-        ///
-        ///
-
-        FireChatService fireChatService = FireChatService();
-        fireChatService.initChatroom(
-          fromId: GlobalVariables.userDto!.uid,
-          toId: toId,
-        );
-        fireChatService = FireChatService(onChanged: (data) async {
-          lastChat = data.last.msg;
-          isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
-          setState(() {});
-        });
-
-        await fireChatService.initChatroom(
-          fromId: GlobalVariables.userDto!.uid,
-          toId: toId,
-        );
-
-        ///
-        ///
-        ///
-        ///
-        ///
-
-        Map<String, dynamic> result =
-            await GlobalVariables.httpConn.get(apiUrl: "/users", queryString: {
-          "userId": toId,
-        });
-
-        if (result['httpConnStatus'] == httpConnStatus.success) {
-          userNickname = result['data']['nickname'];
-        }
-
-        chatroomList.add(
-          ChatroomItem(
-            imgSrc: result['data']['profileImageLocation'],
-            name: userNickname,
-            lastMsg: lastChat,
-            isRecent: isRecent,
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MessageView(
-                  chatroomId: i,
-                  fromId: GlobalVariables.userDto!.uid,
-                  toId: toId,
-                ),
-              ),
-            ).then(
-              (value) => listLoader(),
-            ),
-          ),
-        );
+        targetChatroomLists.add(list);
+        totalCount++;
       }
+    }
+
+    for (List<String> list in targetChatroomLists) {
+      int toId = -1;
+      String userNickname = "알 수 없음";
+      String lastChat = "알 수 없음";
+      DateTime lastChatTime = DateTime(0);
+      bool isRecent = false;
+
+      if (list[0] == GlobalVariables.userDto!.uid.toString()) {
+        toId = int.parse(list[1]);
+      } else {
+        toId = int.parse(list[0]);
+      }
+
+      ///
+      ///
+      ///
+      ///
+      ///
+
+      FireChatService fireChatService = FireChatService();
+      fireChatService.initChatroom(
+        fromId: GlobalVariables.userDto!.uid,
+        toId: toId,
+      );
+      fireChatService = FireChatService(onChanged: (data) async {
+        lastChat = data.last.msg;
+        lastChatTime = data.last.timestamp;
+        isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
+
+        chatroomItemDtos.add(ChatroomItemDto(
+          chatroomId: "${list[0]}=${list[1]}",
+          userNickname: userNickname,
+          lastChat: lastChat,
+          lastChatTime: lastChatTime,
+          isRecent: isRecent,
+          toId: toId,
+        ));
+
+        doneCount++;
+      });
+
+      await fireChatService.initChatroom(
+        fromId: GlobalVariables.userDto!.uid,
+        toId: toId,
+      );
+    }
+
+    int timeoutCount = 0;
+    while (true) {
+      if (doneCount >= totalCount) break;
+      if (timeoutCount >= 5000) break; // 시간초과
+      await Future.delayed(const Duration(milliseconds: 100));
+      timeoutCount += 100;
+    }
+
+    // 채팅방 정렬
+    chatroomItemDtos.sort(((a, b) => b.lastChatTime.compareTo(a.lastChatTime)));
+
+    ///
+    ///
+    ///
+
+    for (ChatroomItemDto item in chatroomItemDtos) {
+      Map<String, dynamic> result =
+          await GlobalVariables.httpConn.get(apiUrl: "/users", queryString: {
+        "userId": item.toId,
+      });
+
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        item.userNickname = result['data']['nickname'];
+      }
+
+      chatroomList.add(
+        ChatroomItem(
+          imgSrc: result['data']['profileImageLocation'],
+          name: item.userNickname,
+          lastMsg: item.lastChat,
+          lastMsgTime: item.lastChatTime,
+          isRecent: item.isRecent,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MessageView(
+                chatroomId: item.chatroomId,
+                fromId: GlobalVariables.userDto!.uid,
+                toId: item.toId,
+              ),
+            ),
+          ).then(
+            (value) => listLoader(),
+          ),
+        ),
+      );
     }
 
     setState(() {
@@ -223,17 +258,36 @@ class _MessagePageViewState extends State<MessagePageView> {
   }
 }
 
+class ChatroomItemDto {
+  int toId;
+  String userNickname;
+  String lastChat;
+  DateTime lastChatTime;
+  bool isRecent;
+  String chatroomId;
+  ChatroomItemDto({
+    required this.chatroomId,
+    required this.lastChatTime,
+    this.userNickname = "알 수 없음",
+    this.lastChat = "알 수 없음",
+    this.isRecent = false,
+    this.toId = -1,
+  });
+}
+
 class ChatroomItem extends StatelessWidget {
   final String imgSrc;
   final String name;
   final String lastMsg;
   final VoidCallback? onPressed;
   final bool isRecent;
+  final DateTime? lastMsgTime;
 
   const ChatroomItem({
     Key? key,
     required this.imgSrc,
     required this.name,
+    this.lastMsgTime,
     this.lastMsg = "",
     this.onPressed,
     this.isRecent = false,
