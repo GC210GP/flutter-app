@@ -213,6 +213,8 @@ class _SignupViewState extends State<SignupView> {
           else if (pageIdx == 8)
             Expanded(
               child: SignPage5(
+                nickname: user.nickname,
+                email: user.email,
                 onPressed: ({
                   String? address,
                   DateTime? birthdate,
@@ -236,6 +238,8 @@ class _SignupViewState extends State<SignupView> {
           else if (pageIdx == 9)
             Expanded(
               child: SignPage6(
+                nickname: user.nickname,
+                email: user.email,
                 onPressed: ((value) {
                   user.sns = value;
                   changeUserWorker(user);

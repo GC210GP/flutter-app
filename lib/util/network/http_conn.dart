@@ -214,7 +214,7 @@ class HttpConn {
       DateTime exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
       Auth auth = Auth.ROLE_NEED_EMAIL;
       for (Auth i in Auth.values) {
-        if (i.toString() == payload['auth']) auth = i;
+        if (i.toString() == ("Auth." + payload['auth'])) auth = i;
       }
 
       _headers[HttpHeaders.authorizationHeader] = "Bearer " + result["token"];
