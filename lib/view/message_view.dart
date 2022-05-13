@@ -228,6 +228,15 @@ class _MessageViewState extends State<MessageView> {
   }
 
   void sendMessage() {
+    String msg = controller.text.trim();
+
+    // 빈 메시지 발송 방지
+    if (msg.isEmpty) {
+      controller.text = "";
+      setState(() {});
+      return;
+    }
+
     fireChatService.sendMessage(
       message: controller.text,
     );
@@ -245,6 +254,7 @@ class _MessageViewState extends State<MessageView> {
       ),
     );
     controller.text = "";
+    setState(() {});
   }
 }
 
@@ -264,6 +274,19 @@ class ChatBubble extends StatelessWidget {
     required this.isLeft,
     required this.time,
   }) : super(key: key);
+
+  String changeStringToBubble(String input) {
+    String result = "";
+
+    for (int i = 0; i < input.length; i++) {
+      result += input[i];
+      if (i >= 15 && i % 15 == 0) {
+        result += "\n";
+      }
+    }
+
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +326,7 @@ class ChatBubble extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                msg,
+                changeStringToBubble(msg),
                 style: TextStyle(
                   fontFamily: DDFontFamily.nanumSR,
                   fontWeight: DDFontWeight.bold,

@@ -331,21 +331,46 @@ class ChatroomItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                          fontFamily: DDFontFamily.nanumSR,
-                          fontWeight: DDFontWeight.bold,
-                          fontSize: DDFontSize.h4,
-                          color: DDColor.fontColor,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: TextStyle(
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.bold,
+                                fontSize: DDFontSize.h4,
+                                color: DDColor.fontColor,
+                              ),
+                            ),
+                          ),
+                          if (isRecent)
+                            Container(
+                              margin: const EdgeInsets.only(right: 5.0),
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: DDColor.primary,
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 2.0,
+                                    offset: const Offset(.0, 1.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 2),
                       Row(
                         children: [
                           Expanded(
                             child: Text(
-                              lastMsg,
+                              lastMsg.length > 30
+                                  ? lastMsg.substring(0, 30) + "..."
+                                  : lastMsg,
                               style: TextStyle(
                                 fontFamily: DDFontFamily.nanumSR,
                                 fontWeight: DDFontWeight.bold,
@@ -354,13 +379,16 @@ class ChatroomItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text(
-                            TimePrint.format(lastMsgTime),
-                            style: TextStyle(
-                              fontFamily: DDFontFamily.nanumSR,
-                              fontWeight: DDFontWeight.bold,
-                              fontSize: DDFontSize.h5,
-                              color: DDColor.grey,
+                          Container(
+                            margin: const EdgeInsets.only(right: 5.0),
+                            child: Text(
+                              TimePrint.format(lastMsgTime),
+                              style: TextStyle(
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.bold,
+                                fontSize: DDFontSize.h6,
+                                color: DDColor.grey,
+                              ),
                             ),
                           ),
                         ],
@@ -368,23 +396,6 @@ class ChatroomItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (isRecent)
-                  Container(
-                    margin: const EdgeInsets.only(right: 10.0),
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: DDColor.primary,
-                      borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 2.0,
-                          offset: const Offset(.0, 1.0),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
           ),
