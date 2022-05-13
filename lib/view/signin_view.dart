@@ -265,43 +265,87 @@ class _SigninViewState extends State<SigninView> {
         });
         debugPrint("FB Token changed!");
 
+        ///
+        ///
+        ///
+
+        AddUserUserDto tmpUser = AddUserUserDto(
+          name: "unknown",
+          nickname: "unknown",
+          email: userResult['data']['email'],
+          sns: [],
+          phoneNumber: "unknown",
+          profileImageLocation: "",
+          birthdate: DateTime(1),
+          location: "unknown",
+          sex: Gender.MALE,
+          job: "",
+          fbToken: userResult['data']['fbToken'],
+          bloodType: BloodType.PLUS_A,
+          isDormant: false,
+          isDonated: false,
+          createdDate: DateTime(1),
+          updatedDate: DateTime(1),
+          frequency: 0,
+          password: userpw.trim(),
+          recency: DateTime(1),
+        );
+
+        print(tokenResult);
+
+        // 이메일 인증 안한 경우!
+        if (tokenResult.auth == Auth.ROLE_NEED_EMAIL) {
+          TokenDto? loginResult = await GlobalVariables.httpConn
+              .auth(email: tmpUser.email, password: tmpUser.password);
+
+          print(loginResult);
+
+          if (loginResult != null) {
+            Map<String, dynamic> result = await GlobalVariables.httpConn
+                .post(apiUrl: "/users/validate-email");
+
+            if (result["httpConnStatus"] == httpConnStatus.success) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SignupView(
+                    userData: tmpUser,
+                    uid: tokenResult.id,
+                    pageIndex: 5,
+                  ),
+                ),
+              );
+              isWorking = false;
+              setState(() {});
+              return;
+            }
+            isLoginFailed = true;
+            isWorking = false;
+            setState(() {});
+            return;
+          } else {
+            isLoginFailed = true;
+            isWorking = false;
+            setState(() {});
+            return;
+          }
+        }
+
         // 회원가입 이후 별도 정보 입력 안한 경우!
-        // TODO: 백엔드에 Auth 요청하기
         if (DateTime.parse(userResult['data']['birthdate']).hashCode ==
             DateTime(1).hashCode) {
-          AddUserUserDto user = AddUserUserDto(
-            name: "unknown",
-            nickname: "unknown",
-            email: userResult['data']['email'],
-            sns: [],
-            phoneNumber: "unknown",
-            profileImageLocation: "",
-            birthdate: DateTime(1),
-            location: "unknown",
-            sex: Gender.MALE,
-            job: "",
-            fbToken: userResult['data']['fbToken'],
-            bloodType: BloodType.PLUS_A,
-            isDormant: false,
-            isDonated: false,
-            createdDate: DateTime(1),
-            updatedDate: DateTime(1),
-            frequency: 0,
-            password: userpw.trim(),
-            recency: DateTime(1),
-          );
-
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => SignupView(
-                userData: user,
+                userData: tmpUser,
                 uid: tokenResult.id,
                 pageIndex: 6,
               ),
             ),
           );
           isWorking = false;
+          setState(() {});
           return;
         }
 
@@ -313,6 +357,7 @@ class _SigninViewState extends State<SigninView> {
         Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         DDToast.showToast("👋");
         isWorking = false;
+        setState(() {});
         return;
       }
     } else {

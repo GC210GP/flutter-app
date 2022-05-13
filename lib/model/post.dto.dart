@@ -1,5 +1,7 @@
 // post
 
+import 'package:app/model/association.dto.dart';
+
 class PostDto {
   int pid;
   String title;
@@ -11,6 +13,7 @@ class PostDto {
   int userId;
   String userNickname;
   int associationId;
+  AssociationDto? associationDto;
 
   PostDto({
     required this.pid,
@@ -23,6 +26,7 @@ class PostDto {
     required this.modifiedDate,
     required this.userId,
     required this.userNickname,
+    this.associationDto,
   });
 
   @override

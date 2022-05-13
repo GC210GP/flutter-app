@@ -14,8 +14,13 @@ class SignPage6 extends StatefulWidget {
   final Function(List<SnsDto>)? onPressed;
   final VoidCallback? onBackPressed;
 
+  final String nickname;
+  final String email;
+
   const SignPage6({
     Key? key,
+    required this.nickname,
+    required this.email,
     this.onPressed,
     this.onBackPressed,
   }) : super(key: key);
@@ -58,8 +63,8 @@ class _SignPage6State extends State<SignPage6> {
                   children: [
                     Center(
                       child: ProfileItem(
-                        nickname: "홍길동",
-                        email: "uhug@naver.com",
+                        nickname: widget.nickname,
+                        email: widget.email,
                         imgUrl: GlobalVariables.defaultImgUrl,
                       ),
                     ),
