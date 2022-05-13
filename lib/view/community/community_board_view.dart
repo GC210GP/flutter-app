@@ -1,3 +1,4 @@
+import 'package:app/model/association.dto.dart';
 import 'package:app/model/post.dto.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
@@ -88,7 +89,9 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                 ),
                                 const SizedBox(height: 3.0),
                                 Text(
-                                  postDto.userNickname,
+                                  postDto.associationDto == null
+                                      ? postDto.userNickname
+                                      : "${postDto.userNickname}  (#${postDto.associationDto!.associationName})",
                                   style: TextStyle(
                                     fontFamily: DDFontFamily.nanumSR,
                                     fontWeight: DDFontWeight.extraBold,
@@ -182,23 +185,35 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
       apiUrl: "/posts/$pid",
     );
 
+    Map<String, dynamic> associationRaw =
+        result['data']['associationResponseDto'];
+    Map<String, dynamic> postRaw = result['data']['postResponseDto'];
+
     if (result['httpConnStatus'] == httpConnStatus.success) {
       return PostDto(
-        pid: result['data']['id'],
-        title: result['data']['title'] ?? "",
-        associationId: result['data']["associationId"] ?? -1,
-        content: result['data']['content'] ?? "",
-        isActiveGiver: result['data']['isActiveGiver'] ?? false,
-        isActiveReceiver: result['data']['isActiveReceiver'] ?? false,
-        createdDate: DateTime.parse(
-            result['data']["createdDate"] ?? DateTime(1).toString()),
-        modifiedDate: DateTime.parse(
-            result['data']["modifiedDate"] ?? DateTime(1).toString()),
-        userId: result['data']['userId'],
-        userNickname: result['data']['userNickname'],
+        pid: postRaw['id'],
+        title: postRaw['title'] ?? "",
+        associationId: postRaw["associationId"] ?? -1,
+        content: postRaw['content'] ?? "",
+        isActiveGiver: postRaw['isActiveGiver'] ?? false,
+        isActiveReceiver: postRaw['isActiveReceiver'] ?? false,
+        createdDate:
+            DateTime.parse(postRaw["createdDate"] ?? DateTime(1).toString()),
+        modifiedDate:
+            DateTime.parse(postRaw["modifiedDate"] ?? DateTime(1).toString()),
+        userId: postRaw['userId'],
+        userNickname: postRaw['userNickname'],
+        associationDto: AssociationDto(
+          aid: associationRaw['id'],
+          associationName: associationRaw['associationName'],
+          createdDate: DateTime.parse(
+              associationRaw['createdDate'] ?? DateTime(1).toString()),
+          modifiedDate: DateTime.parse(
+              associationRaw['modifiedDate'] ?? DateTime(1).toString()),
+          uaid: -1, // TODO 참고
+        ),
       );
     }
-
     return null;
   }
 }
