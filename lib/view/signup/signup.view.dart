@@ -141,7 +141,7 @@ class _SignupViewState extends State<SignupView> {
                 validator: passwordRegex,
                 onBackPressed: () => changePage(2),
                 title: "비밀번호를 입력해주세요",
-                errorMessage: "대/소문자, 특수문자, 숫자 하나씩 입력해주세요",
+                errorMessage: "대/소문자, 특수문자, 숫자를\n포함해서 입력해주세요",
               ),
             )
           else if (pageIdx == 4)
