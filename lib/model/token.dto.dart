@@ -14,4 +14,9 @@ class TokenDto {
     required this.exp,
     required this.id,
   });
+
+  @override
+  String toString() {
+    return "{token: $token, auth: $auth, exp: $exp, id: $id}";
+  }
 }
