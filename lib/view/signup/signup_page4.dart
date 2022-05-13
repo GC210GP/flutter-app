@@ -66,6 +66,7 @@ class _SignPage4State extends State<SignPage4> {
                 Center(
                   child: Text(
                     "계정을 생성합니다",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: DDFontFamily.nanumSR,
                       fontWeight: DDFontWeight.extraBold,
@@ -132,6 +133,7 @@ class _SignPage4State extends State<SignPage4> {
                 Center(
                   child: Text(
                     widget.label,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: DDFontFamily.nanumSR,
                       fontWeight: DDFontWeight.extraBold,
@@ -154,6 +156,7 @@ class _SignPage4State extends State<SignPage4> {
                   Center(
                     child: Text(
                       "최소 한 글자 이상 입력해주세요!",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: DDFontFamily.nanumSR,
                         fontWeight: DDFontWeight.extraBold,

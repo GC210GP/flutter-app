@@ -74,6 +74,7 @@ class _SignPage6State extends State<SignPage6> {
                     Center(
                       child: Text(
                         "마지막이에요!",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -85,6 +86,7 @@ class _SignPage6State extends State<SignPage6> {
                     Center(
                       child: Text(
                         "SNS 계정을 입력해주세요",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -187,6 +189,7 @@ class _SignPage6State extends State<SignPage6> {
                       Center(
                         child: Text(
                           "모든 항목을 빠짐없이 입력해주세요!",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
                             fontWeight: DDFontWeight.extraBold,

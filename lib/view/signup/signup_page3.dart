@@ -38,6 +38,7 @@ class _SignupPage3State extends State<SignupPage3> {
 
           if (!isCorrect) {
             _controller.text = "";
+
             isTyped = false;
           }
 
@@ -71,7 +72,7 @@ class _SignupPage3State extends State<SignupPage3> {
       duration: const Duration(milliseconds: 100),
       child: Center(
         child: SizedBox(
-          width: 300.0,
+          width: 320.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -91,6 +92,7 @@ class _SignupPage3State extends State<SignupPage3> {
               Center(
                 child: Text(
                   "이메일로 인증번호를 발송했습니다",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: DDFontFamily.nanumSR,
                     fontWeight: DDFontWeight.extraBold,
@@ -103,6 +105,7 @@ class _SignupPage3State extends State<SignupPage3> {
               Center(
                 child: Text(
                   "인증번호를 입력해주세요",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: DDFontFamily.nanumSR,
                     fontWeight: DDFontWeight.extraBold,
@@ -117,6 +120,7 @@ class _SignupPage3State extends State<SignupPage3> {
                   ? Center(
                       child: Text(
                         "인증번호가 일치하지 않습니다",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -163,6 +167,7 @@ class _SignupPage3State extends State<SignupPage3> {
                         ),
                         child: Text(
                           _controller.text.length >= 1 ? "*" : "",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
                             fontWeight: DDFontWeight.extraBold,
@@ -184,6 +189,7 @@ class _SignupPage3State extends State<SignupPage3> {
                         ),
                         child: Text(
                           _controller.text.length >= 2 ? "*" : "",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
                             fontWeight: DDFontWeight.extraBold,
