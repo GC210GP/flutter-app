@@ -7,6 +7,7 @@ import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/time_print.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
@@ -55,7 +56,10 @@ class _MessageViewState extends State<MessageView> {
       for (ChatMessage i in data) {
         chatBubbles.add(
           ChatBubble(
-              msg: i.msg, isLeft: i.senderId != GlobalVariables.userDto!.uid),
+            msg: i.msg,
+            time: i.timestamp,
+            isLeft: i.senderId != GlobalVariables.userDto!.uid,
+          ),
         );
       }
 
@@ -224,6 +228,15 @@ class _MessageViewState extends State<MessageView> {
   }
 
   void sendMessage() {
+    String msg = controller.text.trim();
+
+    // 빈 메시지 발송 방지
+    if (msg.isEmpty) {
+      controller.text = "";
+      setState(() {});
+      return;
+    }
+
     fireChatService.sendMessage(
       message: controller.text,
     );
@@ -241,6 +254,7 @@ class _MessageViewState extends State<MessageView> {
       ),
     );
     controller.text = "";
+    setState(() {});
   }
 }
 
@@ -252,19 +266,48 @@ class _MessageViewState extends State<MessageView> {
 class ChatBubble extends StatelessWidget {
   final String msg;
   final bool isLeft;
+  final DateTime time;
 
   const ChatBubble({
     Key? key,
     required this.msg,
     required this.isLeft,
+    required this.time,
   }) : super(key: key);
+
+  String changeStringToBubble(String input) {
+    String result = "";
+
+    for (int i = 0; i < input.length; i++) {
+      result += input[i];
+      if (i >= 15 && i % 15 == 0) {
+        result += "\n";
+      }
+    }
+
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment:
           isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        if (!isLeft)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10.0, right: 3.0),
+            child: Text(
+              TimePrint.msgFormat(time),
+              style: TextStyle(
+                fontFamily: DDFontFamily.nanumSR,
+                fontWeight: DDFontWeight.bold,
+                fontSize: DDFontSize.msgtime,
+                color: DDColor.grey,
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.all(3.0),
           child: Container(
@@ -283,7 +326,7 @@ class ChatBubble extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                msg,
+                changeStringToBubble(msg),
                 style: TextStyle(
                   fontFamily: DDFontFamily.nanumSR,
                   fontWeight: DDFontWeight.bold,
@@ -294,6 +337,19 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
         ),
+        if (isLeft)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10.0, left: 3.0),
+            child: Text(
+              TimePrint.msgFormat(time),
+              style: TextStyle(
+                fontFamily: DDFontFamily.nanumSR,
+                fontWeight: DDFontWeight.bold,
+                fontSize: DDFontSize.msgtime,
+                color: DDColor.disabled,
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -15,6 +15,7 @@ class DDFontSize {
   static const double h4 = 15;
   static const double h5 = 13.5;
   static const double h6 = 12;
+  static const double msgtime = 10;
 }
 
 class DDFontWeight {
