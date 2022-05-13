@@ -7,6 +7,7 @@ import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/time_print.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
@@ -55,7 +56,10 @@ class _MessageViewState extends State<MessageView> {
       for (ChatMessage i in data) {
         chatBubbles.add(
           ChatBubble(
-              msg: i.msg, isLeft: i.senderId != GlobalVariables.userDto!.uid),
+            msg: i.msg,
+            time: i.timestamp,
+            isLeft: i.senderId != GlobalVariables.userDto!.uid,
+          ),
         );
       }
 
@@ -252,11 +256,13 @@ class _MessageViewState extends State<MessageView> {
 class ChatBubble extends StatelessWidget {
   final String msg;
   final bool isLeft;
+  final DateTime time;
 
   const ChatBubble({
     Key? key,
     required this.msg,
     required this.isLeft,
+    required this.time,
   }) : super(key: key);
 
   @override
@@ -264,7 +270,21 @@ class ChatBubble extends StatelessWidget {
     return Row(
       mainAxisAlignment:
           isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        if (!isLeft)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10.0, right: 3.0),
+            child: Text(
+              TimePrint.msgFormat(time),
+              style: TextStyle(
+                fontFamily: DDFontFamily.nanumSR,
+                fontWeight: DDFontWeight.bold,
+                fontSize: DDFontSize.msgtime,
+                color: DDColor.grey,
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.all(3.0),
           child: Container(
@@ -294,6 +314,19 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
         ),
+        if (isLeft)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10.0, left: 3.0),
+            child: Text(
+              TimePrint.msgFormat(time),
+              style: TextStyle(
+                fontFamily: DDFontFamily.nanumSR,
+                fontWeight: DDFontWeight.bold,
+                fontSize: DDFontSize.msgtime,
+                color: DDColor.disabled,
+              ),
+            ),
+          ),
       ],
     );
   }

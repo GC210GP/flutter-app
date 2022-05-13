@@ -4,6 +4,7 @@ import 'package:app/util/theme/colors.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/time_print.dart';
 import 'package:app/view/message_view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -281,13 +282,13 @@ class ChatroomItem extends StatelessWidget {
   final String lastMsg;
   final VoidCallback? onPressed;
   final bool isRecent;
-  final DateTime? lastMsgTime;
+  final DateTime lastMsgTime;
 
   const ChatroomItem({
     Key? key,
     required this.imgSrc,
     required this.name,
-    this.lastMsgTime,
+    required this.lastMsgTime,
     this.lastMsg = "",
     this.onPressed,
     this.isRecent = false,
@@ -340,14 +341,29 @@ class ChatroomItem extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        lastMsg,
-                        style: TextStyle(
-                          fontFamily: DDFontFamily.nanumSR,
-                          fontWeight: DDFontWeight.bold,
-                          fontSize: DDFontSize.h5,
-                          color: DDColor.grey,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              lastMsg,
+                              style: TextStyle(
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.bold,
+                                fontSize: DDFontSize.h5,
+                                color: DDColor.grey,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            TimePrint.format(lastMsgTime),
+                            style: TextStyle(
+                              fontFamily: DDFontFamily.nanumSR,
+                              fontWeight: DDFontWeight.bold,
+                              fontSize: DDFontSize.h5,
+                              color: DDColor.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
