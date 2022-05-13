@@ -49,6 +49,7 @@ class _SignupPage2State extends State<SignupPage2> {
       pageOpacity = 1.0;
       setState(() {});
     });
+
     super.initState();
   }
 
@@ -123,13 +124,14 @@ class _SignupPage2State extends State<SignupPage2> {
                       onPressed: !isEmpty
                           ? () async {
                               // Regex 검사
+
                               if (widget.validator != null) {
                                 isCorrect = widget.validator!
                                     .hasMatch(inputValue.trim());
                               }
 
                               // 사용자 지정 correction check
-                              if (widget.correctionCheck != null) {
+                              if (isCorrect && widget.correctionCheck != null) {
                                 isCorrect = await widget
                                     .correctionCheck!(inputValue.trim());
                               }
