@@ -4,6 +4,7 @@ import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/toast.dart';
 import 'package:app/view/community/community_board_view.dart';
 import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
@@ -286,6 +287,7 @@ class _CommunityViewState extends State<CommunityView> {
           .delete(apiUrl: "/user-associations/$uaid");
 
       if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        DDToast.showToast("즐겨찾기에서 삭제되었어요");
         setState(() {
           isStarred = false;
         });
@@ -301,6 +303,7 @@ class _CommunityViewState extends State<CommunityView> {
           .post(apiUrl: "/user-associations", body: {"associationId": "$aid"});
 
       if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        DDToast.showToast("즐겨찾기에 추가되었어요 🎉");
         setState(() {
           isStarred = true;
         });
