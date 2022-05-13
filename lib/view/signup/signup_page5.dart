@@ -92,6 +92,7 @@ class _SignPage5State extends State<SignPage5> {
                     Center(
                       child: Text(
                         "거의 다왔어요!",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -103,6 +104,7 @@ class _SignPage5State extends State<SignPage5> {
                     Center(
                       child: Text(
                         "추가 정보를 입력해주세요",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,

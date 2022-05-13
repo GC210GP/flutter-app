@@ -72,7 +72,7 @@ class _SignupPage2State extends State<SignupPage2> {
       duration: const Duration(milliseconds: 100),
       child: Center(
         child: SizedBox(
-          width: 300.0,
+          width: 320.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -80,6 +80,7 @@ class _SignupPage2State extends State<SignupPage2> {
               Center(
                 child: Text(
                   widget.title,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: DDFontFamily.nanumSR,
                     fontWeight: DDFontWeight.extraBold,
@@ -93,6 +94,7 @@ class _SignupPage2State extends State<SignupPage2> {
                   ? Center(
                       child: Text(
                         widget.errorMessage,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,

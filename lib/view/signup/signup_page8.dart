@@ -112,6 +112,7 @@ class Complete extends StatelessWidget {
         const SizedBox(height: 25.0),
         Text(
           "회원가입이 완료되었어요!",
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: DDFontFamily.nanumSR,
             fontWeight: DDFontWeight.extraBold,
@@ -155,6 +156,7 @@ class Fail extends StatelessWidget {
         const SizedBox(height: 25.0),
         Text(
           "가입에 실패했어요",
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: DDFontFamily.nanumSR,
             fontWeight: DDFontWeight.extraBold,
