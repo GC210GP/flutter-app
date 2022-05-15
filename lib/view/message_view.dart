@@ -8,6 +8,7 @@ import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/util/time_print.dart';
+import 'package:app/view/user_profile_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/input_box.dart';
@@ -45,6 +46,7 @@ class _MessageViewState extends State<MessageView> {
 
   String toName = "알 수 없음";
   String toToken = "";
+  String toImgSrc = GlobalVariables.defaultImgUrl;
 
   @override
   void initState() {
@@ -71,6 +73,8 @@ class _MessageViewState extends State<MessageView> {
       if (result['httpConnStatus'] == httpConnStatus.success) {
         toName = result['data']['nickname'] ?? "알 수 없음";
         toToken = result['data']['fbToken'] ?? "";
+        toImgSrc = result['data']['profileImageLocation'] ??
+            GlobalVariables.defaultImgUrl;
       }
 
       setState(() {});
@@ -116,6 +120,28 @@ class _MessageViewState extends State<MessageView> {
         context,
         title: toName,
         actions: [
+          CupertinoButton(
+            borderRadius: BorderRadius.circular(30),
+            padding: const EdgeInsets.all(0.0),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => UserProfileView(
+                  title: "메시지",
+                  toId: widget.toId,
+                ),
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Image.network(
+                toImgSrc,
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           Center(
             child: DDButton(
               label: "헌혈방법",

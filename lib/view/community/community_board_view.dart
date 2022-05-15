@@ -5,8 +5,10 @@ import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/community/community_editor_view.dart';
+import 'package:app/view/user_profile_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../message_view.dart';
@@ -28,6 +30,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
   bool isTop = true;
 
   late PostDto postDto;
+  String toImgSrc = GlobalVariables.defaultImgUrl;
 
   @override
   void initState() {
@@ -37,6 +40,18 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
       isTop = _controller.offset <= 10.0;
       setState(() {});
     });
+
+    GlobalVariables.httpConn.get(
+      apiUrl: "/users",
+      queryString: {"userId": widget.postDto.userId},
+    ).then((result) {
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        toImgSrc = result['data']['profileImageLocation'] ??
+            GlobalVariables.defaultImgUrl;
+        setState(() {});
+      }
+    });
+
     super.initState();
   }
 
@@ -75,32 +90,75 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  postDto.title,
-                                  style: TextStyle(
-                                    fontFamily: DDFontFamily.nanumSR,
-                                    fontWeight: DDFontWeight.extraBold,
-                                    fontSize: DDFontSize.h3,
-                                    color: DDColor.fontColor,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    postDto.title,
+                                    style: TextStyle(
+                                      fontFamily: DDFontFamily.nanumSR,
+                                      fontWeight: DDFontWeight.extraBold,
+                                      fontSize: DDFontSize.h3,
+                                      color: DDColor.fontColor,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 3.0),
-                                Text(
-                                  postDto.associationDto == null
-                                      ? postDto.userNickname
-                                      : "${postDto.userNickname}  (#${postDto.associationDto!.associationName})",
-                                  style: TextStyle(
-                                    fontFamily: DDFontFamily.nanumSR,
-                                    fontWeight: DDFontWeight.extraBold,
-                                    fontSize: DDFontSize.h4,
-                                    color: DDColor.grey,
+                                  const SizedBox(height: 3.0),
+                                  SizedBox(
+                                    height: DDFontSize.h4,
+                                    child: CupertinoButton(
+                                      padding: const EdgeInsets.all(0.0),
+                                      alignment: Alignment.centerLeft,
+                                      onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => UserProfileView(
+                                            title: "커뮤니티",
+                                            toId: postDto.userId,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        postDto.associationDto == null
+                                            ? postDto.userNickname
+                                            : "${postDto.userNickname}  (#${postDto.associationDto!.associationName})",
+                                        style: TextStyle(
+                                          fontFamily: DDFontFamily.nanumSR,
+                                          fontWeight: DDFontWeight.extraBold,
+                                          fontSize: DDFontSize.h4,
+                                          color: DDColor.grey,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+
+                            CupertinoButton(
+                              borderRadius: BorderRadius.circular(35),
+                              padding: const EdgeInsets.all(0.0),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => UserProfileView(
+                                    title: "메시지",
+                                    toId: postDto.userId,
+                                  ),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(35),
+                                child: Image.network(
+                                  toImgSrc,
+                                  width: 35,
+                                  height: 35,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+
+                            // 글 수정 버튼
                             // if (postDto.userId == GlobalVariables.userDto!.uid)
                             //   Expanded(
                             //     child: Container(

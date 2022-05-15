@@ -83,7 +83,7 @@ class _CommunityViewState extends State<CommunityView> {
                     children: [
                       Row(
                         children: [
-                          PageTitleWidget(
+                          DDPageTitleWidget(
                             title: widget.associationDto.associationName,
                             margin:
                                 const EdgeInsets.only(top: 15.0, bottom: 15.0),

@@ -70,7 +70,7 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
           children: [
             Stack(
               children: [
-                const PageTitleWidget(title: "글쓰기"),
+                const DDPageTitleWidget(title: "글쓰기"),
                 Positioned(
                   top: .0,
                   right: .0,

@@ -1,3 +1,4 @@
+import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
@@ -143,6 +144,8 @@ class _SplashViewState extends State<SplashView> {
             List<int> likes = [];
 
             for (Map<String, dynamic> users in resLikes['data']['likedInfo']) {
+              GlobalVariables.likedList.add(LikeDto(
+                  userTo: users['userTo']['id'], lid: users['likedId']));
               likes.add(users['userTo']['id']);
             }
 

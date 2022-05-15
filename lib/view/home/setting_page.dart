@@ -46,7 +46,7 @@ class _SettingPageViewState extends State<SettingPageView> {
               ///
               ///
               // 제목
-              const PageTitleWidget(title: "설정"),
+              const DDPageTitleWidget(title: "설정"),
 
               ///
               ///

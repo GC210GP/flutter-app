@@ -29,9 +29,9 @@ class UserDto {
   DateTime createdDate;
   DateTime modifiedDate;
 
-  List<AssociationDto> associations;
-  List<int> likedUid;
-  List<PostDto> posts;
+  // List<AssociationDto> associations;
+  // List<int> likedUid;
+  // List<PostDto> posts;
 
   String fbToken;
 
@@ -55,9 +55,9 @@ class UserDto {
     required this.modifiedDate,
 
     // TODO: 임시 (자신의 association, post 확인 시 사용하는 attribute)
-    this.associations = const <AssociationDto>[],
-    this.likedUid = const <int>[],
-    this.posts = const <PostDto>[],
+    // this.associations = const <AssociationDto>[],
+    // this.likedUid = const <int>[],
+    // this.posts = const <PostDto>[],
   });
 }
 
@@ -174,6 +174,17 @@ enum BloodType {
   MINUS_AB,
   MINUS_O,
 }
+
+Map<BloodType, String> bloodTypeLabel = const {
+  BloodType.PLUS_A: "RH+ A",
+  BloodType.PLUS_B: "RH+ B",
+  BloodType.PLUS_AB: "RH+ AB",
+  BloodType.PLUS_O: "RH+ O",
+  BloodType.MINUS_A: "RH- A",
+  BloodType.MINUS_B: "RH- B",
+  BloodType.MINUS_AB: "RH- AB",
+  BloodType.MINUS_O: "RH- O",
+};
 
 enum SnsType {
   FACEBOOK,

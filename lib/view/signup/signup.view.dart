@@ -369,7 +369,7 @@ class _SignupViewState extends State<SignupView> {
       "profileImageLocation": userDto.profileImageLocation,
       "birthdate":
           DateFormat("yyyy-MM-dd").format(userDto.birthdate).toString(),
-      // "location": userDto.location,
+      "location": userDto.location,
       "sex": userDto.sex.name,
       "job": userDto.job,
       "bloodType": userDto.bloodType.name,
