@@ -241,7 +241,6 @@ class _MessagePageViewState extends State<MessagePageView> {
             context,
             MaterialPageRoute(
               builder: (_) => MessageView(
-                chatroomId: item.chatroomId,
                 fromId: GlobalVariables.userDto!.uid,
                 toId: item.toId,
               ),

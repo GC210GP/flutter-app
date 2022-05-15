@@ -19,14 +19,14 @@ import 'package:http/http.dart' as http;
 class MessageView extends StatefulWidget {
   const MessageView({
     Key? key,
-    this.chatroomId,
+    // this.chatroomId,
     // required this.toName,
     required this.fromId,
     required this.toId,
   }) : super(key: key);
 
   // final String toName;
-  final String? chatroomId;
+  // final String? chatroomId;
 
   final int fromId;
   final int toId;
