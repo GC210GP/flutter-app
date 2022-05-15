@@ -134,26 +134,28 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
       }
 
       // 추천 이후 안내 페이지
-      caroselList.add(
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Text(
-                "여기까지가 추천 리스트입니다!\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.\n\n",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: DDFontFamily.nanumSR,
-                  fontWeight: DDFontWeight.extraBold,
-                  fontSize: DDFontSize.h4,
-                  color: DDColor.grey,
+      if (caroselList.isNotEmpty) {
+        caroselList.add(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Text(
+                  "여기까지가 추천 리스트입니다!\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.\n\n",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: DDFontFamily.nanumSR,
+                    fontWeight: DDFontWeight.extraBold,
+                    fontSize: DDFontSize.h4,
+                    color: DDColor.grey,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
+            ],
+          ),
+        );
+      }
     }
 
     //
