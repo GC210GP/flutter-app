@@ -27,6 +27,8 @@ class GlobalVariables {
   static String addressApiUrl =
       "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=";
 
+  static final DateTime defaultDateTime = DateTime(1900, 1, 1);
+
   // Refactoring
   static HttpConn httpConn = HttpConn();
 

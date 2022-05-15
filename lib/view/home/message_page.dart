@@ -162,7 +162,7 @@ class _MessagePageViewState extends State<MessagePageView> {
       int toId = -1;
       String userNickname = "알 수 없음";
       String lastChat = "알 수 없음";
-      DateTime lastChatTime = DateTime(0);
+      DateTime lastChatTime = GlobalVariables.defaultDateTime;
       bool isRecent = false;
 
       if (list[0] == GlobalVariables.userDto!.uid.toString()) {

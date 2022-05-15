@@ -52,7 +52,7 @@ class _SignupViewState extends State<SignupView> {
     sns: [],
     phoneNumber: "unknown",
     profileImageLocation: "",
-    birthdate: DateTime(1),
+    birthdate: GlobalVariables.defaultDateTime,
     location: "unknown",
     sex: Gender.MALE,
     job: "",
@@ -60,11 +60,11 @@ class _SignupViewState extends State<SignupView> {
     bloodType: BloodType.PLUS_A,
     isDormant: false,
     isDonated: false,
-    createdDate: DateTime(1),
-    updatedDate: DateTime(1),
+    createdDate: GlobalVariables.defaultDateTime,
+    updatedDate: GlobalVariables.defaultDateTime,
     frequency: 0,
     password: '',
-    recency: DateTime(1),
+    recency: GlobalVariables.defaultDateTime,
   );
 
   late int pageIdx;
@@ -300,12 +300,16 @@ class _SignupViewState extends State<SignupView> {
         "password": userData.password,
         "phoneNumber": userData.phoneNumber,
         "profileImageLocation": userData.profileImageLocation,
-        "birthdate": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "birthdate": DateFormat("yyyy-MM-dd")
+            .format(GlobalVariables.defaultDateTime)
+            .toString(),
         "location": userData.location,
         "sex": userData.sex.name,
         "job": userData.job,
         "bloodType": userData.bloodType.name,
-        "recency": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "recency": DateFormat("yyyy-MM-dd")
+            .format(GlobalVariables.defaultDateTime)
+            .toString(),
         "frequency": userData.frequency.toString(),
         "isDonated": userData.isDonated.toString(),
         "isDormant": userData.isDormant.toString(),

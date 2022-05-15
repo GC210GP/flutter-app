@@ -276,7 +276,7 @@ class _SigninViewState extends State<SigninView> {
           sns: [],
           phoneNumber: "unknown",
           profileImageLocation: "",
-          birthdate: DateTime(1),
+          birthdate: GlobalVariables.defaultDateTime,
           location: "unknown",
           sex: Gender.MALE,
           job: "",
@@ -284,11 +284,11 @@ class _SigninViewState extends State<SigninView> {
           bloodType: BloodType.PLUS_A,
           isDormant: false,
           isDonated: false,
-          createdDate: DateTime(1),
-          updatedDate: DateTime(1),
+          createdDate: GlobalVariables.defaultDateTime,
+          updatedDate: GlobalVariables.defaultDateTime,
           frequency: 0,
           password: userpw.trim(),
-          recency: DateTime(1),
+          recency: GlobalVariables.defaultDateTime,
         );
 
         print(tokenResult);
@@ -333,7 +333,7 @@ class _SigninViewState extends State<SigninView> {
 
         // 회원가입 이후 별도 정보 입력 안한 경우!
         if (DateTime.parse(userResult['data']['birthdate']).hashCode ==
-            DateTime(1).hashCode) {
+            GlobalVariables.defaultDateTime.hashCode) {
           Navigator.push(
             context,
             MaterialPageRoute(
