@@ -102,7 +102,7 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
           ),
         ),
       );
-    } else {
+    } else if (GlobalVariables.suggestionList.isNotEmpty) {
       ///
 
       for (int targetUserId in GlobalVariables.suggestionList) {
