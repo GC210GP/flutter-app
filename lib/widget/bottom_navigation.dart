@@ -83,6 +83,16 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
             child: BottomIcon(
               index: 4,
               currIndex: widget.index,
+              icons: CupertinoIcons.doc_fill,
+              label: "나의 글",
+              onPressed: widget.onPressed,
+              controller: widget.controller,
+            ),
+          ),
+          Expanded(
+            child: BottomIcon(
+              index: 5,
+              currIndex: widget.index,
               icons: Icons.equalizer_rounded,
               label: "설정",
               onPressed: widget.onPressed,

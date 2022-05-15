@@ -1,3 +1,4 @@
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/fire_chat_service.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
@@ -6,6 +7,7 @@ import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/util/time_print.dart';
 import 'package:app/view/message_view.dart';
+import 'package:app/view/user_profile_view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,7 @@ class _MessagePageViewState extends State<MessagePageView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const PageTitleWidget(title: "메시지"),
+                    const DDPageTitleWidget(title: "메시지"),
                     Expanded(
                       child: chatroomList.isNotEmpty
                           ? ClipRRect(
@@ -177,12 +179,10 @@ class _MessagePageViewState extends State<MessagePageView> {
       ///
       ///
 
-      FireChatService fireChatService = FireChatService();
-      fireChatService.initChatroom(
-        fromId: GlobalVariables.userDto!.uid,
-        toId: toId,
-      );
-      fireChatService = FireChatService(onChanged: (data) async {
+      FireChatService fireChatService =
+          FireChatService(onChanged: (data) async {
+        if (data.isEmpty) return;
+
         lastChat = data.last.msg;
         lastChatTime = data.last.timestamp;
         isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
@@ -237,11 +237,11 @@ class _MessagePageViewState extends State<MessagePageView> {
           lastMsg: item.lastChat,
           lastMsgTime: item.lastChatTime,
           isRecent: item.isRecent,
+          toId: item.toId,
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => MessageView(
-                chatroomId: item.chatroomId,
                 fromId: GlobalVariables.userDto!.uid,
                 toId: item.toId,
               ),
@@ -279,6 +279,7 @@ class ChatroomItemDto {
 class ChatroomItem extends StatelessWidget {
   final String imgSrc;
   final String name;
+  final int toId;
   final String lastMsg;
   final VoidCallback? onPressed;
   final bool isRecent;
@@ -289,6 +290,7 @@ class ChatroomItem extends StatelessWidget {
     required this.imgSrc,
     required this.name,
     required this.lastMsgTime,
+    required this.toId,
     this.lastMsg = "",
     this.onPressed,
     this.isRecent = false,
@@ -318,11 +320,24 @@ class ChatroomItem extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    imgSrc,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
+                  child: CupertinoButton(
+                    borderRadius: BorderRadius.circular(50),
+                    padding: const EdgeInsets.all(0.0),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => UserProfileView(
+                          backLabel: "메시지",
+                          toId: toId,
+                        ),
+                      ),
+                    ),
+                    child: Image.network(
+                      imgSrc,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 15.0),

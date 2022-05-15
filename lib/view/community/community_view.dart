@@ -83,7 +83,7 @@ class _CommunityViewState extends State<CommunityView> {
                     children: [
                       Row(
                         children: [
-                          PageTitleWidget(
+                          DDPageTitleWidget(
                             title: widget.associationDto.associationName,
                             margin:
                                 const EdgeInsets.only(top: 15.0, bottom: 15.0),
@@ -253,8 +253,6 @@ class _CommunityViewState extends State<CommunityView> {
     });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      print(result);
-
       // aid = result['data']['associationId'];
       List<dynamic> postRaws = result['data']['postResponseDto']['content'];
 

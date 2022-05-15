@@ -33,9 +33,9 @@ class FireChatService {
   ///
 
   Future<Stream<DocumentSnapshot<Object?>>> initChatroom({
-    String? chatroomId,
     required int fromId,
     required int toId,
+    ChatFrom? chatFrom,
     bool isListen = true,
   }) async {
     CollectionReference<Object?> collection = _fireControl.collection;
@@ -43,39 +43,31 @@ class FireChatService {
 
     List<String> docList = await _fireControl.getDocList();
 
-    // 처음 채팅방 생성하는 경우
-    if (chatroomId == null) {
-      String str1 = fromId.toString() + "=" + toId.toString();
-      String str2 = toId.toString() + "=" + fromId.toString();
-      bool isChatroomCreated = false;
-      targetChatroomId = str1;
+    String str1 = fromId.toString() + "=" + toId.toString();
+    String str2 = toId.toString() + "=" + fromId.toString();
+    bool isChatroomCreated = false;
+    targetChatroomId = str1;
 
-      if (docList.contains(str1)) {
-        isChatroomCreated = true;
-      } else if (docList.contains(str2)) {
-        isChatroomCreated = true;
-        targetChatroomId = str2;
-      }
+    if (docList.contains(str1)) {
+      isChatroomCreated = true;
+    } else if (docList.contains(str2)) {
+      isChatroomCreated = true;
+      targetChatroomId = str2;
+    }
 
-      if (!isChatroomCreated) {
-        collection.doc(targetChatroomId).set(
-          {
-            '"metadata"': {
-              '"chatFrom"': '"${ChatFrom.community}"',
-              '"member"': [fromId, toId],
-              '"isDone"': false,
-              '"suggestionIdx"': 0,
-            },
-            '"content"': [],
+    if (!isChatroomCreated) {
+      collection.doc(targetChatroomId).set(
+        {
+          '"metadata"': {
+            '"chatFrom"': '"${chatFrom ?? ChatFrom.community}"',
+            '"member"': [fromId, toId],
+            '"isDone"': false,
+            '"suggestionIdx"': 0,
           },
-        );
-      }
+          '"content"': [],
+        },
+      );
     }
-    // 기존 채팅방 있는 경우
-    else {
-      targetChatroomId = chatroomId;
-    }
-
     _document = collection.doc(targetChatroomId);
     if (isListen) listener = _document.snapshots().listen(streamListener);
 

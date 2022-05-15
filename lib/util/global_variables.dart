@@ -1,3 +1,4 @@
+import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -17,6 +18,9 @@ class GlobalVariables {
   static UserDto? userDto;
 
   static BuildContext? currentContext;
+
+  static List<int> suggestionList = [];
+  static List<LikeDto> likedList = [];
 
   // TODO: 바꾸기
   static String defaultImgUrl =

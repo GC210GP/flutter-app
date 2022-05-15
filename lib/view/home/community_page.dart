@@ -86,10 +86,10 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     if (starredCommunity.isEmpty) {
       starredMargin = 0;
     } else if (starredCommunity.length < 4) {
-      starredMargin = 100;
-      starredMargin += starredCommunity.length * 90;
+      starredMargin = 150;
+      starredMargin += starredCommunity.length * 60;
       for (var i in starredCommunityPosts) {
-        starredMargin += (i.length + 1) * 90;
+        starredMargin += (i.length + 1) * 60;
       }
       starredMargin = MediaQuery.of(context).size.height - starredMargin;
       starredMargin = starredMargin < 0 ? 100 : starredMargin;
@@ -510,7 +510,7 @@ class UnauthorizedPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const PageTitleWidget(
+        const DDPageTitleWidget(
           title: "커뮤니티",
           margin: EdgeInsets.fromLTRB(0, 50.0, 0, 20.0),
         ),
@@ -703,7 +703,7 @@ class StarredItems extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  PageTitleWidget(
+                  DDPageTitleWidget(
                     title: communityList[i].associationName,
                     margin: const EdgeInsets.only(bottom: 10.0),
                   ),

@@ -1,10 +1,16 @@
+import 'package:app/model/person.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/message_view.dart';
 import 'package:app/widget/button.dart';
+import 'package:app/widget/user_informations.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url;
 
 class SuggestionPageView extends StatefulWidget {
   const SuggestionPageView({Key? key}) : super(key: key);
@@ -63,13 +69,13 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
               ),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
-  void doSuggestion() {
+  Future<void> doSuggestion() async {
     if (GlobalVariables.userDto == null) {
       caroselList.add(
         CaroselItemLayout(
@@ -97,6 +103,62 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
         ),
       );
     } else {
+      ///
+
+      for (int targetUserId in GlobalVariables.suggestionList) {
+        // 사용자 포스트 중 활성개수 수집
+        int activeNum = 0;
+
+        Map<String, dynamic> resultPosts = await GlobalVariables.httpConn
+            .get(apiUrl: "/posts/users/$targetUserId");
+
+        if (resultPosts['httpConnStatus'] == httpConnStatus.success) {
+          for (Map<String, dynamic> post in resultPosts['data']) {
+            if (!post['postResponseDto']['isActiveReceiver']) {
+              activeNum++;
+            }
+          }
+        }
+
+        if (activeNum > 0) {
+          caroselList.add(
+            CaroselItemLayout(
+              child: UserInformations(
+                toId: targetUserId,
+                padding: const EdgeInsets.all(20.0),
+                chatFrom: ChatFrom.suggestion,
+              ),
+            ),
+          );
+        }
+      }
+
+      // 추천 이후 안내 페이지
+      caroselList.add(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Text(
+                "여기까지가 추천 리스트입니다!\n[커뮤니티] 탭에서 새로운 대화를 시작해보세요.\n\n",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: DDFontFamily.nanumSR,
+                  fontWeight: DDFontWeight.extraBold,
+                  fontSize: DDFontSize.h4,
+                  color: DDColor.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    //
+
+    if (caroselList.isEmpty) {
       caroselList.add(
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -118,36 +180,9 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
         ),
       );
     }
+
+    setState(() {});
   }
-
-  // Future<void> getSuggestion() async {
-  //   for (int i = 0; i < 10; i++) {
-  //     GlobalVariables.suggestionList.add(
-  //       UserDto(
-  //         uid: 1,
-  //         fbToken: "",
-  //         name: "홍길동",
-  //         nickname: "홍홍",
-  //         email: "tttt@test.com",
-  //         sns: [SnsDto(snsType: SnsType.INSTAGRAM, snsProfile: "doky.sp")],
-  //         phoneNumber: "010-4444-7777",
-  //         profileImageLocation:
-  //             "https://www.pcmag.com/images/PCMag_NavLogo.png",
-  //         birthdate: DateTime.now(),
-  //         location: "경기도 성남시 수정구",
-  //         sex: Gender.MALE,
-  //         job: "학생",
-  //         bloodType: BloodType.PLUS_A,
-  //         isDormant: false,
-  //         isDonated: false,
-  //         createdDate: DateTime.now(),
-  //         modifiedDate: DateTime.now(),
-  //       ),
-  //     );
-  //   }
-
-  //   setState(() {});
-  // }
 }
 
 ///
@@ -180,19 +215,6 @@ class CaroselItemLayout extends StatelessWidget {
 ///
 ///
 ///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
 
 class ShadowBox extends StatelessWidget {
   final Alignment? alignment;
@@ -218,7 +240,7 @@ class ShadowBox extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: color ?? DDColor.white,
-        borderRadius: BorderRadius.circular(GlobalVariables.radius),
+        borderRadius: BorderRadius.circular(GlobalVariables.radius + 15.0),
         boxShadow: const [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.1),
@@ -256,8 +278,8 @@ class _SuggestionUpperBarState extends State<SuggestionUpperBar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 30),
-        Container(
+        const SizedBox(height: 20),
+        SizedBox(
           width: 40,
           height: 40,
           child: Stack(
@@ -309,411 +331,7 @@ class _SuggestionUpperBarState extends State<SuggestionUpperBar> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
       ],
     );
   }
 }
-
-
-
-
-
-
-
-                //  for (UserDto user in GlobalVariables.suggestionList) {
-                //     caroselList.add(
-                //       CaroselItemLayout(
-                //         child: Column(
-                //           children: [
-                //             Expanded(
-                //               flex: 20,
-                //               child: Column(
-                //                 mainAxisAlignment: MainAxisAlignment.center,
-                //                 children: [
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-
-                //                   Container(
-                //                     width: 140,
-                //                     height: 140,
-                //                     decoration: BoxDecoration(
-                //                       color: DDColor.background,
-                //                       borderRadius: BorderRadius.circular(140),
-                //                       boxShadow: const [
-                //                         BoxShadow(
-                //                           color: Color.fromRGBO(0, 0, 0, 0.2),
-                //                           offset: Offset(0, 4),
-                //                           spreadRadius: 0.0,
-                //                           blurRadius: 7.0,
-                //                         ),
-                //                       ],
-                //                     ),
-                //                     child: Row(
-                //                       mainAxisAlignment:
-                //                           MainAxisAlignment.center,
-                //                       children: [
-                //                         ClipRRect(
-                //                           borderRadius:
-                //                               BorderRadius.circular(130),
-                //                           child: Image.network(
-                //                             user.profileImageLocation,
-                //                             width: 130,
-                //                             height: 130,
-                //                             fit: BoxFit.cover,
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     ),
-                //                   ),
-
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-
-                //                   SizedBox(height: 20),
-                //                   Row(
-                //                     mainAxisAlignment: MainAxisAlignment.center,
-                //                     children: [
-                //                       Text(
-                //                         user.nickname,
-                //                         textAlign: TextAlign.center,
-                //                         style: TextStyle(
-                //                           fontFamily: "NanumSR",
-                //                           fontWeight: FontWeight.w900,
-                //                           fontSize: 23,
-                //                           color: Colors.red.shade300,
-                //                         ),
-                //                       ),
-                //                       Text(
-                //                         " 님은",
-                //                         textAlign: TextAlign.center,
-                //                         style: TextStyle(
-                //                           fontFamily: "NanumSR",
-                //                           fontWeight: FontWeight.w900,
-                //                           fontSize: 23,
-                //                           color: Colors.grey.shade800,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   Text(
-                //                     "당신의 도움이 필요해요",
-                //                     textAlign: TextAlign.center,
-                //                     style: TextStyle(
-                //                       fontFamily: "NanumSR",
-                //                       fontWeight: FontWeight.w900,
-                //                       fontSize: 20,
-                //                       color: Colors.grey.shade800,
-                //                     ),
-                //                   ),
-                //                   SizedBox(height: 10),
-
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-
-                //                   Row(
-                //                     mainAxisAlignment: MainAxisAlignment.center,
-                //                     children: [
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-
-                //                       ShadowBox(
-                //                         height: 35,
-                //                         color: Colors.red.shade300,
-                //                         width:
-                //                             user.bloodType.toString().length *
-                //                                 13.0,
-                //                         alignment: Alignment.center,
-                //                         child: Text(
-                //                           "   " +
-                //                               user.bloodType.toString() +
-                //                               "   ",
-                //                           style: TextStyle(
-                //                             fontFamily: "NanumSR",
-                //                             fontWeight: FontWeight.w900,
-                //                             fontSize: 15,
-                //                             color: Colors.grey.shade100,
-                //                           ),
-                //                         ),
-                //                       ),
-
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-
-                //                       SizedBox(width: 5),
-                //                       CupertinoButton(
-                //                         padding: EdgeInsets.all(0),
-                //                         onPressed: () => url.launch(
-                //                             "https://instagram.com/${user.sns[0].snsProfile.substring(1, user.sns[0].snsProfile.length)}"),
-                //                         child: ShadowBox(
-                //                           height: 35,
-                //                           color: Colors.purple.shade300,
-                //                           alignment: Alignment.center,
-                //                           child: Text(
-                //                             "   " +
-                //                                 user.sns[0].snsProfile +
-                //                                 "   ",
-                //                             style: TextStyle(
-                //                               fontFamily: "NanumSR",
-                //                               fontWeight: FontWeight.w900,
-                //                               fontSize: 15,
-                //                               color: Colors.grey.shade100,
-                //                             ),
-                //                           ),
-                //                         ),
-                //                       ),
-                //                       SizedBox(width: 5),
-
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-
-                //                       ShadowBox(
-                //                         height: 35,
-                //                         color: Colors.pink.shade300,
-                //                         alignment: Alignment.center,
-                //                         child: Text(
-                //                           "   " + user.location + "   ",
-                //                           style: TextStyle(
-                //                             fontFamily: "NanumSR",
-                //                             fontWeight: FontWeight.w900,
-                //                             fontSize: 15,
-                //                             color: Colors.grey.shade100,
-                //                           ),
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   )
-                //                 ],
-                //               ),
-                //             ),
-
-                //             ///
-                //             ///
-                //             ///
-                //             ///
-                //             ///
-
-                //             Expanded(
-                //               flex: 10,
-                //               child: Column(
-                //                 children: [
-                //                   Row(
-                //                     children: [
-                //                       SizedBox(
-                //                         width: 15,
-                //                       ),
-                //                       Expanded(
-                //                         child: ShadowBox(
-                //                           height: 75,
-                //                           child: Row(
-                //                             mainAxisAlignment:
-                //                                 MainAxisAlignment.center,
-                //                             children: [
-                //                               Icon(
-                //                                 Icons.thermostat_sharp,
-                //                                 color: Colors.red.shade300,
-                //                                 size: 40,
-                //                               ),
-                //                               SizedBox(width: 7),
-                //                               Column(
-                //                                 mainAxisAlignment:
-                //                                     MainAxisAlignment.center,
-                //                                 crossAxisAlignment:
-                //                                     CrossAxisAlignment.start,
-                //                                 children: [
-                //                                   Text(
-                //                                     "나와의 온도",
-                //                                     textAlign: TextAlign.center,
-                //                                     style: TextStyle(
-                //                                       fontFamily: "NanumSR",
-                //                                       fontWeight:
-                //                                           FontWeight.w900,
-                //                                       fontSize: 12,
-                //                                       color:
-                //                                           Colors.grey.shade500,
-                //                                     ),
-                //                                   ),
-                //                                   Text(
-                //                                     // TODO: Correlation 값
-                //                                     (0.23 * 100).toString() +
-                //                                         "℃",
-                //                                     textAlign: TextAlign.center,
-                //                                     style: TextStyle(
-                //                                       fontFamily: "NanumSR",
-                //                                       fontWeight:
-                //                                           FontWeight.w900,
-                //                                       fontSize: 22,
-                //                                       color:
-                //                                           Colors.red.shade300,
-                //                                     ),
-                //                                   ),
-                //                                 ],
-                //                               ),
-                //                             ],
-                //                           ),
-                //                         ),
-                //                       ),
-
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-                //                       ///
-
-                //                       // SizedBox(
-                //                       //   width: 15,
-                //                       // ),
-                //                       // Expanded(
-                //                       //   child: shadowBox(
-                //                       //     alignment: Alignment.center,
-                //                       //     height: 75,
-                //                       //     child: Row(
-                //                       //       mainAxisAlignment:
-                //                       //           MainAxisAlignment.center,
-                //                       //       children: [
-                //                       //         Icon(
-                //                       //           CupertinoIcons.person_2_fill,
-                //                       //           color: Colors.red.shade300,
-                //                       //           size: 30,
-                //                       //         ),
-                //                       //         SizedBox(width: 7),
-                //                       //         Column(
-                //                       //           mainAxisAlignment:
-                //                       //               MainAxisAlignment.center,
-                //                       //           crossAxisAlignment:
-                //                       //               CrossAxisAlignment.start,
-                //                       //           children: [
-                //                       //             Text(
-                //                       //               "연결고리",
-                //                       //               textAlign: TextAlign.center,
-                //                       //               style: TextStyle(
-                //                       //                 fontFamily: "NanumSR",
-                //                       //                 fontWeight:
-                //                       //                     FontWeight.w900,
-                //                       //                 fontSize: 11,
-                //                       //                 color:
-                //                       //                     Colors.grey.shade500,
-                //                       //               ),
-                //                       //             ),
-                //                       //             Text(
-                //                       //               i["rels"][0] +
-                //                       //                   ", " +
-                //                       //                   i["rels"][1] +
-                //                       //                   "..",
-                //                       //               textAlign: TextAlign.center,
-                //                       //               style: TextStyle(
-                //                       //                 fontFamily: "NanumSR",
-                //                       //                 fontWeight:
-                //                       //                     FontWeight.w900,
-                //                       //                 fontSize: 13,
-                //                       //                 color:
-                //                       //                     Colors.red.shade300,
-                //                       //               ),
-                //                       //             ),
-                //                       //           ],
-                //                       //         ),
-                //                       //       ],
-                //                       //     ),
-                //                       //   ),
-                //                       // ),
-                //                       SizedBox(
-                //                         width: 15,
-                //                       ),
-                //                     ],
-                //                   ),
-
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-
-                //                   Expanded(
-                //                     child: Padding(
-                //                       padding: const EdgeInsets.all(15.0),
-                //                       child: Row(
-                //                         crossAxisAlignment:
-                //                             CrossAxisAlignment.stretch,
-                //                         children: [
-                //                           Expanded(
-                //                             child: CupertinoButton(
-                //                               borderRadius:
-                //                                   BorderRadius.circular(
-                //                                       GlobalVariables.radius),
-                //                               child: Text(
-                //                                 "대화 시작하기",
-                //                                 style: TextStyle(
-                //                                   fontFamily: "NanumSR",
-                //                                   fontWeight: FontWeight.w900,
-                //                                   fontSize: 20,
-                //                                   color: Colors.grey.shade100,
-                //                                 ),
-                //                               ),
-                //                               color: Colors.red.shade300,
-                //                               padding: EdgeInsets.all(0),
-                //                               onPressed: () => Navigator.push(
-                //                                 context,
-                //                                 MaterialPageRoute(
-                //                                   builder: (_) => MessageView(
-                //                                     fromId:
-                //                                         GlobalVariables.userIdx,
-                //                                     // TODO: 연락할 상대방 정보 입력
-                //                                     toId: user.uid,
-                //                                     toName: user.nickname,
-                //                                   ),
-                //                                 ),
-                //                               ),
-                //                             ),
-                //                           ),
-                //                           SizedBox(width: 5),
-                //                           SizedBox(
-                //                             width: 75,
-                //                             child: CupertinoButton(
-                //                               borderRadius:
-                //                                   BorderRadius.circular(
-                //                                       GlobalVariables.radius),
-                //                               child: Icon(
-                //                                   CupertinoIcons.star_fill),
-                //                               color: Colors.pinkAccent.shade400,
-                //                               padding: EdgeInsets.all(0),
-                //                               onPressed: () => {},
-                //                             ),
-                //                           ),
-                //                         ],
-                //                       ),
-                //                     ),
-                //                   ),
-
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                   ///
-                //                 ],
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     );
-                //   }

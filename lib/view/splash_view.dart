@@ -1,3 +1,6 @@
+import 'package:app/model/like.dto.dart';
+import 'package:app/model/person.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -129,6 +132,42 @@ class _SplashViewState extends State<SplashView> {
 
           if (userResult['httpConnStatus'] == httpConnStatus.success) {
             GlobalVariables.userDto = readUserDto(userResult);
+          }
+        }
+
+        // 사용자 추천 정보 수신
+        if (GlobalVariables.userDto != null) {
+          Map<String, dynamic> resLikes = await GlobalVariables.httpConn
+              .get(apiUrl: "/users/${GlobalVariables.userDto!.uid}/likes");
+
+          if (resLikes['httpConnStatus'] == httpConnStatus.success &&
+              resLikes['data']['likedInfo'].isNotEmpty) {
+            List<int> likes = [];
+
+            for (Map<String, dynamic> users in resLikes['data']['likedInfo']) {
+              GlobalVariables.likedList.add(LikeDto(
+                  userTo: users['userTo']['id'], lid: users['likedId']));
+              likes.add(users['userTo']['id']);
+            }
+
+            Map<String, dynamic> resRecommends = await GlobalVariables.httpConn
+                .post(apiUrl: "/recommend", body: {
+              "userId": GlobalVariables.userDto!.uid,
+              "likedList": likes,
+            });
+
+            // TODO: Dummy data
+            GlobalVariables.suggestionList.add(1);
+            GlobalVariables.suggestionList.add(3);
+            GlobalVariables.suggestionList.add(50);
+            GlobalVariables.suggestionList.add(17);
+
+            if (resRecommends['httpConnStatus'] == httpConnStatus.success) {
+              // TODO: 추천기능 제작
+              // GlobalVariables.suggestionList.add(1);
+              // GlobalVariables.suggestionList.add(3);
+              // GlobalVariables.suggestionList.add(5);
+            }
           }
         }
 
