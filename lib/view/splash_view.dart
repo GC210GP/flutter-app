@@ -140,8 +140,7 @@ class _SplashViewState extends State<SplashView> {
           Map<String, dynamic> resLikes = await GlobalVariables.httpConn
               .get(apiUrl: "/users/${GlobalVariables.userDto!.uid}/likes");
 
-          if (resLikes['httpConnStatus'] == httpConnStatus.success &&
-              resLikes['data']['likedInfo'].isNotEmpty) {
+          if (resLikes['httpConnStatus'] == httpConnStatus.success) {
             List<int> likes = [];
 
             for (Map<String, dynamic> users in resLikes['data']['likedInfo']) {
@@ -156,17 +155,11 @@ class _SplashViewState extends State<SplashView> {
               "likedList": likes,
             });
 
-            // TODO: Dummy data
-            GlobalVariables.suggestionList.add(1);
-            GlobalVariables.suggestionList.add(3);
-            GlobalVariables.suggestionList.add(50);
-            GlobalVariables.suggestionList.add(17);
-
+            // 추천 리스트 생성
             if (resRecommends['httpConnStatus'] == httpConnStatus.success) {
-              // TODO: 추천기능 제작
-              // GlobalVariables.suggestionList.add(1);
-              // GlobalVariables.suggestionList.add(3);
-              // GlobalVariables.suggestionList.add(5);
+              for (String targ in resRecommends['result']) {
+                GlobalVariables.suggestionList.add(int.parse(targ));
+              }
             }
           }
         }
