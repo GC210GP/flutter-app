@@ -1,5 +1,6 @@
 import 'package:app/model/association.dto.dart';
 import 'package:app/model/post.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
@@ -15,10 +16,12 @@ import '../message_view.dart';
 
 class CommunityBoardView extends StatefulWidget {
   final PostDto postDto;
+  final ChatFrom? chatFrom;
 
   const CommunityBoardView({
     Key? key,
     required this.postDto,
+    this.chatFrom,
   }) : super(key: key);
 
   @override
@@ -113,7 +116,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => UserProfileView(
-                                            title: "커뮤니티",
+                                            backLabel: "커뮤니티",
                                             toId: postDto.userId,
                                           ),
                                         ),
@@ -142,7 +145,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => UserProfileView(
-                                    title: "메시지",
+                                    backLabel: "메시지",
                                     toId: postDto.userId,
                                   ),
                                 ),
@@ -222,6 +225,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => MessageView(
+                                  chatFrom: widget.chatFrom,
                                   fromId: GlobalVariables.userDto!.uid,
                                   toId: postDto.userId,
                                 ),

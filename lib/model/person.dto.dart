@@ -1,4 +1,3 @@
-// ignore_for_file: constant_identifier_names
 // auth, user 대응
 
 // 유저 정보

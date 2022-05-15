@@ -24,6 +24,7 @@ class MessageView extends StatefulWidget {
     // required this.toName,
     required this.fromId,
     required this.toId,
+    this.chatFrom,
   }) : super(key: key);
 
   // final String toName;
@@ -31,6 +32,7 @@ class MessageView extends StatefulWidget {
 
   final int fromId;
   final int toId;
+  final ChatFrom? chatFrom;
 
   @override
   _MessageViewState createState() => _MessageViewState();
@@ -100,6 +102,7 @@ class _MessageViewState extends State<MessageView> {
     });
 
     fireChatService.initChatroom(
+      chatFrom: widget.chatFrom,
       fromId: widget.fromId,
       toId: widget.toId,
     );
@@ -127,7 +130,7 @@ class _MessageViewState extends State<MessageView> {
               context,
               MaterialPageRoute(
                 builder: (_) => UserProfileView(
-                  title: "메시지",
+                  backLabel: "메시지",
                   toId: widget.toId,
                 ),
               ),

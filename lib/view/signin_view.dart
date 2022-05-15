@@ -291,14 +291,10 @@ class _SigninViewState extends State<SigninView> {
           recency: GlobalVariables.defaultDateTime,
         );
 
-        print(tokenResult);
-
         // 이메일 인증 안한 경우!
         if (tokenResult.auth == Auth.ROLE_NEED_EMAIL) {
           TokenDto? loginResult = await GlobalVariables.httpConn
               .auth(email: tmpUser.email, password: tmpUser.password);
-
-          print(loginResult);
 
           if (loginResult != null) {
             Map<String, dynamic> result = await GlobalVariables.httpConn

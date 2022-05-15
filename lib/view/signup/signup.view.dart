@@ -388,7 +388,7 @@ class _SignupViewState extends State<SignupView> {
             "snsProfile": i.snsProfile,
           },
         );
-        if (result['httpConnStatus'] != httpConnStatus.success) {
+        if (resultSns['httpConnStatus'] != httpConnStatus.success) {
           isSuccess = false;
         }
       }

@@ -19,7 +19,7 @@ class GlobalVariables {
 
   static BuildContext? currentContext;
 
-  static List<UserDto> suggestionList = [];
+  static List<int> suggestionList = [];
   static List<LikeDto> likedList = [];
 
   // TODO: 바꾸기

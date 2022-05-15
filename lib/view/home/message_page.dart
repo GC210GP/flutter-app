@@ -1,3 +1,4 @@
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/fire_chat_service.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
@@ -178,12 +179,10 @@ class _MessagePageViewState extends State<MessagePageView> {
       ///
       ///
 
-      FireChatService fireChatService = FireChatService();
-      fireChatService.initChatroom(
-        fromId: GlobalVariables.userDto!.uid,
-        toId: toId,
-      );
-      fireChatService = FireChatService(onChanged: (data) async {
+      FireChatService fireChatService =
+          FireChatService(onChanged: (data) async {
+        if (data.isEmpty) return;
+
         lastChat = data.last.msg;
         lastChatTime = data.last.timestamp;
         isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
@@ -328,7 +327,7 @@ class ChatroomItem extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) => UserProfileView(
-                          title: "메시지",
+                          backLabel: "메시지",
                           toId: toId,
                         ),
                       ),

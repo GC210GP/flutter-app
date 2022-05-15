@@ -1,9 +1,13 @@
 import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/community/user_board_view.dart';
+import 'package:app/view/message_view.dart';
+import 'package:app/widget/button.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +17,11 @@ import 'package:url_launcher/url_launcher.dart' as url;
 class UserInformations extends StatefulWidget {
   final int toId;
   final EdgeInsets padding;
+  final ChatFrom? chatFrom;
   const UserInformations({
     Key? key,
     required this.toId,
+    this.chatFrom,
     this.padding = const EdgeInsets.fromLTRB(20, 0, 20, 0),
   }) : super(key: key);
 
@@ -29,6 +35,8 @@ class _UserInformationsState extends State<UserInformations> {
   late UserDto toUser;
   bool isLiked = false;
   List<List<String>> detailedInfo = [];
+
+  int postBadge = 0;
 
   @override
   void initState() {
@@ -51,9 +59,10 @@ class _UserInformationsState extends State<UserInformations> {
 
         GlobalVariables.httpConn.get(
           apiUrl: "/users/sns",
-          queryString: {"userId": 17},
+          queryString: {"userId": widget.toId},
         ).then((resultSns) {
           if (resultSns['httpConnStatus'] == httpConnStatus.success) {
+            // 사용자 정보 추가
             List<SnsDto> snslists = [];
 
             for (Map<String, dynamic> snsList in resultSns['data']) {
@@ -90,6 +99,7 @@ class _UserInformationsState extends State<UserInformations> {
               modifiedDate: DateTime.parse(result['data']['modifiedDate']),
             );
 
+            // 좋아요 누른 사람인지 확인
             for (LikeDto l in GlobalVariables.likedList) {
               if (l.userTo == toUser.uid) {
                 isLiked = true;
@@ -97,16 +107,31 @@ class _UserInformationsState extends State<UserInformations> {
               }
             }
 
+            // Label 정보 업데이트
             detailedInfo = [
               ["혈액형", bloodTypeLabel[toUser.bloodType] ?? "unknown"],
+              ["위치", toUser.location],
               ["직업", toUser.job],
-              ["위치", toUser.location]
             ];
+
+            // 사용자 포스트 중 활성개수 수집
+            GlobalVariables.httpConn
+                .get(apiUrl: "/posts/users/${toUser.uid}")
+                .then((resultPosts) {
+              if (resultPosts['httpConnStatus'] == httpConnStatus.success) {
+                for (Map<String, dynamic> post in resultPosts['data']) {
+                  if (!post['postResponseDto']['isActiveReceiver']) {
+                    postBadge++;
+                  }
+                }
+
+                isLoaded = true;
+                setState(() {});
+              }
+            });
 
             //
 
-            isLoaded = true;
-            setState(() {});
           }
         });
       }
@@ -133,30 +158,80 @@ class _UserInformationsState extends State<UserInformations> {
                       fit: BoxFit.cover,
                     ),
                   ),
+
                   Container(
                     margin: const EdgeInsets.only(top: 30.0, bottom: 20.0),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: DDPageTitleWidget(
-                            title: toUser.nickname,
-                            margin: const EdgeInsets.all(0.0),
-                          ),
+                        DDPageTitleWidget(
+                          title: toUser.nickname,
+                          margin: const EdgeInsets.all(0.0),
                         ),
-                        SizedBox(
-                          width: 30,
-                          height: 30,
+                        const SizedBox(width: 5.0),
+                        Container(
+                          width: 25,
+                          height: 25,
+                          margin: const EdgeInsets.only(bottom: 2.5),
                           child: CupertinoButton(
                             padding: const EdgeInsets.all(0.0),
                             child: Icon(
                               isLiked
-                                  ? Icons.thumb_up
-                                  : Icons.thumb_up_outlined,
-                              size: 30,
-                              color: isLiked ? DDColor.primary : DDColor.grey,
+                                  ? CupertinoIcons.heart_fill
+                                  : CupertinoIcons.heart,
+                              size: 25,
+                              color: isLiked
+                                  ? DDColor.primary
+                                  : DDColor.primary.shade600,
                             ),
                             onPressed: () =>
                                 setLike(isLike: isLiked, userTo: toUser.uid),
+                          ),
+                        ),
+                        const Expanded(child: SizedBox()),
+                        DDButton(
+                          height: 35,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                            child: const Icon(
+                              CupertinoIcons.paperplane_fill,
+                              size: 20,
+                            ),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => MessageView(
+                                chatFrom: widget.chatFrom,
+                                fromId: GlobalVariables.userDto!.uid,
+                                toId: widget.toId,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5.0),
+                        DDButton(
+                          height: 35,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                            child: Text(
+                              "게시글 ($postBadge)",
+                              style: const TextStyle(
+                                color: DDColor.white,
+                                fontWeight: DDFontWeight.extraBold,
+                                fontSize: DDFontSize.h5,
+                                fontFamily: DDFontFamily.nanumSR,
+                              ),
+                            ),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UserBoardView(
+                                chatFrom: widget.chatFrom,
+                                userDto: toUser,
+                                backLabel: "홈",
+                              ),
+                            ),
                           ),
                         ),
                       ],

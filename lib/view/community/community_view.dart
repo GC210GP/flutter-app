@@ -253,8 +253,6 @@ class _CommunityViewState extends State<CommunityView> {
     });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      print(result);
-
       // aid = result['data']['associationId'];
       List<dynamic> postRaws = result['data']['postResponseDto']['content'];
 
