@@ -83,7 +83,7 @@ class _CommunityViewState extends State<CommunityView> {
                     children: [
                       Row(
                         children: [
-                          PageTitleWidget(
+                          DDPageTitleWidget(
                             title: widget.associationDto.associationName,
                             margin:
                                 const EdgeInsets.only(top: 15.0, bottom: 15.0),
@@ -157,8 +157,10 @@ class _CommunityViewState extends State<CommunityView> {
                                     associationId: widget.associationDto.aid,
                                     isActiveGiver: false,
                                     isActiveReceiver: false,
-                                    createdDate: DateTime(0),
-                                    modifiedDate: DateTime(0),
+                                    createdDate:
+                                        GlobalVariables.defaultDateTime,
+                                    modifiedDate:
+                                        GlobalVariables.defaultDateTime,
                                     userId: GlobalVariables.userDto!.uid,
                                     userNickname:
                                         GlobalVariables.userDto!.nickname,
@@ -251,7 +253,10 @@ class _CommunityViewState extends State<CommunityView> {
     });
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      for (var i in result['data']['content']) {
+      // aid = result['data']['associationId'];
+      List<dynamic> postRaws = result['data']['postResponseDto']['content'];
+
+      for (var i in postRaws) {
         posts.add(
           PostDto(
             pid: i["id"],
@@ -260,12 +265,21 @@ class _CommunityViewState extends State<CommunityView> {
             associationId: i["associationId"] ?? -1,
             isActiveGiver: i["isActiveGiver"] ?? false,
             isActiveReceiver: i["isActiveReceiver"] ?? false,
-            createdDate:
-                DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
-            modifiedDate:
-                DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
+            createdDate: DateTime.parse(
+                i["createdDate"] ?? GlobalVariables.defaultDateTime.toString()),
+            modifiedDate: DateTime.parse(i["modifiedDate"] ??
+                GlobalVariables.defaultDateTime.toString()),
             userId: i['userId'],
             userNickname: i['userNickname'],
+            // associationDto: AssociationDto(
+            //   aid: associationRaw['id'],
+            //   associationName: associationRaw['associationName'],
+            //   createdDate: DateTime.parse(
+            //       associationRaw['createdDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   modifiedDate: DateTime.parse(
+            //       associationRaw['modifiedDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   uaid: -1, // TODO 참고
+            // ),
           ),
         );
       }

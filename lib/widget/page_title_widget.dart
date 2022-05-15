@@ -2,11 +2,11 @@ import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:flutter/material.dart';
 
-class PageTitleWidget extends StatelessWidget {
+class DDPageTitleWidget extends StatelessWidget {
   final String title;
   final EdgeInsetsGeometry margin;
 
-  const PageTitleWidget({
+  const DDPageTitleWidget({
     Key? key,
     required this.title,
     this.margin = const EdgeInsets.only(bottom: 20.0),

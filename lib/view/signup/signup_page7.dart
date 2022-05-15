@@ -59,6 +59,7 @@ class Processing extends StatelessWidget {
         const SizedBox(height: 50.0),
         Text(
           "조금만 더 기다려주세요...",
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: DDFontFamily.nanumSR,
             fontWeight: DDFontWeight.extraBold,

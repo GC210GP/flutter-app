@@ -11,6 +11,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SignPage5 extends StatefulWidget {
+  final String nickname;
+  final String email;
+
   final Function({
     required BloodType bloodType,
     required bool isDonated,
@@ -23,6 +26,8 @@ class SignPage5 extends StatefulWidget {
 
   const SignPage5({
     Key? key,
+    required this.nickname,
+    required this.email,
     this.onPressed,
     this.onBackPressed,
   }) : super(key: key);
@@ -76,8 +81,8 @@ class _SignPage5State extends State<SignPage5> {
                   children: [
                     Center(
                       child: ProfileItem(
-                        nickname: "홍길동",
-                        email: "uhug@naver.com",
+                        nickname: widget.nickname,
+                        email: widget.email,
                         imgUrl: GlobalVariables.defaultImgUrl,
                       ),
                     ),
@@ -87,6 +92,7 @@ class _SignPage5State extends State<SignPage5> {
                     Center(
                       child: Text(
                         "거의 다왔어요!",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -98,6 +104,7 @@ class _SignPage5State extends State<SignPage5> {
                     Center(
                       child: Text(
                         "추가 정보를 입력해주세요",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,

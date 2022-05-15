@@ -1,3 +1,4 @@
+import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -18,6 +19,9 @@ class GlobalVariables {
 
   static BuildContext? currentContext;
 
+  static List<int> suggestionList = [];
+  static List<LikeDto> likedList = [];
+
   // TODO: 바꾸기
   static String defaultImgUrl =
       "https://www.mein-maler.de/wp-content/uploads/2021/04/anonym.png";
@@ -26,6 +30,8 @@ class GlobalVariables {
   /// - 41*000000 경기도 시군구
   static String addressApiUrl =
       "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=";
+
+  static final DateTime defaultDateTime = DateTime(1900, 1, 1);
 
   // Refactoring
   static HttpConn httpConn = HttpConn();

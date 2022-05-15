@@ -49,7 +49,7 @@ class HttpConn {
   Future<Map<String, dynamic>> post({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.post(
@@ -83,7 +83,7 @@ class HttpConn {
   Future<Map<String, dynamic>> delete({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.delete(
@@ -101,7 +101,7 @@ class HttpConn {
   Future<Map<String, dynamic>> patch({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.patch(
@@ -214,7 +214,7 @@ class HttpConn {
       DateTime exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
       Auth auth = Auth.ROLE_NEED_EMAIL;
       for (Auth i in Auth.values) {
-        if (i.toString() == payload['auth']) auth = i;
+        if (i.toString() == ("Auth." + payload['auth'])) auth = i;
       }
 
       _headers[HttpHeaders.authorizationHeader] = "Bearer " + result["token"];

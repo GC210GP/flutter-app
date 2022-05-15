@@ -40,6 +40,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
   bool isLoading = true;
 
   List<AssociationDto> starredCommunity = [];
+  List<int> starredCommunityIds = [];
   List<AssociationDto> searchedCommunity = [];
   List<List<PostDto>> starredCommunityPosts = [];
 
@@ -82,11 +83,13 @@ class _CommunityPageViewState extends State<CommunityPageView> {
 
   @override
   Widget build(BuildContext context) {
-    if (starredCommunity.length < 4) {
-      starredMargin = 100;
-      starredMargin += starredCommunity.length * 90;
+    if (starredCommunity.isEmpty) {
+      starredMargin = 0;
+    } else if (starredCommunity.length < 4) {
+      starredMargin = 150;
+      starredMargin += starredCommunity.length * 60;
       for (var i in starredCommunityPosts) {
-        starredMargin += (i.length + 1) * 90;
+        starredMargin += (i.length + 1) * 60;
       }
       starredMargin = MediaQuery.of(context).size.height - starredMargin;
       starredMargin = starredMargin < 0 ? 100 : starredMargin;
@@ -243,18 +246,23 @@ class _CommunityPageViewState extends State<CommunityPageView> {
                           SearchedItem(
                             searchQuery: textController.text,
                             searchResult: searchedCommunity,
+                            starredCommunityIds: starredCommunityIds,
                             clearSearchBar: clearSearchBar,
                             onCreatePressed: createCommunity,
-                            onItemPressed: (associationDto) => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CommunityView(
-                                  associationDto: associationDto,
+                            onItemPressed: (associationDto) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CommunityView(
+                                    associationDto: associationDto,
+                                    isStarred: starredCommunityIds.contains(
+                                        associationDto.aid), // starred 인지 검사
+                                  ),
                                 ),
-                              ),
-                            ).then(
-                              (value) => getStarredCommunity(),
-                            ),
+                              ).then(
+                                (value) => getStarredCommunity(),
+                              );
+                            },
                           ),
 
                         ///
@@ -314,21 +322,34 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     List<PostDto> posts = [];
 
     if (result['httpConnStatus'] == httpConnStatus.success) {
-      for (var i in result['data']['content']) {
+      // aid = result['data']['associationId'];
+      List<dynamic> postRaws = result['data']['postResponseDto']['content'];
+
+      for (var i in postRaws) {
         posts.add(
           PostDto(
-              pid: i["id"],
-              title: i["title"] ?? "",
-              content: i["content"] ?? "",
-              associationId: i["associationId"] ?? -1,
-              isActiveGiver: i["isActiveGiver"] ?? false,
-              isActiveReceiver: i["isActiveReceiver"] ?? false,
-              createdDate:
-                  DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
-              modifiedDate:
-                  DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
-              userId: i['userId'],
-              userNickname: i['userNickname']),
+            pid: i["id"],
+            title: i["title"] ?? "",
+            content: i["content"] ?? "",
+            associationId: i["associationId"] ?? -1,
+            isActiveGiver: i["isActiveGiver"] ?? false,
+            isActiveReceiver: i["isActiveReceiver"] ?? false,
+            createdDate: DateTime.parse(
+                i["createdDate"] ?? GlobalVariables.defaultDateTime.toString()),
+            modifiedDate: DateTime.parse(i["modifiedDate"] ??
+                GlobalVariables.defaultDateTime.toString()),
+            userId: i['userId'],
+            userNickname: i['userNickname'],
+            // associationDto: AssociationDto(
+            //   aid: associationRaw['id'],
+            //   associationName: associationRaw['associationName'],
+            //   createdDate: DateTime.parse(
+            //       associationRaw['createdDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   modifiedDate: DateTime.parse(
+            //       associationRaw['modifiedDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   uaid: -1, // TODO 참고
+            // ),
+          ),
         );
       }
     }
@@ -363,6 +384,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
     isLoading = true;
     starredCommunity.clear();
     starredCommunityPosts.clear();
+    starredCommunityIds.clear();
 
     pageOpacity = 1.0;
     setState(() {});
@@ -386,12 +408,13 @@ class _CommunityPageViewState extends State<CommunityPageView> {
             .get(apiUrl: "/associations?associationId=${i['associationId']}");
 
         if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+          starredCommunityIds.add(i['associationId']);
           starredCommunity.add(
             AssociationDto(
               aid: i['associationId'],
               uaid: i['userAssociationId'],
               associationName: i['associationName'],
-              cratedDate:
+              createdDate:
                   DateTime.parse(resultAssociation['data']['createdDate']),
               modifiedDate:
                   DateTime.parse(resultAssociation['data']['modifiedDate']),
@@ -436,7 +459,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
               aid: i['id'],
               uaid: -1,
               associationName: i['associationName'],
-              cratedDate: DateTime.parse(i['createdDate']),
+              createdDate: DateTime.parse(i['createdDate']),
               modifiedDate: DateTime.parse(i['modifiedDate']),
             ),
           );
@@ -461,7 +484,7 @@ class _CommunityPageViewState extends State<CommunityPageView> {
               aid: result['id'],
               uaid: -1,
               associationName: result['associationName'],
-              cratedDate: DateTime.parse(result['createdDate']),
+              createdDate: DateTime.parse(result['createdDate']),
               modifiedDate: DateTime.parse(result['modifiedDate']),
             ),
           ),
@@ -487,7 +510,7 @@ class UnauthorizedPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const PageTitleWidget(
+        const DDPageTitleWidget(
           title: "커뮤니티",
           margin: EdgeInsets.fromLTRB(0, 50.0, 0, 20.0),
         ),
@@ -586,7 +609,7 @@ class CommunityItem extends StatelessWidget {
                   color: DDColor.fontColor,
                 ),
               ),
-              if (isStarred != null)
+              if (isStarred != null && isStarred!)
                 Expanded(
                   child: Container(
                     alignment: Alignment.centerRight,
@@ -594,9 +617,7 @@ class CommunityItem extends StatelessWidget {
                       padding: const EdgeInsets.all(0.0),
                       child: Icon(
                         CupertinoIcons.star_fill,
-                        color: isStarred!
-                            ? Colors.yellowAccent.shade700
-                            : DDColor.disabled,
+                        color: Colors.yellowAccent.shade700,
                       ),
                       onPressed: onStarPressed,
                     ),
@@ -616,10 +637,13 @@ class SearchedItem extends StatelessWidget {
   final Function(String name)? onCreatePressed;
   final Function(AssociationDto associationDto)? onItemPressed;
   final VoidCallback? clearSearchBar;
+  final List<int> starredCommunityIds;
+
   const SearchedItem({
     Key? key,
     required this.searchQuery,
     required this.searchResult,
+    this.starredCommunityIds = const [],
     this.onCreatePressed,
     this.onItemPressed,
     this.clearSearchBar,
@@ -635,7 +659,7 @@ class SearchedItem extends StatelessWidget {
           for (AssociationDto i in searchResult)
             CommunityItem(
                 title: i.associationName.toString(),
-                // isStarred: true,
+                isStarred: starredCommunityIds.contains(i.aid),
                 onPressed: () {
                   if (onItemPressed != null) onItemPressed!(i);
                   if (clearSearchBar != null) clearSearchBar!();
@@ -679,7 +703,7 @@ class StarredItems extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  PageTitleWidget(
+                  DDPageTitleWidget(
                     title: communityList[i].associationName,
                     margin: const EdgeInsets.only(bottom: 10.0),
                   ),

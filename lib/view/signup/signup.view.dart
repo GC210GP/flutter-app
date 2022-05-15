@@ -52,7 +52,7 @@ class _SignupViewState extends State<SignupView> {
     sns: [],
     phoneNumber: "unknown",
     profileImageLocation: "",
-    birthdate: DateTime(1),
+    birthdate: GlobalVariables.defaultDateTime,
     location: "unknown",
     sex: Gender.MALE,
     job: "",
@@ -60,11 +60,11 @@ class _SignupViewState extends State<SignupView> {
     bloodType: BloodType.PLUS_A,
     isDormant: false,
     isDonated: false,
-    createdDate: DateTime(1),
-    updatedDate: DateTime(1),
+    createdDate: GlobalVariables.defaultDateTime,
+    updatedDate: GlobalVariables.defaultDateTime,
     frequency: 0,
     password: '',
-    recency: DateTime(1),
+    recency: GlobalVariables.defaultDateTime,
   );
 
   late int pageIdx;
@@ -141,7 +141,7 @@ class _SignupViewState extends State<SignupView> {
                 validator: passwordRegex,
                 onBackPressed: () => changePage(2),
                 title: "비밀번호를 입력해주세요",
-                errorMessage: "대/소문자, 특수문자, 숫자 하나씩 입력해주세요",
+                errorMessage: "대/소문자, 특수문자, 숫자를\n포함해서 입력해주세요",
               ),
             )
           else if (pageIdx == 4)
@@ -213,6 +213,8 @@ class _SignupViewState extends State<SignupView> {
           else if (pageIdx == 8)
             Expanded(
               child: SignPage5(
+                nickname: user.nickname,
+                email: user.email,
                 onPressed: ({
                   String? address,
                   DateTime? birthdate,
@@ -236,6 +238,8 @@ class _SignupViewState extends State<SignupView> {
           else if (pageIdx == 9)
             Expanded(
               child: SignPage6(
+                nickname: user.nickname,
+                email: user.email,
                 onPressed: ((value) {
                   user.sns = value;
                   changeUserWorker(user);
@@ -296,12 +300,16 @@ class _SignupViewState extends State<SignupView> {
         "password": userData.password,
         "phoneNumber": userData.phoneNumber,
         "profileImageLocation": userData.profileImageLocation,
-        "birthdate": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "birthdate": DateFormat("yyyy-MM-dd")
+            .format(GlobalVariables.defaultDateTime)
+            .toString(),
         "location": userData.location,
         "sex": userData.sex.name,
         "job": userData.job,
         "bloodType": userData.bloodType.name,
-        "recency": DateFormat("yyyy-MM-dd").format(DateTime(1)).toString(),
+        "recency": DateFormat("yyyy-MM-dd")
+            .format(GlobalVariables.defaultDateTime)
+            .toString(),
         "frequency": userData.frequency.toString(),
         "isDonated": userData.isDonated.toString(),
         "isDormant": userData.isDormant.toString(),
@@ -361,7 +369,7 @@ class _SignupViewState extends State<SignupView> {
       "profileImageLocation": userDto.profileImageLocation,
       "birthdate":
           DateFormat("yyyy-MM-dd").format(userDto.birthdate).toString(),
-      // "location": userDto.location,
+      "location": userDto.location,
       "sex": userDto.sex.name,
       "job": userDto.job,
       "bloodType": userDto.bloodType.name,
@@ -380,7 +388,7 @@ class _SignupViewState extends State<SignupView> {
             "snsProfile": i.snsProfile,
           },
         );
-        if (result['httpConnStatus'] != httpConnStatus.success) {
+        if (resultSns['httpConnStatus'] != httpConnStatus.success) {
           isSuccess = false;
         }
       }

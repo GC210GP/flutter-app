@@ -49,6 +49,7 @@ class _SignupPage2State extends State<SignupPage2> {
       pageOpacity = 1.0;
       setState(() {});
     });
+
     super.initState();
   }
 
@@ -71,7 +72,7 @@ class _SignupPage2State extends State<SignupPage2> {
       duration: const Duration(milliseconds: 100),
       child: Center(
         child: SizedBox(
-          width: 300.0,
+          width: 320.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -79,6 +80,7 @@ class _SignupPage2State extends State<SignupPage2> {
               Center(
                 child: Text(
                   widget.title,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: DDFontFamily.nanumSR,
                     fontWeight: DDFontWeight.extraBold,
@@ -92,6 +94,7 @@ class _SignupPage2State extends State<SignupPage2> {
                   ? Center(
                       child: Text(
                         widget.errorMessage,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,
                           fontWeight: DDFontWeight.extraBold,
@@ -123,13 +126,14 @@ class _SignupPage2State extends State<SignupPage2> {
                       onPressed: !isEmpty
                           ? () async {
                               // Regex 검사
+
                               if (widget.validator != null) {
                                 isCorrect = widget.validator!
                                     .hasMatch(inputValue.trim());
                               }
 
                               // 사용자 지정 correction check
-                              if (widget.correctionCheck != null) {
+                              if (isCorrect && widget.correctionCheck != null) {
                                 isCorrect = await widget
                                     .correctionCheck!(inputValue.trim());
                               }

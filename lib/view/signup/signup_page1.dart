@@ -63,6 +63,7 @@ class _SignupPage1State extends State<SignupPage1> {
             Center(
               child: Text(
                 widget.title,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: DDFontFamily.nanumSR,
                   fontWeight: DDFontWeight.extraBold,
