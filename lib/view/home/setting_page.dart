@@ -1,3 +1,4 @@
+import 'package:app/model/person.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/preference_manager.dart';
@@ -6,6 +7,7 @@ import 'package:app/util/toast.dart';
 import 'package:app/view/settting_text_view.dart';
 import 'package:app/view/signin_view.dart';
 import 'package:app/view/signup/signup.view.dart';
+import 'package:app/view/signup/signup_page5.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -59,40 +61,90 @@ class _SettingPageViewState extends State<SettingPageView> {
                     SettingListItem(
                       height: 100,
                       children: [
-                        Text(
-                          GlobalVariables.userDto != null
-                              ? GlobalVariables.userDto!.nickname
-                              : "\n로그인이 필요합니다.",
-                          style: TextStyle(
-                            fontFamily: "NanumSR",
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Colors.grey.shade900,
-                          ),
-                        ),
-                        Text(
-                          GlobalVariables.userDto != null
-                              ? GlobalVariables.userDto!.name
-                              : "",
-                          style: TextStyle(
-                            fontFamily: "NanumSR",
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Text(
-                          GlobalVariables.userDto != null
-                              ? GlobalVariables.userDto!.email
-                              : "",
-                          style: TextStyle(
-                            fontFamily: "NanumSR",
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                            color: Colors.grey.shade600,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    GlobalVariables.userDto != null
+                                        ? GlobalVariables.userDto!.nickname
+                                        : "\n로그인이 필요합니다.",
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 20,
+                                      color: Colors.grey.shade900,
+                                    ),
+                                  ),
+                                  Text(
+                                    GlobalVariables.userDto != null
+                                        ? GlobalVariables.userDto!.name
+                                        : "",
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                  Text(
+                                    GlobalVariables.userDto != null
+                                        ? GlobalVariables.userDto!.email
+                                        : "",
+                                    style: TextStyle(
+                                      fontFamily: "NanumSR",
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: Image.network(
+                                GlobalVariables.userDto!.profileImageLocation,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                          ],
                         ),
                       ],
+
+                      // TODO: User 정보 수정
+                      // onPressed: () => Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (_) => Scaffold(
+                      //       body: SignPage5(
+                      //         nickname: GlobalVariables.userDto!.nickname,
+                      //         email: GlobalVariables.userDto!.email,
+                      //         onPressed: ({
+                      //           String? address,
+                      //           DateTime? birthdate,
+                      //           BloodType? bloodType,
+                      //           bool? isDonated,
+                      //           String? job,
+                      //           Gender? sex,
+                      //         }) {
+                      //           GlobalVariables.userDto!.location = address!;
+                      //           GlobalVariables.userDto!.birthdate = birthdate!;
+                      //           GlobalVariables.userDto!.sex = sex!;
+                      //           GlobalVariables.userDto!.isDonated = isDonated!;
+                      //           GlobalVariables.userDto!.job = job!;
+                      //           GlobalVariables.userDto!.bloodType = bloodType!;
+                      //         },
+                      //         onBackPressed: () => Navigator.pop(context),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       onPressed: GlobalVariables.userDto != null
                           ? () {
                               showDialog(

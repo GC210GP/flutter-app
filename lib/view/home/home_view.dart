@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:app/view/community/user_board_view.dart';
 import 'package:app/view/home/community_page.dart';
 import 'package:app/view/home/message_page.dart';
 import 'package:app/view/home/setting_page.dart';
@@ -64,6 +65,12 @@ class _HomeViewState extends State<HomeView> {
               else if (pageIdx == 3)
                 const Expanded(child: CommunityPageView())
               else if (pageIdx == 4)
+                Expanded(
+                    child: UserBoardView(
+                  title: "나의 글",
+                  userDto: GlobalVariables.userDto,
+                ))
+              else if (pageIdx == 5)
                 const Expanded(child: SettingPageView()),
 
               ///

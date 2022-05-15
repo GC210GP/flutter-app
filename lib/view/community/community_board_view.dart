@@ -191,7 +191,62 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                             //   ),
                           ],
                         ),
-                        const SizedBox(height: 35.0),
+
+                        ///
+
+                        // 수혈자 / 헌혈자 상태표시줄
+
+                        // Container(
+                        //   margin: const EdgeInsets.fromLTRB(0, 15, 0, 25),
+                        //   padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                        //   decoration: BoxDecoration(
+                        //       color: DDColor.white,
+                        //       borderRadius: BorderRadius.circular(
+                        //         GlobalVariables.radius,
+                        //       ),
+                        //       boxShadow: [
+                        //         BoxShadow(
+                        //           color: Colors.black.withOpacity(0.1),
+                        //           offset: const Offset(0.0, 3.0),
+                        //           blurRadius: 5,
+                        //         )
+                        //       ]),
+                        //   child: Row(
+                        //     children: [
+                        //       Expanded(
+                        //         child: Center(
+                        //           child: Text(
+                        //             "수혈자 헌혈 여부: ${widget.postDto.isActiveGiver ? 'O' : 'X'}",
+                        //             style: TextStyle(
+                        //               fontFamily: DDFontFamily.nanumSR,
+                        //               fontWeight: DDFontWeight.bold,
+                        //               fontSize: DDFontSize.h5,
+                        //               color: DDColor.grey,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Expanded(
+                        //         child: Center(
+                        //           child: Text(
+                        //             "현혈자 수락: ${widget.postDto.isActiveReceiver ? 'O' : 'X'}",
+                        //             style: TextStyle(
+                        //               fontFamily: DDFontFamily.nanumSR,
+                        //               fontWeight: DDFontWeight.bold,
+                        //               fontSize: DDFontSize.h5,
+                        //               color: DDColor.grey,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+
+                        ///
+
+                        const SizedBox(height: 30),
+
                         Text(
                           postDto.content,
                           style: TextStyle(
