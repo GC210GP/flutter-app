@@ -18,6 +18,8 @@ class GlobalVariables {
 
   static BuildContext? currentContext;
 
+  static List<UserDto> suggestionList = [];
+
   // TODO: 바꾸기
   static String defaultImgUrl =
       "https://www.mein-maler.de/wp-content/uploads/2021/04/anonym.png";

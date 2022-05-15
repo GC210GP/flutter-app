@@ -1,3 +1,4 @@
+import 'package:app/model/person.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -129,6 +130,52 @@ class _SplashViewState extends State<SplashView> {
 
           if (userResult['httpConnStatus'] == httpConnStatus.success) {
             GlobalVariables.userDto = readUserDto(userResult);
+          }
+        }
+
+        // 사용자 추천 정보 수신
+        if (GlobalVariables.userDto != null) {
+          Map<String, dynamic> resLikes = await GlobalVariables.httpConn
+              .get(apiUrl: "/users/${GlobalVariables.userDto!.uid}/likes");
+
+          if (resLikes['httpConnStatus'] == httpConnStatus.success &&
+              resLikes['data']['likedInfo'].isNotEmpty) {
+            List<int> likes = [];
+
+            for (Map<String, dynamic> users in resLikes['data']['likedInfo']) {
+              likes.add(users['userTo']['id']);
+            }
+
+            Map<String, dynamic> resRecommends = await GlobalVariables.httpConn
+                .post(apiUrl: "/recommend", body: {
+              "userId": GlobalVariables.userDto!.uid,
+              "likedList": likes,
+            });
+
+            if (resRecommends['httpConnStatus'] == httpConnStatus.success) {
+              print(resRecommends);
+
+              // TODO: 추천기능 제작
+              GlobalVariables.suggestionList.add(UserDto(
+                uid: 2,
+                name: "ㅁㄴㅇㄹ",
+                nickname: "ㅁㄴㅇㄹ",
+                email: "ㅁㄴㅇㄹ",
+                sns: [],
+                phoneNumber: "ㅁㄴㅇㄹ",
+                profileImageLocation: "",
+                birthdate: GlobalVariables.defaultDateTime,
+                location: "asdf",
+                sex: Gender.MALE,
+                job: "asdf",
+                fbToken: "",
+                bloodType: BloodType.MINUS_A,
+                isDormant: false,
+                isDonated: false,
+                createdDate: GlobalVariables.defaultDateTime,
+                modifiedDate: GlobalVariables.defaultDateTime,
+              ));
+            }
           }
         }
 
