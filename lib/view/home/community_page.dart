@@ -334,19 +334,19 @@ class _CommunityPageViewState extends State<CommunityPageView> {
             associationId: i["associationId"] ?? -1,
             isActiveGiver: i["isActiveGiver"] ?? false,
             isActiveReceiver: i["isActiveReceiver"] ?? false,
-            createdDate:
-                DateTime.parse(i["createdDate"] ?? DateTime(1).toString()),
-            modifiedDate:
-                DateTime.parse(i["modifiedDate"] ?? DateTime(1).toString()),
+            createdDate: DateTime.parse(
+                i["createdDate"] ?? GlobalVariables.defaultDateTime.toString()),
+            modifiedDate: DateTime.parse(i["modifiedDate"] ??
+                GlobalVariables.defaultDateTime.toString()),
             userId: i['userId'],
             userNickname: i['userNickname'],
             // associationDto: AssociationDto(
             //   aid: associationRaw['id'],
             //   associationName: associationRaw['associationName'],
             //   createdDate: DateTime.parse(
-            //       associationRaw['createdDate'] ?? DateTime(1).toString()),
+            //       associationRaw['createdDate'] ?? GlobalVariables.defaultDateTime.toString()),
             //   modifiedDate: DateTime.parse(
-            //       associationRaw['modifiedDate'] ?? DateTime(1).toString()),
+            //       associationRaw['modifiedDate'] ?? GlobalVariables.defaultDateTime.toString()),
             //   uaid: -1, // TODO 참고
             // ),
           ),

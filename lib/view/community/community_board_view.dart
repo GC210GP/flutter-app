@@ -197,19 +197,19 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
         content: postRaw['content'] ?? "",
         isActiveGiver: postRaw['isActiveGiver'] ?? false,
         isActiveReceiver: postRaw['isActiveReceiver'] ?? false,
-        createdDate:
-            DateTime.parse(postRaw["createdDate"] ?? DateTime(1).toString()),
-        modifiedDate:
-            DateTime.parse(postRaw["modifiedDate"] ?? DateTime(1).toString()),
+        createdDate: DateTime.parse(postRaw["createdDate"] ??
+            GlobalVariables.defaultDateTime.toString()),
+        modifiedDate: DateTime.parse(postRaw["modifiedDate"] ??
+            GlobalVariables.defaultDateTime.toString()),
         userId: postRaw['userId'],
         userNickname: postRaw['userNickname'],
         associationDto: AssociationDto(
           aid: associationRaw['id'],
           associationName: associationRaw['associationName'],
-          createdDate: DateTime.parse(
-              associationRaw['createdDate'] ?? DateTime(1).toString()),
-          modifiedDate: DateTime.parse(
-              associationRaw['modifiedDate'] ?? DateTime(1).toString()),
+          createdDate: DateTime.parse(associationRaw['createdDate'] ??
+              GlobalVariables.defaultDateTime.toString()),
+          modifiedDate: DateTime.parse(associationRaw['modifiedDate'] ??
+              GlobalVariables.defaultDateTime.toString()),
           uaid: -1, // TODO 참고
         ),
       );
