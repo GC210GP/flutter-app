@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../widget/app_bar.dart';
 
-class UserProfileView extends StatefulWidget {
+class UserProfileView extends StatelessWidget {
   final String backLabel;
   final int toId;
   final ChatFrom? chatFrom;
@@ -16,21 +16,16 @@ class UserProfileView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<UserProfileView> createState() => _UserProfileViewState();
-}
-
-class _UserProfileViewState extends State<UserProfileView> {
-  @override
   Widget build(BuildContext context) => Scaffold(
         appBar: DDAppBar(
           context,
-          title: widget.backLabel,
+          title: backLabel,
         ),
         body: Padding(
           padding: const EdgeInsets.all(0.0),
           child: UserInformations(
-            toId: widget.toId,
-            chatFrom: widget.chatFrom,
+            toId: toId,
+            chatFrom: chatFrom,
           ),
         ),
       );
