@@ -215,6 +215,7 @@ class _SignupViewState extends State<SignupView> {
               child: SignPage5(
                 nickname: user.nickname,
                 email: user.email,
+                profileImageLocation: user.profileImageLocation,
                 onPressed: ({
                   String? address,
                   DateTime? birthdate,
@@ -240,6 +241,7 @@ class _SignupViewState extends State<SignupView> {
               child: SignPage6(
                 nickname: user.nickname,
                 email: user.email,
+                profileImageLocation: user.profileImageLocation,
                 onPressed: ((value) {
                   user.sns = value;
                   changeUserWorker(user);

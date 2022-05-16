@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 class SignPage5 extends StatefulWidget {
   final String nickname;
   final String email;
+  final String profileImageLocation;
 
   final Function({
     required BloodType bloodType,
@@ -28,6 +29,7 @@ class SignPage5 extends StatefulWidget {
     Key? key,
     required this.nickname,
     required this.email,
+    required this.profileImageLocation,
     this.onPressed,
     this.onBackPressed,
   }) : super(key: key);
@@ -83,7 +85,7 @@ class _SignPage5State extends State<SignPage5> {
                       child: ProfileItem(
                         nickname: widget.nickname,
                         email: widget.email,
-                        imgUrl: GlobalVariables.defaultImgUrl,
+                        imgUrl: widget.profileImageLocation,
                       ),
                     ),
 
