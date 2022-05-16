@@ -37,8 +37,7 @@ class _SignupPage3State extends State<SignupPage3> {
               await widget.onCheckValidation!(int.parse(_controller.text));
 
           if (!isCorrect) {
-            _controller.text = "";
-
+            _controller.clear();
             isTyped = false;
           }
 

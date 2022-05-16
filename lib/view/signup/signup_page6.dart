@@ -16,11 +16,13 @@ class SignPage6 extends StatefulWidget {
 
   final String nickname;
   final String email;
+  final String profileImageLocation;
 
   const SignPage6({
     Key? key,
     required this.nickname,
     required this.email,
+    required this.profileImageLocation,
     this.onPressed,
     this.onBackPressed,
   }) : super(key: key);
@@ -65,7 +67,7 @@ class _SignPage6State extends State<SignPage6> {
                       child: ProfileItem(
                         nickname: widget.nickname,
                         email: widget.email,
-                        imgUrl: GlobalVariables.defaultImgUrl,
+                        imgUrl: widget.profileImageLocation,
                       ),
                     ),
 

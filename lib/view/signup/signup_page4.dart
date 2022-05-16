@@ -254,7 +254,8 @@ class _SignPage4State extends State<SignPage4> {
       // Read a jpeg image from file.
       ip.Image? imageResize = ip.decodeImage(image.readAsBytesSync());
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-      ip.Image thumbnail = ip.copyResize(imageResize!, width: 120);
+      ip.Image thumbnail =
+          ip.copyResize(imageResize!, width: GlobalVariables.uploadImgWidth);
       // Save the thumbnail as a PNG.
 
       image.writeAsBytesSync(ip.encodeJpg(thumbnail));

@@ -1,6 +1,5 @@
 import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
-import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +20,8 @@ class GlobalVariables {
 
   static List<int> suggestionList = [];
   static List<LikeDto> likedList = [];
+
+  static int uploadImgWidth = 512;
 
   // TODO: 바꾸기
   static String defaultImgUrl =
