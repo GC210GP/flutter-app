@@ -108,7 +108,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                   ),
                                   const SizedBox(height: 3.0),
                                   SizedBox(
-                                    height: DDFontSize.h4,
+                                    height: DDFontSize.h3,
                                     child: CupertinoButton(
                                       padding: const EdgeInsets.all(0.0),
                                       alignment: Alignment.centerLeft,

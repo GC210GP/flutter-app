@@ -230,7 +230,7 @@ class _SettingPageViewState extends State<SettingPageView> {
                       title: "🏠  더블디 홈페이지",
                       margin: const EdgeInsets.only(bottom: 10.0),
                       onPressed: () => url.launch(
-                        "https://doky.space",
+                        "https://github.com/GC210GP",
                         forceSafariVC: false,
                       ),
                     ),

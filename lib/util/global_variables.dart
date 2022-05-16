@@ -37,7 +37,7 @@ class GlobalVariables {
   static HttpConn httpConn = HttpConn();
 
   static String emailQuery(String? name) =>
-      'subject=[더블디] ${name == null ? "" : name + '님 '}계정 및 기타문의&body=카테고리: [ 계정 | 장애 | 건의사항 | 기타 ]\n문의내용:&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr';
+      'subject=[더블디] ${name == null ? "" : name + '님 '}계정 및 기타문의&body=카테고리: [ 계정 | 장애 | 이용자 신고 | 건의사항 | 기타 ]\n문의내용:&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr';
   static String emailAccountQuery =
       'subject=[더블디] 계정 문의&body=카테고리: [ 계정 ]\n이름:\n가입 이메일:\n&cc=uhug@gachon.ac.kr, 2rhgywls@gachon.ac.kr, cyc0227@gachon.ac.kr';
 }
