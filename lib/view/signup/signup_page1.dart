@@ -89,7 +89,17 @@ class _SignupPage1State extends State<SignupPage1> {
                   controller: _controller,
                   padding: const EdgeInsets.all(20.0),
                   physics: const BouncingScrollPhysics(),
-                  children: [Text(widget.content)],
+                  children: [
+                    Text(
+                      widget.content,
+                      style: TextStyle(
+                        fontFamily: DDFontFamily.nanumSR,
+                        fontWeight: DDFontWeight.bold,
+                        fontSize: DDFontSize.h5,
+                        color: DDColor.fontColor,
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
