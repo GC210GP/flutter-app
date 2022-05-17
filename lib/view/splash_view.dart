@@ -1,6 +1,4 @@
 import 'package:app/model/like.dto.dart';
-import 'package:app/model/person.dto.dart';
-import 'package:app/util/chat/chat_data.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/network/http_conn.dart';
@@ -154,6 +152,10 @@ class _SplashViewState extends State<SplashView> {
               "userId": GlobalVariables.userDto!.uid,
               "likedList": likes,
             });
+
+            // GlobalVariables.suggestionList.add(1);
+            // GlobalVariables.suggestionList.add(99);
+            // GlobalVariables.suggestionList.add(92);
 
             // 추천 리스트 생성
             if (resRecommends['httpConnStatus'] == httpConnStatus.success) {
