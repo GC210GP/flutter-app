@@ -203,7 +203,7 @@ class CaroselItemLayout extends StatelessWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
             child: ShadowBox(child: child),
           ),
         ),
