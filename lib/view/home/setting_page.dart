@@ -2,6 +2,7 @@ import 'package:app/model/person.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/preference_manager.dart';
+import 'package:app/util/privacy_policies.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/toast.dart';
 import 'package:app/view/settting_text_view.dart';
@@ -182,9 +183,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SettingTextView(
+                        builder: (_) => const SettingTextView(
                           title: "이용약관",
-                          content: exampleText,
+                          content: PrivacyPolicies.policies,
                         ),
                       ),
                     ),
@@ -195,9 +196,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SettingTextView(
+                        builder: (_) => const SettingTextView(
                           title: "개인정보보호방침",
-                          content: exampleText,
+                          content: PrivacyPolicies.privacy,
                         ),
                       ),
                     ),
@@ -208,9 +209,9 @@ class _SettingPageViewState extends State<SettingPageView> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SettingTextView(
+                        builder: (_) => const SettingTextView(
                           title: "오픈소스 라이센스",
-                          content: exampleText,
+                          content: PrivacyPolicies.ossNotice,
                         ),
                       ),
                     ),

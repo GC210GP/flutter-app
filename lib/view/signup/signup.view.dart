@@ -2,6 +2,7 @@ import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/network/http_conn.dart';
+import 'package:app/util/privacy_policies.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/signup/signup_page1.dart';
@@ -100,7 +101,7 @@ class _SignupViewState extends State<SignupView> {
             Expanded(
               child: SignupPage1(
                 title: "이용약관",
-                content: exampleText,
+                content: PrivacyPolicies.policies,
                 buttonTitle: "이용약관 동의",
                 onPressed: () => changePage(1),
               ),
@@ -109,7 +110,7 @@ class _SignupViewState extends State<SignupView> {
             Expanded(
               child: SignupPage1(
                 title: "개인정보보호방침",
-                content: exampleText,
+                content: PrivacyPolicies.privacy,
                 buttonTitle: "개인정보보호방침 동의",
                 onPressed: () => changePage(2),
               ),

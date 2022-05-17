@@ -76,8 +76,8 @@ class _SettingTextViewState extends State<SettingTextView> {
                           widget.content,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.regular,
-                            fontSize: DDFontSize.h4,
+                            fontWeight: DDFontWeight.bold,
+                            fontSize: DDFontSize.h5,
                             color: DDColor.fontColor,
                           ),
                         ),
