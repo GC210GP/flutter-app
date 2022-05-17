@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/util/theme/colors.dart';
+import 'package:app/util/theme/font.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,20 +30,20 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.only(top: 20.0),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: DDColor.widgetBackgroud,
-        borderRadius: Platform.isIOS
-            ? const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              )
-            : null,
-        boxShadow: const [
+        // borderRadius: Platform.isIOS
+        //     ? const BorderRadius.only(
+        //         topLeft: Radius.circular(25),
+        //         topRight: Radius.circular(25),
+        //       )
+        //     : null,
+        boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.1),
-            offset: Offset(0, -3),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            offset: Offset(0, 5),
             spreadRadius: 0.0,
-            blurRadius: 7.0,
+            blurRadius: 20.0,
           )
         ],
       ),
@@ -148,9 +149,9 @@ class BottomIcon extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontFamily: "NanumSR",
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
+              fontFamily: DDFontFamily.nanumSR,
+              fontWeight: DDFontWeight.extraBold,
+              fontSize: DDFontSize.h6,
               color: index == currIndex ? DDColor.primary : DDColor.disabled,
             ),
           ),

@@ -193,13 +193,13 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
                     ),
                   ),
                   Positioned(
-                    top: 25,
-                    left: 70,
+                    top: 80,
+                    left: 85,
+                    height: 20,
+                    width: 80,
                     child: CupertinoButton(
-                      child: const SizedBox(
-                        width: 78,
-                        height: 15,
-                      ),
+                      padding: const EdgeInsets.all(0.0),
+                      child: const SizedBox(),
                       onPressed: () => url.launch(
                         "https://biss.bloodinfo.net/direct_donation_hos.jsp",
                         forceWebView: true,

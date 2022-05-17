@@ -76,7 +76,7 @@ class _HomeViewState extends State<HomeView> {
               ///
               /// Safe area for BottomNavigation
               if (MediaQuery.of(context).viewInsets.bottom <= 0.0)
-                SizedBox(height: Platform.isIOS ? 115 - 7 : 95 - 7),
+                SizedBox(height: Platform.isIOS ? 100 - 7 : 80 - 7),
             ],
           ),
 
@@ -84,7 +84,7 @@ class _HomeViewState extends State<HomeView> {
           /// BottomNavigation
           Positioned.fill(
             top: MediaQuery.of(context).size.height -
-                (Platform.isIOS ? 115 + 45 : 95 + 45),
+                (Platform.isIOS ? 100 + 45 : 80 + 45),
             child: CustomBottomNavigation(
               index: pageIdx,
               controller: controller,
