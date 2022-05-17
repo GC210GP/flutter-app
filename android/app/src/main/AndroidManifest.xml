@@ -31,7 +31,8 @@
     <application
         android:label="더블디"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher">
 
         <!-- https://stackoverflow.com/questions/45874742/android-color-notification-icon -->
         <meta-data
