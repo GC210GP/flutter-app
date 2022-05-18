@@ -38,6 +38,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.height);
     return Scaffold(
       backgroundColor: DDColor.background,
       appBar: AppBar(
@@ -76,7 +77,14 @@ class _HomeViewState extends State<HomeView> {
               ///
               /// Safe area for BottomNavigation
               if (MediaQuery.of(context).viewInsets.bottom <= 0.0)
-                SizedBox(height: Platform.isIOS ? 100 - 7 : 80 - 7),
+                SizedBox(
+                  height: Platform.isIOS &&
+                          MediaQuery.of(context).size.height /
+                                  MediaQuery.of(context).size.width >=
+                              1.8
+                      ? 100 - 7
+                      : 80 - 7,
+                ),
             ],
           ),
 
@@ -84,7 +92,14 @@ class _HomeViewState extends State<HomeView> {
           /// BottomNavigation
           Positioned.fill(
             top: MediaQuery.of(context).size.height -
-                (Platform.isIOS ? 100 + 45 : 80 + 45),
+                (Platform.isIOS &&
+                        MediaQuery.of(context).size.height /
+                                MediaQuery.of(context).size.width >=
+                            1.8
+                    ? 100 + 45
+                    : Platform.isAndroid
+                        ? 80 + 45
+                        : 60 + 45),
             child: CustomBottomNavigation(
               index: pageIdx,
               controller: controller,
