@@ -40,10 +40,10 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
         //     : null,
         boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.1),
             offset: Offset(0, 5),
             spreadRadius: 0.0,
-            blurRadius: 20.0,
+            blurRadius: 15.0,
           )
         ],
       ),

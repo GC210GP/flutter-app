@@ -287,7 +287,13 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                               ),
                             ),
                   ),
-                  const SizedBox(height: 75),
+                  SizedBox(
+                    height: (MediaQuery.of(context).size.height /
+                                MediaQuery.of(context).size.width >=
+                            1.8)
+                        ? 50.0
+                        : 30.0,
+                  ),
                 ],
               ),
             ),

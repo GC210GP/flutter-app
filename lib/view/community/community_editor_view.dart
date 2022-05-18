@@ -233,7 +233,13 @@ class _CommunityEditorViewState extends State<CommunityEditorView> {
                     focusNodeContent.unfocus();
                   }),
             if (!focusNodeContent.hasFocus && !focusNodeTitle.hasFocus)
-              const SizedBox(height: 50.0)
+              SizedBox(
+                height: (MediaQuery.of(context).size.height /
+                            MediaQuery.of(context).size.width >=
+                        1.8)
+                    ? 50.0
+                    : 30.0,
+              )
             else
               const SizedBox(height: 10.0)
           ],

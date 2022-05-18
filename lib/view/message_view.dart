@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app/model/fcm.dto.dart';
 import 'package:app/util/chat/chat_data.dart';
@@ -188,7 +189,14 @@ class _MessageViewState extends State<MessageView> {
             ),
           ),
           Container(
-            height: focusNode.hasFocus ? 55 : 90,
+            height: focusNode.hasFocus
+                ? 60
+                : Platform.isIOS &&
+                        MediaQuery.of(context).size.height /
+                                MediaQuery.of(context).size.width >=
+                            1.8
+                    ? 98
+                    : 85,
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
