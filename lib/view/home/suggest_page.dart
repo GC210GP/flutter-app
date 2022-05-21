@@ -5,6 +5,7 @@ import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/view/message_view.dart';
+import 'package:app/view/splash_view.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/user_informations.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -105,12 +106,12 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
     } else if (GlobalVariables.suggestionList.isNotEmpty) {
       ///
 
-      for (int targetUserId in GlobalVariables.suggestionList) {
+      for (SuggestionItem targetUserId in GlobalVariables.suggestionList) {
         // 사용자 포스트 중 활성개수 수집
         int activeNum = 0;
 
         Map<String, dynamic> resultPosts = await GlobalVariables.httpConn
-            .get(apiUrl: "/posts/users/$targetUserId");
+            .get(apiUrl: "/posts/users/${targetUserId.idx}");
 
         if (resultPosts['httpConnStatus'] == httpConnStatus.success) {
           for (Map<String, dynamic> post in resultPosts['data']) {
@@ -124,13 +125,19 @@ class _SuggestionPageViewState extends State<SuggestionPageView> {
           caroselList.add(
             CaroselItemLayout(
               child: UserInformations(
-                toId: targetUserId,
+                toId: targetUserId.idx,
+                distance: targetUserId.distance,
                 padding: const EdgeInsets.all(20.0),
                 chatFrom: ChatFrom.suggestion,
               ),
             ),
           );
         }
+      }
+
+      //  TODO: 20개가 넘어가는 리스트는 버림
+      if (caroselList.length > 20) {
+        caroselList = caroselList.sublist(0, 20);
       }
 
       // 추천 이후 안내 페이지

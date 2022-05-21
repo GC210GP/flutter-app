@@ -16,7 +16,6 @@ import 'package:app/widget/input_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url;
-import 'package:http/http.dart' as http;
 
 class MessageView extends StatefulWidget {
   const MessageView({
@@ -51,6 +50,9 @@ class _MessageViewState extends State<MessageView> {
   String toToken = "";
   String toImgSrc = GlobalVariables.defaultImgUrl;
 
+  bool isChatDone = false;
+  bool isReceiver = false;
+
   @override
   void initState() {
     super.initState();
@@ -58,7 +60,13 @@ class _MessageViewState extends State<MessageView> {
     fireChatService = FireChatService(onChanged: (data) async {
       chatBubbles.clear();
 
-      for (ChatMessage i in data) {
+      // 내가 연락을 받는 경우 -> 완료버튼 활성!
+      if (data.metadata.member[1] == GlobalVariables.userDto!.uid) {
+        isReceiver = true;
+      }
+      isChatDone = data.metadata.isDone;
+
+      for (ChatMessage i in data.content) {
         chatBubbles.add(
           ChatBubble(
             msg: i.msg,
@@ -124,34 +132,35 @@ class _MessageViewState extends State<MessageView> {
         context,
         title: toName,
         actions: [
-          CupertinoButton(
-            borderRadius: BorderRadius.circular(30),
-            padding: const EdgeInsets.all(0.0),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => UserProfileView(
-                  backLabel: "메시지",
-                  toId: widget.toId,
+          if (!isReceiver)
+            CupertinoButton(
+              borderRadius: BorderRadius.circular(30),
+              padding: const EdgeInsets.all(0.0),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UserProfileView(
+                    backLabel: "메시지",
+                    toId: widget.toId,
+                  ),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Image.network(
+                  toImgSrc,
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Image.network(
-                toImgSrc,
-                width: 30,
-                height: 30,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           Center(
             child: DDButton(
-              label: "헌혈방법",
+              label: "도움말",
               height: 30,
-              width: 80,
-              margin: const EdgeInsets.only(right: 20.0),
+              width: 65,
+              margin: EdgeInsets.only(right: isReceiver ? 5.0 : 20.0),
               fontColor: DDColor.white,
               color: DDColor.grey,
               fontWeight: DDFontWeight.bold,
@@ -162,6 +171,20 @@ class _MessageViewState extends State<MessageView> {
               ),
             ),
           ),
+          if (GlobalVariables.userDto != null && isReceiver)
+            Center(
+              child: DDButton(
+                label: !isChatDone ? "완료" : "취소",
+                height: 30,
+                width: 50,
+                margin: const EdgeInsets.only(right: 20.0),
+                fontColor: DDColor.white,
+                color: !isChatDone ? DDColor.primary : DDColor.disabled,
+                fontWeight: DDFontWeight.bold,
+                fontSize: DDFontSize.h4,
+                onPressed: () => fireChatService.changeIsDone(),
+              ),
+            ),
         ],
       ),
       body: Column(
@@ -174,16 +197,46 @@ class _MessageViewState extends State<MessageView> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Column(
+              child: Stack(
                 children: [
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      physics: const BouncingScrollPhysics(),
-                      controller: scrollController,
-                      children: [...chatBubbles],
-                    ),
+                  Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          physics: const BouncingScrollPhysics(),
+                          controller: scrollController,
+                          children: [...chatBubbles],
+                        ),
+                      ),
+                    ],
                   ),
+                  if (!isReceiver && isChatDone)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 30,
+                      child: Center(
+                        child: Container(
+                          child: const Text(
+                            "상대방이 '헌혈완료' 버튼을 눌렀습니다!\n소중한 마음 감사합니다 😊",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: DDFontFamily.nanumSR,
+                              fontWeight: DDFontWeight.bold,
+                              fontSize: DDFontSize.h4,
+                              color: DDColor.white,
+                            ),
+                          ),
+                          padding:
+                              const EdgeInsets.fromLTRB(12.0, 5.0, 12.0, 5.0),
+                          decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(
+                                  GlobalVariables.radius)),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

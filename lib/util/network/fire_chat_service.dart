@@ -11,7 +11,7 @@ class FireChatService {
 
   late final FireControl _fireControl;
 
-  final void Function(List<ChatMessage>)? onChanged;
+  final void Function(ChatData)? onChanged;
   StreamSubscription<DocumentSnapshot<Object?>>? listener;
 
   FireChatService({
@@ -25,7 +25,7 @@ class FireChatService {
 
   void streamListener(DocumentSnapshot<Object?> event) {
     _chatdata = ChatData(event.data().toString());
-    if (onChanged != null) onChanged!(_chatdata.content);
+    if (onChanged != null) onChanged!(_chatdata);
   }
 
   ///
@@ -94,6 +94,15 @@ class FireChatService {
         msg: message,
       ),
     );
+    _document.update(_chatdata.toFireStore());
+  }
+
+  ///
+  ///
+  ///
+
+  changeIsDone() {
+    _chatdata.metadata.isDone = !_chatdata.metadata.isDone;
     _document.update(_chatdata.toFireStore());
   }
 }

@@ -100,7 +100,7 @@ class _SignPage6State extends State<SignPage6> {
                     const SizedBox(height: 10.0),
                     Center(
                       child: Text(
-                        "SNS 계정을 등록하시면 헌혈자를\n더 빠르게 구할 수 있어요!",
+                        "SNS 계정을 등록해주세요!",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: DDFontFamily.nanumSR,

@@ -77,9 +77,9 @@ class ChatMetadata {
   });
 
   final List<int> member;
-  final bool isDone;
   final ChatFrom chatFrom;
   final int suggestionIdx;
+  bool isDone;
 
   @override
   String toString() {

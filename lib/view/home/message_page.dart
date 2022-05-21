@@ -181,15 +181,23 @@ class _MessagePageViewState extends State<MessagePageView> {
 
       FireChatService fireChatService =
           FireChatService(onChanged: (data) async {
-        if (data.isEmpty) return;
+        if (data.content.isEmpty) return;
 
-        lastChat = data.last.msg;
-        lastChatTime = data.last.timestamp;
-        isRecent = data.last.senderId != GlobalVariables.userDto!.uid;
+        bool isChatDoneTmp = false;
+        // 내가 연락을 받는 경우 -> 완료버튼 활성!
+        // if (data.metadata.member[1] == GlobalVariables.userDto!.uid) {
+        //   isReceiver = true;
+        // }
+        isChatDoneTmp = data.metadata.isDone;
+
+        lastChat = data.content.last.msg;
+        lastChatTime = data.content.last.timestamp;
+        isRecent = data.content.last.senderId != GlobalVariables.userDto!.uid;
 
         chatroomItemDtos.add(ChatroomItemDto(
           chatroomId: "${list[0]}=${list[1]}",
           userNickname: userNickname,
+          isChatDone: isChatDoneTmp,
           lastChat: lastChat,
           lastChatTime: lastChatTime,
           isRecent: isRecent,
@@ -215,6 +223,8 @@ class _MessagePageViewState extends State<MessagePageView> {
 
     // 채팅방 정렬
     chatroomItemDtos.sort(((a, b) => b.lastChatTime.compareTo(a.lastChatTime)));
+    chatroomItemDtos
+        .sort(((a, b) => (a.isChatDone ? 1 : 0) - (b.isChatDone ? 1 : 0)));
 
     ///
     ///
@@ -235,6 +245,7 @@ class _MessagePageViewState extends State<MessagePageView> {
           imgSrc: result['data']['profileImageLocation'],
           name: item.userNickname,
           lastMsg: item.lastChat,
+          isChatDone: item.isChatDone,
           lastMsgTime: item.lastChatTime,
           isRecent: item.isRecent,
           toId: item.toId,
@@ -265,10 +276,12 @@ class ChatroomItemDto {
   String lastChat;
   DateTime lastChatTime;
   bool isRecent;
+  bool isChatDone;
   String chatroomId;
   ChatroomItemDto({
     required this.chatroomId,
     required this.lastChatTime,
+    required this.isChatDone,
     this.userNickname = "알 수 없음",
     this.lastChat = "알 수 없음",
     this.isRecent = false,
@@ -281,6 +294,7 @@ class ChatroomItem extends StatelessWidget {
   final String name;
   final int toId;
   final String lastMsg;
+  final bool isChatDone;
   final VoidCallback? onPressed;
   final bool isRecent;
   final DateTime lastMsgTime;
@@ -291,6 +305,7 @@ class ChatroomItem extends StatelessWidget {
     required this.name,
     required this.lastMsgTime,
     required this.toId,
+    required this.isChatDone,
     this.lastMsg = "",
     this.onPressed,
     this.isRecent = false,
@@ -298,124 +313,139 @@ class ChatroomItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: const EdgeInsets.all(0),
-      onPressed: onPressed,
-      child: Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: DDColor.widgetBackgroud,
-          border: Border(
-            bottom: BorderSide(
-              color: DDColor.background,
-            ),
-          ),
-        ),
-        child: CupertinoButton(
-          padding: const EdgeInsets.all(.0),
+    return Stack(
+      children: [
+        CupertinoButton(
+          padding: const EdgeInsets.all(0),
           onPressed: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: CupertinoButton(
-                    borderRadius: BorderRadius.circular(50),
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => UserProfileView(
-                          backLabel: "메시지",
-                          toId: toId,
+          child: Container(
+            height: 80,
+            decoration: const BoxDecoration(
+              color: DDColor.widgetBackgroud,
+              border: Border(
+                bottom: BorderSide(
+                  color: DDColor.background,
+                ),
+              ),
+            ),
+            child: CupertinoButton(
+              padding: const EdgeInsets.all(.0),
+              onPressed: onPressed,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: CupertinoButton(
+                        borderRadius: BorderRadius.circular(50),
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UserProfileView(
+                              backLabel: "메시지",
+                              toId: toId,
+                            ),
+                          ),
+                        ),
+                        child: Image.network(
+                          imgSrc,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    child: Image.network(
-                      imgSrc,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 15.0),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
+                    const SizedBox(width: 15.0),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(
-                            child: Text(
-                              name,
-                              style: TextStyle(
-                                fontFamily: DDFontFamily.nanumSR,
-                                fontWeight: DDFontWeight.bold,
-                                fontSize: DDFontSize.h4,
-                                color: DDColor.fontColor,
-                              ),
-                            ),
-                          ),
-                          if (isRecent)
-                            Container(
-                              margin: const EdgeInsets.only(right: 5.0),
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: DDColor.primary,
-                                borderRadius: BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 2.0,
-                                    offset: const Offset(.0, 1.0),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h4,
+                                    color: DDColor.fontColor,
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                              if (isRecent)
+                                Container(
+                                  margin: const EdgeInsets.only(right: 5.0),
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: DDColor.primary,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 2.0,
+                                        offset: const Offset(.0, 1.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  lastMsg.length > 30
+                                      ? lastMsg.substring(0, 30) + "..."
+                                      : lastMsg,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h5,
+                                    color: DDColor.grey,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(right: 5.0),
+                                child: Text(
+                                  TimePrint.format(lastMsgTime),
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h6,
+                                    color: DDColor.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              lastMsg.length > 30
-                                  ? lastMsg.substring(0, 30) + "..."
-                                  : lastMsg,
-                              style: TextStyle(
-                                fontFamily: DDFontFamily.nanumSR,
-                                fontWeight: DDFontWeight.bold,
-                                fontSize: DDFontSize.h5,
-                                color: DDColor.grey,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(right: 5.0),
-                            child: Text(
-                              TimePrint.format(lastMsgTime),
-                              style: TextStyle(
-                                fontFamily: DDFontFamily.nanumSR,
-                                fontWeight: DDFontWeight.bold,
-                                fontSize: DDFontSize.h6,
-                                color: DDColor.grey,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        // 채팅 완료 시, 가림
+        if (isChatDone)
+          Positioned.fill(
+              child: Container(
+            color: Colors.white.withOpacity(0.7),
+            child: CupertinoButton(
+              padding: const EdgeInsets.all(0.0),
+              child: const SizedBox(),
+              onPressed: onPressed,
+            ),
+          )),
+      ],
     );
   }
 }
