@@ -148,7 +148,7 @@ class _MessageViewState extends State<MessageView> {
           ),
           Center(
             child: DDButton(
-              label: "헌혈방법",
+              label: "도움말",
               height: 30,
               width: 80,
               margin: const EdgeInsets.only(right: 20.0),

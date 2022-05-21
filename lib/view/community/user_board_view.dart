@@ -195,7 +195,7 @@ class _UserBoardViewState extends State<UserBoardView> {
                                   height: 100,
                                   alignment: Alignment.bottomCenter,
                                   child: Text(
-                                    "헌혈 요청글이 없습니다.",
+                                    "요청글이 없습니다.",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: DDFontFamily.nanumSR,
