@@ -1,6 +1,7 @@
 import 'package:app/model/like.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/util/network/http_conn.dart';
+import 'package:app/view/splash_view.dart';
 import 'package:flutter/material.dart';
 
 class GlobalVariables {
@@ -18,7 +19,8 @@ class GlobalVariables {
 
   static BuildContext? currentContext;
 
-  static List<int> suggestionList = [];
+  static List<SuggestionItem> suggestionList = [];
+
   static List<LikeDto> likedList = [];
 
   static int uploadImgWidth = 512;

@@ -153,16 +153,26 @@ class _SplashViewState extends State<SplashView> {
               "likedList": likes,
             });
 
-            // GlobalVariables.suggestionList.add(1);
-            // GlobalVariables.suggestionList.add(99);
-            // GlobalVariables.suggestionList.add(92);
-
             // 추천 리스트 생성
             if (resRecommends['httpConnStatus'] == httpConnStatus.success) {
-              for (String targ in resRecommends['result']) {
-                GlobalVariables.suggestionList.add(int.parse(targ));
+              for (int i = 0; i < resRecommends['result'].length; i++) {
+                double dist = 1.0 - resRecommends['weight'][i];
+
+                dist = dist > 1
+                    ? 1
+                    : dist < 0
+                        ? 0
+                        : dist;
+
+                GlobalVariables.suggestionList.add(SuggestionItem(
+                  idx: resRecommends['result'][i],
+                  distance: dist,
+                ));
               }
             }
+
+            GlobalVariables.suggestionList
+                .sort(((a, b) => ((b.distance - a.distance) * 10000).toInt()));
           }
         }
 
@@ -181,5 +191,19 @@ class _SplashViewState extends State<SplashView> {
       });
       await Future.delayed(Duration(milliseconds: animationDuration));
     }
+  }
+}
+
+class SuggestionItem {
+  int idx;
+  double distance;
+  SuggestionItem({
+    required this.idx,
+    required this.distance,
+  });
+
+  @override
+  String toString() {
+    return "{idx: $idx, distance: $distance}";
   }
 }

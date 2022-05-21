@@ -16,11 +16,13 @@ import 'package:url_launcher/url_launcher.dart' as url;
 
 class UserInformations extends StatefulWidget {
   final int toId;
+  final double? distance;
   final EdgeInsets padding;
   final ChatFrom? chatFrom;
   const UserInformations({
     Key? key,
     required this.toId,
+    this.distance,
     this.chatFrom,
     this.padding = const EdgeInsets.fromLTRB(20, 0, 20, 0),
   }) : super(key: key);
@@ -109,6 +111,8 @@ class _UserInformationsState extends State<UserInformations> {
 
             // Label 정보 업데이트
             detailedInfo = [
+              if (widget.distance != null)
+                ["추천도", "${((widget.distance!) * 1000).toInt() / 10} ℃"],
               ["혈액형", bloodTypeLabel[toUser.bloodType] ?? "unknown"],
               ["위치", toUser.location],
               ["직업", toUser.job],
