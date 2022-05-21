@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 class ChatData {
   late ChatMetadata metadata;
@@ -76,13 +77,13 @@ class ChatMetadata {
   });
 
   final List<int> member;
-  final bool isDone;
   final ChatFrom chatFrom;
   final int suggestionIdx;
+  bool isDone;
 
   @override
   String toString() {
-    print("""
+    debugPrint("""
     {
       member: $member,
       isDone: $isDone,
@@ -107,7 +108,7 @@ class ChatMessage {
 
   @override
   String toString() {
-    print("""
+    debugPrint("""
     {
       senderId: $senderId,
       timestamp: $timestamp,

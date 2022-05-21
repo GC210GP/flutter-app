@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart' as fs;
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_storage/firebase_storage.dart' as fbs;
-// import 'package:firebase_auth/firebase_auth.dart' as fa;
+import 'package:flutter/material.dart';
 
 class FireControl {
   // Make singleton instance
@@ -43,7 +41,7 @@ class FireControl {
     try {
       _collection = fs.FirebaseFirestore.instance.collection(collectionName);
     } catch (e) {
-      print("Error to init. $e");
+      debugPrint("Error to init. $e");
       isInit = false;
       return false;
     }
@@ -65,7 +63,7 @@ class FireControl {
 
       return true;
     } catch (e) {
-      print("Failed to add: $e");
+      debugPrint("Failed to add: $e");
       return false;
     }
   }
@@ -84,7 +82,7 @@ class FireControl {
       });
       return true;
     } catch (e) {
-      print("Failed to delete: $e");
+      debugPrint("Failed to delete: $e");
       return false;
     }
   }
@@ -107,12 +105,12 @@ class FireControl {
       _doc =
           fs.FirebaseFirestore.instance.collection(collectionName).doc(docName);
       fs.DocumentSnapshot result = await _doc.get();
-      // print(result.data());
+      // debugPrint(result.data());
       dynamic resultJson = jsonDecode(result.data().toString());
 
       return Future.value(resultJson);
     } catch (e) {
-      print("Failed to get doc: $e");
+      debugPrint("Failed to get doc: $e");
       return null;
     }
   }
@@ -128,7 +126,7 @@ class FireControl {
       await _doc.delete();
       return true;
     } catch (e) {
-      print("Failed to delete doc: $e");
+      debugPrint("Failed to delete doc: $e");
       return false;
     }
   }

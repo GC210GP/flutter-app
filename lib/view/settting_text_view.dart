@@ -1,11 +1,7 @@
 import 'package:app/util/theme/colors.dart';
-import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
 import 'package:app/widget/app_bar.dart';
-import 'package:app/widget/button.dart';
 import 'package:flutter/material.dart';
-
-import 'message_view.dart';
 
 class SettingTextView extends StatefulWidget {
   final String title;
@@ -80,8 +76,8 @@ class _SettingTextViewState extends State<SettingTextView> {
                           widget.content,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.regular,
-                            fontSize: DDFontSize.h4,
+                            fontWeight: DDFontWeight.bold,
+                            fontSize: DDFontSize.h5,
                             color: DDColor.fontColor,
                           ),
                         ),

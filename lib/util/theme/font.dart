@@ -15,24 +15,8 @@ class DDFontSize {
   static const double h4 = 15;
   static const double h5 = 13.5;
   static const double h6 = 12;
+  static const double msgtime = 10;
 }
-
-// 12
-// 13
-// 13.5
-
-// 14
-// 15
-// 16
-
-// 20
-// 22
-// 23
-
-// 24
-// 30
-
-// 45
 
 class DDFontWeight {
   static const light = FontWeight.w300;

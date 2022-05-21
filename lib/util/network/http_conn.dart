@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:app/model/fcm.dto.dart';
 import 'package:app/model/person.dto.dart';
 import 'package:app/model/token.dto.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/secret.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:jwt_decode/jwt_decode.dart';
@@ -30,6 +33,8 @@ class HttpConn {
     required String apiUrl,
     Map<String, dynamic>? queryString,
   }) async {
+    debugPrint(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString));
+
     http.Response response = await http.get(
       Uri.parse(GlobalVariables.baseurl + apiUrl + queryBuilder(queryString)),
       headers: _headers,
@@ -44,7 +49,7 @@ class HttpConn {
   Future<Map<String, dynamic>> post({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.post(
@@ -58,11 +63,27 @@ class HttpConn {
   ///
   ///
   ///
+  /// POST
+  Future<Map<String, dynamic>> fbPost({
+    required FcmDto sendData,
+  }) async {
+    var _body = convert.json.encode(Secret.buildFbBody(sendData));
+    http.Response response = await http.post(
+      Uri.parse(Secret.fbBaseUrl),
+      headers: Secret.fbHeader,
+      body: _body,
+    );
+    return resultBuilder(response);
+  }
+
+  ///
+  ///
+  ///
   /// DELETE
   Future<Map<String, dynamic>> delete({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.delete(
@@ -80,7 +101,7 @@ class HttpConn {
   Future<Map<String, dynamic>> patch({
     required String apiUrl,
     Map<String, String>? queryString,
-    Map<String, String>? body,
+    Map<String, dynamic>? body,
   }) async {
     var _body = convert.json.encode(body);
     http.Response response = await http.patch(
@@ -191,9 +212,9 @@ class HttpConn {
 
       int userIdx = int.parse(payload['sub']);
       DateTime exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
-      Auth auth = Auth.UNKNOWN;
+      Auth auth = Auth.ROLE_NEED_EMAIL;
       for (Auth i in Auth.values) {
-        if (i.toString() == payload['auth']) auth = i;
+        if (i.toString() == ("Auth." + payload['auth'])) auth = i;
       }
 
       _headers[HttpHeaders.authorizationHeader] = "Bearer " + result["token"];
@@ -208,14 +229,19 @@ class HttpConn {
     return null;
   }
 
+  void setHeaderToken(String token) {
+    _headers[HttpHeaders.authorizationHeader] = "Bearer " + token;
+  }
+
   ///
   ///
   ///
   /// 결과를 Map 형태로 리턴
   Map<String, dynamic> resultBuilder(http.Response response) {
-    Map<String, dynamic> result = convert.jsonDecode(response.body);
-
-    result = convert.jsonDecode(response.body);
+    Map<String, dynamic> result = {};
+    if (convert.utf8.decode(response.bodyBytes).isNotEmpty) {
+      result = convert.jsonDecode(convert.utf8.decode(response.bodyBytes));
+    }
 
     if (response.statusCode < 400) {
       result["httpConnStatus"] = httpConnStatus.success;
@@ -244,9 +270,10 @@ class HttpConn {
       query = "?";
       List<String> keys = queryString.keys.toList();
       List<dynamic> values = queryString.values.toList();
-      for (int i = 0; i < keys.length; i++) {
-        query += keys[i] + "=" + values[i].toString();
+      for (int i = 0; i < keys.length - 1; i++) {
+        query += keys[i] + "=" + values[i].toString() + "&";
       }
+      query += keys[keys.length - 1] + "=" + values[keys.length - 1].toString();
     }
     return query;
   }

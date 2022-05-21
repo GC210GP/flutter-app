@@ -1,8 +1,13 @@
+import 'package:app/util/chat/chat_data.dart';
+import 'package:app/util/network/fire_chat_service.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/network/fire_control.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/time_print.dart';
 import 'package:app/view/message_view.dart';
+import 'package:app/view/user_profile_view.dart';
 import 'package:app/widget/page_title_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +59,7 @@ class _MessagePageViewState extends State<MessagePageView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const PageTitleWidget(title: "메시지"),
+                    const DDPageTitleWidget(title: "메시지"),
                     Expanded(
                       child: chatroomList.isNotEmpty
                           ? ClipRRect(
@@ -93,10 +98,10 @@ class _MessagePageViewState extends State<MessagePageView> {
                                     "\n대화가 없습니다\n[홈]이나 [커뮤니티] 탭에서 대화를 시작해보세요\n\n\n\n",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontFamily: "NanumSR",
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 15,
-                                      color: Colors.grey.shade500,
+                                      fontFamily: DDFontFamily.nanumSR,
+                                      fontWeight: DDFontWeight.extraBold,
+                                      fontSize: DDFontSize.h4,
+                                      color: DDColor.grey,
                                     ),
                                   ),
                                 ],
@@ -133,120 +138,314 @@ class _MessagePageViewState extends State<MessagePageView> {
   Future<void> listLoader() async {
     var value = await _fireControl.getDocList();
 
+    setState(() {
+      chatroomList.clear();
+      isListLoaded = false;
+    });
+
+    // 로그인 안되어있을 시,
+    if (GlobalVariables.userDto == null) return;
+
+    List<List<String>> targetChatroomLists = [];
+    List<ChatroomItemDto> chatroomItemDtos = [];
+
+    int totalCount = 0;
+    int doneCount = 0;
+
     for (String i in value) {
       List<String> list = i.split("=");
-      if (list.contains(GlobalVariables.userIdx.toString())) {
-        int toId = -1;
-
-        if (list[0] == GlobalVariables.userIdx.toString()) {
-          toId = int.parse(list[1]);
-        } else {
-          toId = int.parse(list[0]);
-        }
-
-        chatroomList.add(
-          ChatroomItem(
-            imgSrc:
-                "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-            name: toId.toString(),
-            lastMsg:
-                GlobalVariables.userIdx.toString() + "->" + toId.toString(),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MessageView(
-                  chatroomId: i,
-                  fromId: GlobalVariables.userIdx,
-                  toId: toId,
-                  toName: toId.toString(),
-                ),
-              ),
-            ),
-          ),
-        );
+      if (list.contains(GlobalVariables.userDto!.uid.toString())) {
+        targetChatroomLists.add(list);
+        totalCount++;
       }
     }
+
+    for (List<String> list in targetChatroomLists) {
+      int toId = -1;
+      String userNickname = "알 수 없음";
+      String lastChat = "알 수 없음";
+      DateTime lastChatTime = GlobalVariables.defaultDateTime;
+      bool isRecent = false;
+
+      if (list[0] == GlobalVariables.userDto!.uid.toString()) {
+        toId = int.parse(list[1]);
+      } else {
+        toId = int.parse(list[0]);
+      }
+
+      ///
+      ///
+      ///
+      ///
+      ///
+
+      FireChatService fireChatService =
+          FireChatService(onChanged: (data) async {
+        if (data.content.isEmpty) return;
+
+        bool isChatDoneTmp = false;
+        // 내가 연락을 받는 경우 -> 완료버튼 활성!
+        // if (data.metadata.member[1] == GlobalVariables.userDto!.uid) {
+        //   isReceiver = true;
+        // }
+        isChatDoneTmp = data.metadata.isDone;
+
+        lastChat = data.content.last.msg;
+        lastChatTime = data.content.last.timestamp;
+        isRecent = data.content.last.senderId != GlobalVariables.userDto!.uid;
+
+        chatroomItemDtos.add(ChatroomItemDto(
+          chatroomId: "${list[0]}=${list[1]}",
+          userNickname: userNickname,
+          isChatDone: isChatDoneTmp,
+          lastChat: lastChat,
+          lastChatTime: lastChatTime,
+          isRecent: isRecent,
+          toId: toId,
+        ));
+
+        doneCount++;
+      });
+
+      await fireChatService.initChatroom(
+        fromId: GlobalVariables.userDto!.uid,
+        toId: toId,
+      );
+    }
+
+    int timeoutCount = 0;
+    while (true) {
+      if (doneCount >= totalCount) break;
+      if (timeoutCount >= 5000) break; // 시간초과
+      await Future.delayed(const Duration(milliseconds: 100));
+      timeoutCount += 100;
+    }
+
+    // 채팅방 정렬
+    chatroomItemDtos.sort(((a, b) => b.lastChatTime.compareTo(a.lastChatTime)));
+    chatroomItemDtos
+        .sort(((a, b) => (a.isChatDone ? 1 : 0) - (b.isChatDone ? 1 : 0)));
+
+    ///
+    ///
+    ///
+
+    for (ChatroomItemDto item in chatroomItemDtos) {
+      Map<String, dynamic> result =
+          await GlobalVariables.httpConn.get(apiUrl: "/users", queryString: {
+        "userId": item.toId,
+      });
+
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        item.userNickname = result['data']['nickname'];
+      }
+
+      chatroomList.add(
+        ChatroomItem(
+          imgSrc: result['data']['profileImageLocation'],
+          name: item.userNickname,
+          lastMsg: item.lastChat,
+          isChatDone: item.isChatDone,
+          lastMsgTime: item.lastChatTime,
+          isRecent: item.isRecent,
+          toId: item.toId,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MessageView(
+                fromId: GlobalVariables.userDto!.uid,
+                toId: item.toId,
+              ),
+            ),
+          ).then(
+            (value) => listLoader(),
+          ),
+        ),
+      );
+    }
+
+    setState(() {
+      isListLoaded = true;
+    });
   }
+}
+
+class ChatroomItemDto {
+  int toId;
+  String userNickname;
+  String lastChat;
+  DateTime lastChatTime;
+  bool isRecent;
+  bool isChatDone;
+  String chatroomId;
+  ChatroomItemDto({
+    required this.chatroomId,
+    required this.lastChatTime,
+    required this.isChatDone,
+    this.userNickname = "알 수 없음",
+    this.lastChat = "알 수 없음",
+    this.isRecent = false,
+    this.toId = -1,
+  });
 }
 
 class ChatroomItem extends StatelessWidget {
   final String imgSrc;
   final String name;
+  final int toId;
   final String lastMsg;
+  final bool isChatDone;
   final VoidCallback? onPressed;
+  final bool isRecent;
+  final DateTime lastMsgTime;
 
   const ChatroomItem({
     Key? key,
     required this.imgSrc,
     required this.name,
+    required this.lastMsgTime,
+    required this.toId,
+    required this.isChatDone,
     this.lastMsg = "",
     this.onPressed,
+    this.isRecent = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: const EdgeInsets.all(0),
-      onPressed: onPressed,
-      child: Container(
-        height: 80,
-        decoration: const BoxDecoration(
-          color: DDColor.widgetBackgroud,
-          border: Border(
-            bottom: BorderSide(
-              color: DDColor.background,
-            ),
-          ),
-        ),
-        child: CupertinoButton(
-          padding: const EdgeInsets.all(.0),
+    return Stack(
+      children: [
+        CupertinoButton(
+          padding: const EdgeInsets.all(0),
           onPressed: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    imgSrc,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
+          child: Container(
+            height: 80,
+            decoration: const BoxDecoration(
+              color: DDColor.widgetBackgroud,
+              border: Border(
+                bottom: BorderSide(
+                  color: DDColor.background,
                 ),
-                const SizedBox(width: 15.0),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        name,
-                        style: TextStyle(
-                          fontFamily: DDFontFamily.nanumSR,
-                          fontWeight: DDFontWeight.bold,
-                          fontSize: DDFontSize.h4,
-                          color: DDColor.fontColor,
+              ),
+            ),
+            child: CupertinoButton(
+              padding: const EdgeInsets.all(.0),
+              onPressed: onPressed,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: CupertinoButton(
+                        borderRadius: BorderRadius.circular(50),
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UserProfileView(
+                              backLabel: "메시지",
+                              toId: toId,
+                            ),
+                          ),
+                        ),
+                        child: Image.network(
+                          imgSrc,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        lastMsg,
-                        style: TextStyle(
-                          fontFamily: DDFontFamily.nanumSR,
-                          fontWeight: DDFontWeight.bold,
-                          fontSize: DDFontSize.h5,
-                          color: DDColor.grey,
-                        ),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h4,
+                                    color: DDColor.fontColor,
+                                  ),
+                                ),
+                              ),
+                              if (isRecent)
+                                Container(
+                                  margin: const EdgeInsets.only(right: 5.0),
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: DDColor.primary,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 2.0,
+                                        offset: const Offset(.0, 1.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  lastMsg.length > 30
+                                      ? lastMsg.substring(0, 30) + "..."
+                                      : lastMsg,
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h5,
+                                    color: DDColor.grey,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(right: 5.0),
+                                child: Text(
+                                  TimePrint.format(lastMsgTime),
+                                  style: TextStyle(
+                                    fontFamily: DDFontFamily.nanumSR,
+                                    fontWeight: DDFontWeight.bold,
+                                    fontSize: DDFontSize.h6,
+                                    color: DDColor.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        // 채팅 완료 시, 가림
+        if (isChatDone)
+          Positioned.fill(
+              child: Container(
+            color: Colors.white.withOpacity(0.7),
+            child: CupertinoButton(
+              padding: const EdgeInsets.all(0.0),
+              child: const SizedBox(),
+              onPressed: onPressed,
+            ),
+          )),
+      ],
     );
   }
 }

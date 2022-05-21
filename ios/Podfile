@@ -27,11 +27,20 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
+# https://stackoverflow.com/questions/52398521/flutter-ios-build-failure-error-with-multiple-commands-after-the-xcode-upgrade
+pod 'GoogleUtilities'
+
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
+
+# Notification Image
+target 'ImageNotification' do
+  use_frameworks!
+  pod 'Firebase/Messaging'
 end
 
 post_install do |installer|

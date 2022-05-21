@@ -1,7 +1,12 @@
+import 'package:app/model/association.dto.dart';
+import 'package:app/model/post.dto.dart';
 import 'package:app/util/global_variables.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/util/toast.dart';
 import 'package:app/view/community/community_board_view.dart';
+import 'package:app/view/community/community_editor_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:app/widget/community_item.dart';
@@ -10,7 +15,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CommunityView extends StatefulWidget {
-  const CommunityView({Key? key}) : super(key: key);
+  final AssociationDto associationDto;
+  final bool isStarred;
+
+  const CommunityView({
+    Key? key,
+    required this.associationDto,
+    this.isStarred = false,
+  }) : super(key: key);
 
   @override
   _CommunityViewState createState() => _CommunityViewState();
@@ -19,14 +31,25 @@ class CommunityView extends StatefulWidget {
 class _CommunityViewState extends State<CommunityView> {
   final ScrollController _controller = ScrollController();
   bool isTop = true;
-  bool isStarred = false;
+
+  List<PostDto> posts = [];
+  late bool isStarred;
+
+  bool isStarredWorking = false;
 
   @override
   void initState() {
+    isStarred = widget.isStarred;
+
     _controller.addListener(() {
       isTop = _controller.offset <= 10.0;
       setState(() {});
     });
+
+    getCommunityBoards(widget.associationDto.aid, 0).then((value) {
+      setState(() {});
+    });
+
     super.initState();
   }
 
@@ -60,9 +83,10 @@ class _CommunityViewState extends State<CommunityView> {
                     children: [
                       Row(
                         children: [
-                          const PageTitleWidget(
-                            title: "#성남시",
-                            margin: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                          DDPageTitleWidget(
+                            title: widget.associationDto.associationName,
+                            margin:
+                                const EdgeInsets.only(top: 15.0, bottom: 15.0),
                           ),
                           Container(
                             margin:
@@ -76,11 +100,22 @@ class _CommunityViewState extends State<CommunityView> {
                                     : DDColor.disabled,
                                 size: 20.0,
                               ),
-                              onPressed: () {},
+                              onPressed: () => isStarred
+                                  ? removeCommunityStar(
+                                      widget.associationDto.uaid,
+                                    )
+                                  : addCommunityStar(
+                                      widget.associationDto.aid,
+                                    ),
                             ),
                           ),
                         ],
                       ),
+
+                      ///
+                      ///
+                      ///
+
                       Positioned(
                         top: .0,
                         bottom: .0,
@@ -110,7 +145,37 @@ class _CommunityViewState extends State<CommunityView> {
                             color: DDColor.grey.withOpacity(0.5),
                             height: 35.0,
                             width: 85,
-                            onPressed: () => {},
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityEditorView(
+                                  isModify: false,
+                                  post: PostDto(
+                                    pid: -1,
+                                    title: "",
+                                    content: "",
+                                    associationId: widget.associationDto.aid,
+                                    isActiveGiver: false,
+                                    isActiveReceiver: false,
+                                    createdDate:
+                                        GlobalVariables.defaultDateTime,
+                                    modifiedDate:
+                                        GlobalVariables.defaultDateTime,
+                                    userId: GlobalVariables.userDto!.uid,
+                                    userNickname:
+                                        GlobalVariables.userDto!.nickname,
+                                  ),
+                                ),
+                              ),
+                            ).then(
+                              (value) => getCommunityBoards(
+                                      widget.associationDto.aid, 0)
+                                  .then(
+                                (value) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -121,17 +186,43 @@ class _CommunityViewState extends State<CommunityView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        CommunityBoardItem(
-                            author: "성남주민", title: "성남병원 지정헌혈 부탁드립니다.."),
-                        CommunityBoardItem(
-                            author: "분당주민", title: "지금 제생병원에 있습니다. 정말 급합니다!"),
-                        CommunityBoardItem(
-                            author: "이매주민", title: "서울대병원 지정헌혈 부탁드립니다.."),
-                        CommunityBoardItem(
-                            author: "위례주민", title: "분당제생병원 지정헌혈 부탁드립니다.."),
-                        for (int i = 0; i < 20; i++)
-                          CommunityBoardItem(
-                              author: "정자주민", title: "저희 가족을 도와주세요"),
+                        if (posts.isNotEmpty)
+                          for (PostDto i in posts)
+                            CommunityBoardItem(
+                              author: i.userNickname,
+                              title: i.title.length >= 10
+                                  ? i.title.substring(0, 10)
+                                  : i.title,
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CommunityBoardView(
+                                    postDto: i,
+                                  ),
+                                ),
+                              ).then(
+                                (value) => getCommunityBoards(
+                                        widget.associationDto.aid, 0)
+                                    .then((value) {
+                                  setState(() {});
+                                }),
+                              ),
+                            )
+                        else
+                          Container(
+                            height: 100,
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                              "글이 없습니다.\n새 글을 작성해보세요!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: DDFontFamily.nanumSR,
+                                fontWeight: DDFontWeight.extraBold,
+                                fontSize: DDFontSize.h4,
+                                color: DDColor.grey,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -144,43 +235,94 @@ class _CommunityViewState extends State<CommunityView> {
     );
   }
 
-  Widget item({required String author, required String title}) => Container(
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.shade100,
-            ),
+  ///
+  ///
+  ///
+  ///
+  ///
+
+  Future<List<String>> getCommunityBoards(int aid, int pageNum) async {
+    posts.clear();
+
+    Map<String, dynamic> result =
+        await GlobalVariables.httpConn.get(apiUrl: "/posts", queryString: {
+      "associationId": aid,
+      "page": pageNum,
+      // "size": 20,
+      "sort": "modifiedDate,desc",
+    });
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      // aid = result['data']['associationId'];
+      List<dynamic> postRaws = result['data']['postResponseDto']['content'];
+
+      for (var i in postRaws) {
+        posts.add(
+          PostDto(
+            pid: i["id"],
+            title: i["title"] ?? "",
+            content: i["content"] ?? "",
+            associationId: i["associationId"] ?? -1,
+            isActiveGiver: i["isActiveGiver"] ?? false,
+            isActiveReceiver: i["isActiveReceiver"] ?? false,
+            createdDate: DateTime.parse(
+                i["createdDate"] ?? GlobalVariables.defaultDateTime.toString()),
+            modifiedDate: DateTime.parse(i["modifiedDate"] ??
+                GlobalVariables.defaultDateTime.toString()),
+            userId: i['userId'],
+            userNickname: i['userNickname'],
+            // associationDto: AssociationDto(
+            //   aid: associationRaw['id'],
+            //   associationName: associationRaw['associationName'],
+            //   createdDate: DateTime.parse(
+            //       associationRaw['createdDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   modifiedDate: DateTime.parse(
+            //       associationRaw['modifiedDate'] ?? GlobalVariables.defaultDateTime.toString()),
+            //   uaid: -1, // TODO 참고
+            // ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                author,
-                style: TextStyle(
-                  fontFamily: "NanumSR",
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: "NanumSR",
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                  color: Colors.grey.shade900,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+        );
+      }
+    }
+
+    return [];
+  }
+
+  removeCommunityStar(int uaid) async {
+    if (!isStarredWorking) {
+      isStarredWorking = true;
+
+      // TODO: 추가할 때는 uid를 모름
+      if (uaid == -1) {
+        return;
+      }
+
+      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+          .delete(apiUrl: "/user-associations/$uaid");
+
+      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        DDToast.showToast("즐겨찾기에서 삭제되었어요");
+        setState(() {
+          isStarred = false;
+        });
+      }
+      isStarredWorking = false;
+    }
+  }
+
+  addCommunityStar(int aid) async {
+    if (!isStarredWorking) {
+      isStarredWorking = true;
+      Map<String, dynamic> resultAssociation = await GlobalVariables.httpConn
+          .post(apiUrl: "/user-associations", body: {"associationId": "$aid"});
+
+      if (resultAssociation['httpConnStatus'] == httpConnStatus.success) {
+        DDToast.showToast("즐겨찾기에 추가되었어요 🎉");
+        setState(() {
+          isStarred = true;
+        });
+      }
+      isStarredWorking = false;
+    }
+  }
 }

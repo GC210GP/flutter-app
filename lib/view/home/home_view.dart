@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/colors.dart';
+import 'package:app/view/community/user_board_view.dart';
 import 'package:app/view/home/community_page.dart';
 import 'package:app/view/home/message_page.dart';
 import 'package:app/view/home/setting_page.dart';
@@ -10,20 +12,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  final int? index;
+
+  const HomeView({
+    Key? key,
+    this.index,
+  }) : super(key: key);
 
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  int pageIdx = 1;
+  late int pageIdx;
 
   CustomButtomNavigationController controller =
       CustomButtomNavigationController();
 
   @override
+  void initState() {
+    pageIdx = widget.index ?? 1;
+    GlobalVariables.currentContext = context;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.height);
     return Scaffold(
       backgroundColor: DDColor.background,
       appBar: AppBar(
@@ -51,12 +66,25 @@ class _HomeViewState extends State<HomeView> {
               else if (pageIdx == 3)
                 const Expanded(child: CommunityPageView())
               else if (pageIdx == 4)
+                Expanded(
+                    child: UserBoardView(
+                  title: "나의 글",
+                  userDto: GlobalVariables.userDto,
+                ))
+              else if (pageIdx == 5)
                 const Expanded(child: SettingPageView()),
 
               ///
               /// Safe area for BottomNavigation
               if (MediaQuery.of(context).viewInsets.bottom <= 0.0)
-                SizedBox(height: Platform.isIOS ? 115 - 7 : 95 - 7),
+                SizedBox(
+                  height: Platform.isIOS &&
+                          MediaQuery.of(context).size.height /
+                                  MediaQuery.of(context).size.width >=
+                              1.8
+                      ? 100 - 7
+                      : 80 - 7,
+                ),
             ],
           ),
 
@@ -64,7 +92,14 @@ class _HomeViewState extends State<HomeView> {
           /// BottomNavigation
           Positioned.fill(
             top: MediaQuery.of(context).size.height -
-                (Platform.isIOS ? 115 + 45 : 95 + 45),
+                (Platform.isIOS &&
+                        MediaQuery.of(context).size.height /
+                                MediaQuery.of(context).size.width >=
+                            1.8
+                    ? 100 + 45
+                    : Platform.isAndroid
+                        ? 80 + 45
+                        : 60 + 45),
             child: CustomBottomNavigation(
               index: pageIdx,
               controller: controller,

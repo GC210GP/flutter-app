@@ -1,14 +1,28 @@
+import 'package:app/model/association.dto.dart';
+import 'package:app/model/post.dto.dart';
+import 'package:app/util/chat/chat_data.dart';
+import 'package:app/util/network/http_conn.dart';
 import 'package:app/util/theme/colors.dart';
 import 'package:app/util/global_variables.dart';
 import 'package:app/util/theme/font.dart';
+import 'package:app/view/community/community_editor_view.dart';
+import 'package:app/view/user_profile_view.dart';
 import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../message_view.dart';
 
 class CommunityBoardView extends StatefulWidget {
-  const CommunityBoardView({Key? key}) : super(key: key);
+  final PostDto postDto;
+  final ChatFrom? chatFrom;
+
+  const CommunityBoardView({
+    Key? key,
+    required this.postDto,
+    this.chatFrom,
+  }) : super(key: key);
 
   @override
   _CommunityBoardViewState createState() => _CommunityBoardViewState();
@@ -18,12 +32,29 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
   final ScrollController _controller = ScrollController();
   bool isTop = true;
 
+  late PostDto postDto;
+  String toImgSrc = GlobalVariables.defaultImgUrl;
+
   @override
   void initState() {
+    postDto = widget.postDto;
+
     _controller.addListener(() {
       isTop = _controller.offset <= 10.0;
       setState(() {});
     });
+
+    GlobalVariables.httpConn.get(
+      apiUrl: "/users",
+      queryString: {"userId": widget.postDto.userId},
+    ).then((result) {
+      if (result['httpConnStatus'] == httpConnStatus.success) {
+        toImgSrc = result['data']['profileImageLocation'] ??
+            GlobalVariables.defaultImgUrl;
+        setState(() {});
+      }
+    });
+
     super.initState();
   }
 
@@ -58,29 +89,166 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                       padding: const EdgeInsets.only(bottom: 50.0),
                       physics: const BouncingScrollPhysics(),
                       children: [
-                        SizedBox(height: 10.0),
-                        Text(
-                          "제 친구가 많이 아파요..ㅠ",
-                          style: TextStyle(
-                            fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.extraBold,
-                            fontSize: DDFontSize.h3,
-                            color: DDColor.fontColor,
-                          ),
+                        const SizedBox(height: 10.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    postDto.title,
+                                    style: TextStyle(
+                                      fontFamily: DDFontFamily.nanumSR,
+                                      fontWeight: DDFontWeight.extraBold,
+                                      fontSize: DDFontSize.h3,
+                                      color: DDColor.fontColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3.0),
+                                  SizedBox(
+                                    height: DDFontSize.h3,
+                                    child: CupertinoButton(
+                                      padding: const EdgeInsets.all(0.0),
+                                      alignment: Alignment.centerLeft,
+                                      onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => UserProfileView(
+                                            backLabel: "커뮤니티",
+                                            toId: postDto.userId,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        postDto.associationDto == null
+                                            ? postDto.userNickname
+                                            : "${postDto.userNickname}  (#${postDto.associationDto!.associationName})",
+                                        style: TextStyle(
+                                          fontFamily: DDFontFamily.nanumSR,
+                                          fontWeight: DDFontWeight.extraBold,
+                                          fontSize: DDFontSize.h4,
+                                          color: DDColor.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            CupertinoButton(
+                              borderRadius: BorderRadius.circular(35),
+                              padding: const EdgeInsets.all(0.0),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => UserProfileView(
+                                    backLabel: "메시지",
+                                    toId: postDto.userId,
+                                  ),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(35),
+                                child: Image.network(
+                                  toImgSrc,
+                                  width: 35,
+                                  height: 35,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+
+                            // 글 수정 버튼
+                            // if (postDto.userId == GlobalVariables.userDto!.uid)
+                            //   Expanded(
+                            //     child: Container(
+                            //       alignment: Alignment.centerRight,
+                            //       child: DDButton(
+                            //         width: 35,
+                            //         height: 35,
+                            //         child: const Icon(
+                            //           Icons.edit_rounded,
+                            //           size: 20,
+                            //         ),
+                            //         color: DDColor.grey,
+                            //         onPressed: () => Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //             builder: (_) => CommunityEditorView(
+                            //               post: widget.postDto,
+                            //             ),
+                            //           ),
+                            //         ).then((_) async {
+                            //           postDto =
+                            //               (await getPost(widget.postDto.pid))!;
+                            //           setState(() {});
+                            //         }),
+                            //       ),
+                            //     ),
+                            //   ),
+                          ],
                         ),
-                        SizedBox(height: 3),
+
+                        ///
+
+                        // 수혈자 / 헌혈자 상태표시줄
+
+                        // Container(
+                        //   margin: const EdgeInsets.fromLTRB(0, 15, 0, 25),
+                        //   padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                        //   decoration: BoxDecoration(
+                        //       color: DDColor.white,
+                        //       borderRadius: BorderRadius.circular(
+                        //         GlobalVariables.radius,
+                        //       ),
+                        //       boxShadow: [
+                        //         BoxShadow(
+                        //           color: Colors.black.withOpacity(0.1),
+                        //           offset: const Offset(0.0, 3.0),
+                        //           blurRadius: 5,
+                        //         )
+                        //       ]),
+                        //   child: Row(
+                        //     children: [
+                        //       Expanded(
+                        //         child: Center(
+                        //           child: Text(
+                        //             "수혈자 헌혈 여부: ${widget.postDto.isActiveGiver ? 'O' : 'X'}",
+                        //             style: TextStyle(
+                        //               fontFamily: DDFontFamily.nanumSR,
+                        //               fontWeight: DDFontWeight.bold,
+                        //               fontSize: DDFontSize.h5,
+                        //               color: DDColor.grey,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Expanded(
+                        //         child: Center(
+                        //           child: Text(
+                        //             "현혈자 수락: ${widget.postDto.isActiveReceiver ? 'O' : 'X'}",
+                        //             style: TextStyle(
+                        //               fontFamily: DDFontFamily.nanumSR,
+                        //               fontWeight: DDFontWeight.bold,
+                        //               fontSize: DDFontSize.h5,
+                        //               color: DDColor.grey,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+
+                        ///
+
+                        const SizedBox(height: 30),
+
                         Text(
-                          "테평주민",
-                          style: TextStyle(
-                            fontFamily: DDFontFamily.nanumSR,
-                            fontWeight: DDFontWeight.extraBold,
-                            fontSize: DDFontSize.h4,
-                            color: DDColor.grey,
-                          ),
-                        ),
-                        SizedBox(height: 35),
-                        Text(
-                          "안녕하세요.. 지금 태평에 살고 있는데 친구가 서울대병원에 입원중입니다. \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n친구가 혈액암으로 투병중인데 요즘 코로나라 헌혈을 받기가 너무 힘들다고 하네요.. \n\n혹시 현혈이 가능하시다면 연락바랍니다!",
+                          postDto.content,
                           style: TextStyle(
                             fontFamily: DDFontFamily.nanumSR,
                             fontWeight: DDFontWeight.extraBold,
@@ -92,19 +260,40 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                     ),
                   ),
                   DDButton(
-                    label: "도와주기",
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MessageView(
-                          fromId: GlobalVariables.userIdx,
-                          toId: 4,
-                          toName: "태평주민",
-                        ),
-                      ),
-                    ),
+                    label: (postDto.userId == GlobalVariables.userDto!.uid)
+                        ? "글 수정하기"
+                        : "대화 시작하기",
+                    onPressed: (postDto.userId == GlobalVariables.userDto!.uid)
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CommunityEditorView(
+                                  isModify: true,
+                                  post: widget.postDto,
+                                ),
+                              ),
+                            ).then((_) async {
+                              postDto = (await getPost(widget.postDto.pid))!;
+                              setState(() {});
+                            })
+                        : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MessageView(
+                                  chatFrom: widget.chatFrom,
+                                  fromId: GlobalVariables.userDto!.uid,
+                                  toId: postDto.userId,
+                                ),
+                              ),
+                            ),
                   ),
-                  SizedBox(height: 75),
+                  SizedBox(
+                    height: (MediaQuery.of(context).size.height /
+                                MediaQuery.of(context).size.width >=
+                            1.8)
+                        ? 50.0
+                        : 30.0,
+                  ),
                 ],
               ),
             ),
@@ -112,5 +301,42 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
         ],
       ),
     );
+  }
+
+  Future<PostDto?> getPost(int pid) async {
+    Map<String, dynamic> result = await GlobalVariables.httpConn.get(
+      apiUrl: "/posts/$pid",
+    );
+
+    Map<String, dynamic> associationRaw =
+        result['data']['associationResponseDto'];
+    Map<String, dynamic> postRaw = result['data']['postResponseDto'];
+
+    if (result['httpConnStatus'] == httpConnStatus.success) {
+      return PostDto(
+        pid: postRaw['id'],
+        title: postRaw['title'] ?? "",
+        associationId: postRaw["associationId"] ?? -1,
+        content: postRaw['content'] ?? "",
+        isActiveGiver: postRaw['isActiveGiver'] ?? false,
+        isActiveReceiver: postRaw['isActiveReceiver'] ?? false,
+        createdDate: DateTime.parse(postRaw["createdDate"] ??
+            GlobalVariables.defaultDateTime.toString()),
+        modifiedDate: DateTime.parse(postRaw["modifiedDate"] ??
+            GlobalVariables.defaultDateTime.toString()),
+        userId: postRaw['userId'],
+        userNickname: postRaw['userNickname'],
+        associationDto: AssociationDto(
+          aid: associationRaw['id'],
+          associationName: associationRaw['associationName'],
+          createdDate: DateTime.parse(associationRaw['createdDate'] ??
+              GlobalVariables.defaultDateTime.toString()),
+          modifiedDate: DateTime.parse(associationRaw['modifiedDate'] ??
+              GlobalVariables.defaultDateTime.toString()),
+          uaid: -1, // TODO 참고
+        ),
+      );
+    }
+    return null;
   }
 }

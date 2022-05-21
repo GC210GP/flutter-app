@@ -1,11 +1,13 @@
+import 'package:app/util/noti/fcm_service.dart';
 import 'package:app/view/home/home_view.dart';
 import 'package:app/view/signin_view.dart';
 import 'package:app/view/signup/signup.view.dart';
-import 'package:app/view/spash_view.dart';
+import 'package:app/view/splash_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
+  FcmService.startBackgroundListener();
 }
 
 class MyApp extends StatelessWidget {

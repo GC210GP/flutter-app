@@ -7,11 +7,13 @@ class CommunityBoardItem extends StatelessWidget {
   final String title;
   final Color? fontColor;
   final VoidCallback? onPressed;
+  final String? associationName;
 
   const CommunityBoardItem({
     Key? key,
     required this.author,
     required this.title,
+    this.associationName,
     this.fontColor,
     this.onPressed,
   }) : super(key: key);
@@ -38,7 +40,7 @@ class CommunityBoardItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                author,
+                associationName != null ? associationName! : author,
                 style: TextStyle(
                   fontFamily: DDFontFamily.nanumSR,
                   fontWeight: DDFontWeight.bold,
