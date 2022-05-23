@@ -157,17 +157,53 @@ class _MessageViewState extends State<MessageView> {
             ),
           Center(
             child: DDButton(
-              label: "도움말",
+              child: const Icon(
+                CupertinoIcons.question_circle,
+                size: 20,
+              ),
               height: 30,
-              width: 65,
+              width: 30,
               margin: EdgeInsets.only(right: isReceiver ? 5.0 : 20.0),
               fontColor: DDColor.white,
               color: DDColor.grey,
               fontWeight: DDFontWeight.bold,
               fontSize: DDFontSize.h4,
-              onPressed: () => url.launch(
-                "https://biss.bloodinfo.net/direct_donation_hos.jsp",
-                forceWebView: true,
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => CupertinoAlertDialog(
+                  title: const Text("도움이 필요하신가요?"),
+                  content: const Text("메뉴를 선택해주세요"),
+                  actions: [
+                    CupertinoButton(
+                      child: Text(
+                        "지정헌혈 관련 안내사항",
+                        style: TextStyle(color: DDColor.primary),
+                      ),
+                      onPressed: () => url.launch(
+                        "https://biss.bloodinfo.net/direct_donation_hos.jsp",
+                        forceWebView: true,
+                      ),
+                    ),
+                    CupertinoButton(
+                      child: Text(
+                        "사용자 신고",
+                        style: TextStyle(color: DDColor.primary),
+                      ),
+                      onPressed: () => url.launch(
+                        Uri(
+                          scheme: 'mailto',
+                          path: 'doubld@gmail.com',
+                          query: GlobalVariables.emailQuery(
+                              GlobalVariables.userDto!.name),
+                        ).toString(),
+                      ),
+                    ),
+                    CupertinoButton(
+                      child: const Text("아니오"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -11,7 +11,7 @@ import 'package:app/widget/app_bar.dart';
 import 'package:app/widget/button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:url_launcher/url_launcher.dart' as url;
 import '../message_view.dart';
 
 class CommunityBoardView extends StatefulWidget {
@@ -68,7 +68,61 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DDColor.background,
-      appBar: DDAppBar(context, title: "뒤로"),
+      appBar: DDAppBar(context, title: "뒤로", actions: [
+        Center(
+          child: DDButton(
+            child: Icon(
+              CupertinoIcons.question_circle,
+              size: 25,
+              color: DDColor.grey,
+            ),
+            height: 30,
+            width: 30,
+            margin: const EdgeInsets.only(right: 25.0),
+            fontColor: DDColor.white,
+            color: DDColor.background,
+            fontWeight: DDFontWeight.bold,
+            fontSize: DDFontSize.h4,
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => CupertinoAlertDialog(
+                title: const Text("도움이 필요하신가요?"),
+                content: const Text("메뉴를 선택해주세요"),
+                actions: [
+                  CupertinoButton(
+                    child: Text(
+                      "지정헌혈 관련 안내사항",
+                      style: TextStyle(color: DDColor.primary),
+                    ),
+                    onPressed: () => url.launch(
+                      "https://biss.bloodinfo.net/direct_donation_hos.jsp",
+                      forceWebView: true,
+                    ),
+                  ),
+                  CupertinoButton(
+                    child: Text(
+                      "사용자 신고",
+                      style: TextStyle(color: DDColor.primary),
+                    ),
+                    onPressed: () => url.launch(
+                      Uri(
+                        scheme: 'mailto',
+                        path: 'doubld@gmail.com',
+                        query: GlobalVariables.emailQuery(
+                            GlobalVariables.userDto!.name),
+                      ).toString(),
+                    ),
+                  ),
+                  CupertinoButton(
+                    child: const Text("아니오"),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ]),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -139,7 +193,7 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                             ),
 
                             CupertinoButton(
-                              borderRadius: BorderRadius.circular(35),
+                              borderRadius: BorderRadius.circular(45),
                               padding: const EdgeInsets.all(0.0),
                               onPressed: () => Navigator.push(
                                 context,
@@ -151,11 +205,11 @@ class _CommunityBoardViewState extends State<CommunityBoardView> {
                                 ),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(35),
+                                borderRadius: BorderRadius.circular(45),
                                 child: Image.network(
                                   toImgSrc,
-                                  width: 35,
-                                  height: 35,
+                                  width: 45,
+                                  height: 45,
                                   fit: BoxFit.cover,
                                 ),
                               ),
